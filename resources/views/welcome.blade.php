@@ -17,14 +17,14 @@
         @laravelPWA
     </head>
     <body>
-        
+
         {{-- Iniciamos el For para mostrar la informacion de la empresa --}}
         <div id="app" class="py-4">
             @include('navegacion')
-            <main>  
+            <main>
                 {{-- seccion del carousel --}}
                 <section class="carousel slide cid-ru615axhXJ" data-interval="false" id="slider2-x" style="background-image: linear-gradient(to right top, #4c73b1, #577dbb, #6286c5, #6d90cf, #789ad9, #71a2df, #6aaae3, #64b2e7, #4eb8e2, #42bdd8, #45c1cc, #55c4bd);
-                        background-repeat: no-repeat; background-attachment: fixed;">    
+                        background-repeat: no-repeat; background-attachment: fixed;">
                     @if ($errors->has('sugerencia'))
                         <div class="container">
                             <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -33,7 +33,7 @@
                                 <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                        </div>                        
+                        </div>
                     @endif
                     @if(Session::has('success'))
                         <div class="container">
@@ -49,9 +49,9 @@
                         <div class="content-slider-wrap">
                             <div>
                                 <div class="mbr-slider slide carousel" data-pause="true" data-keyboard="false" data-ride="carousel" data-interval="3000">
-                                    
+
                                     <div class="carousel-inner" role="listbox">
-                                        @foreach ($imagenes as $item)    
+                                        @foreach ($imagenes as $item)
                                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                                             <img src="img/carousel/{{$item->url_imagen}}" class="card-img-top img-responsive" alt="img/carousel/{{$item->url_imagen}}" >
                                         </div>
@@ -86,11 +86,11 @@
                             </div>
                         </div>
                     </div>
-                </section>  
+                </section>
                 {{-- seccion de los servicios --}}
                 <section class="services3 cid-ru624clkax mbr-parallax-background" id="services3-y" style="z-index: 0; background-image: url('img/carousel/facebook_imagen.jpg'); position: relative;">
                     <!---->
-                    
+
                     <!---->
                     <!--Overlay-->
                     <div class="mbr-overlay" style="opacity: 0.5; background-color: rgb(206, 191, 175);">
@@ -111,7 +111,7 @@
                                         <div class="top-line pb-1">
                                             <h4 class="card-title mbr-fonts-style display-5">
                                                 <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45"> {{$item->nombre_servicio}}
-                                            </h4>   
+                                            </h4>
                                             <p class="mbr-text card-title cost mbr-fonts-style m-0 display-4"></p>
                                         </div>
                                         <div class="bottom-line">
@@ -121,12 +121,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>  
-                            @endforeach                          
+                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </section>
-                
+
                 <section class="mbr-section form1 cid-ru64LmyPnK mbr-parallax-background" id="form1-12" style="z-index: 0; background-image: url('img/carousel/_LCP1445-min.JPG'); position: relative;">
                     <div class="mbr-overlay" style="opacity: 0.9; background-color: rgb(193, 193, 193);">
                     </div>
@@ -163,7 +163,7 @@
                     </div>
                 </section>
                 <section class="mbr-section contacts3 cid-ru65QYf5WR" id="contacts3-13">
-                    
+
                     <!--Container-->
                     <div class="container">
                         @foreach ($miEmpresa as $item)
@@ -186,7 +186,7 @@
                                                 </h5>
                                                     <p class="mbr-text align-left mbr-fonts-style display-7">
                                                         {{$item->direccion_empresa}}
-                                                    </p>      
+                                                    </p>
                                             </div>
                                         </div>
                                     </div>
@@ -203,7 +203,7 @@
                                                     <a target="_blank" href="https://api.whatsapp.com/send?phone=57{{$item->celular_empresa}}&text=Hola, quiero conocer mas información de {{$item->nombre_empresa}}.">
                                                         <i class="fab fa-whatsapp text-green"></i> WhatsApp, {{$item->celular_empresa}}
                                                     </a>
-                                                </p>     
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -237,7 +237,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <section class="cid-rua54tdUv9" id="social-buttons3-17">
                             <div class="container">
@@ -268,7 +268,7 @@
                         </section>
                         @endforeach
                     </div>
-                </section>               
+                </section>
             </main>
         </div>
         <!--Importando todos los Js del webpack vue y boostrap-->
