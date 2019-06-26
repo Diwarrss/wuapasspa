@@ -29,7 +29,8 @@ class ImagenesController extends Controller
         //para validar
         $request->validate([
             //'nombre_imagen' => 'required',
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nombreImagen' => 'required'
         ]);
 
         //aqui guardamos la imagen en esta variable
@@ -41,17 +42,17 @@ class ImagenesController extends Controller
             //creamos la ruta dnd se va a guardar la imagen
             //$path = Storage::disk('public')->put('img/carousel', $request->file('file'));//UN METODO DE SUBIR LA IMAGEN PERO SE REPITEN
             $imagenFile->move(public_path('/img/carousel/'), $nombreImagen);
-           
+
             $imagen = new Imagene();
             $imagen->empresas_empresas_id = 1;
-            //$imagen->nombre_imagen = 'prueba 1';
+            $imagen->nombre_imagen = $request->nombreImagen;
             $imagen->url_imagen = $nombreImagen;
             $imagen->save();
         }
     }
     public function deleteImagen(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');      
+        if (!$request->ajax()) return redirect('/');
 
         $url_imagen = $request->url_imagen;
 
@@ -64,7 +65,7 @@ class ImagenesController extends Controller
             //unlink($image_path);
             //para borrar el registro de la BD
             $idImagen = Imagene::findOrFail($request->id);
-            $idImagen->delete(); 
+            $idImagen->delete();
         }
     }
 }

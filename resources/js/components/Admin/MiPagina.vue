@@ -118,6 +118,7 @@
                                 <thead>
                                     <tr>
                                         <th>Imagen</th>
+                                        <th>Nombre</th>
                                         <th>Creado el</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -318,6 +319,13 @@
                                             <p class="text-red" v-if="arrayErrors.file" v-text="arrayErrors.file[0]"></p>
                                         </div>
                                     </div>
+                                    <div class="form-group row">
+                                        <label for="password" class="col-md-12 col-sm-12 col-12 col-form-label d-none d-sm-block">Nombre Imagen</label>
+                                        <div class="col-md-12 col-sm-12 col-12">
+                                            <input type="text" class="form-control" id="password" v-model="nombreImagen" placeholder="Nombre Imagen">
+                                            <p class="text-red" v-if="arrayErrors.nombreImagen" v-text="arrayErrors.nombreImagen[0]"></p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -347,6 +355,7 @@
                 urlLogotipo:'/img/perfiles/',
                 logo_empresa: '',
                 imagenSelect1: '',
+                nombreImagen:'',
                 imagenSelect2: '',
                 idServicio:0,//el id del servicio
                 empresas_empresas_id: 1,
@@ -457,6 +466,8 @@
 
                 let fileCargada = new FormData();
                 fileCargada.append('file', me.imagenSelect2);
+                fileCargada.append('nombreImagen', me.nombreImagen);
+
 
                 axios.post('/saveImagen', fileCargada)//le envio el parametro completo
                     .then(function (response) {
@@ -631,6 +642,7 @@
                                     return '<img class="img-responsive" height="100px" width="100px" src="img/carousel/'+ row.url_imagen + '">';
                                     }
                                 },
+                                {data:'nombre_imagen'},
                                 {data:'created_at'},
                                 {defaultContent:'<button class="btn btn-danger borrar btn-sm" title="Eliminar Imagen")><i class="fas fa-eraser"></i> Eliminar</button>'}
                             ]
