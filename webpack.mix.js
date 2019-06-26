@@ -69,7 +69,7 @@ mix.js(['resources/js/appCliente.js'
 //para el js de solo Vuejs y axios sin boostrap panel admin
 .js('resources/js/appAdmin.js', 'public/js')
 
-//Creamos los css de adminlte
+//Creamos los css de adminlte Panel Administrador
 .styles([
     'public/resources/adminlte/bower_components/bootstrap/dist/css/bootstrap.min.css',
     'public/resources/adminlte/bower_components/font-awesome/css/font-awesome.min.css',
@@ -80,7 +80,7 @@ mix.js(['resources/js/appCliente.js'
     'public/resources/MisLibrerias/charjs/Chart.min.css'
  ], 'public/css/adminlte.css')
 
- //Creamos el js de bootstrap 3 para adminlte
+ //Creamos el js de bootstrap 3 para adminlte Panel Administrador
  .scripts([
     'public/resources/adminlte/bower_components/jquery/dist/jquery.min.js',
     'public/resources/adminlte/bower_components/bootstrap/dist/js/bootstrap.min.js',

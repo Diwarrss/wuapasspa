@@ -23,8 +23,7 @@
             @include('navegacion')
             <main>
                 {{-- seccion del carousel --}}
-                <section class="carousel slide cid-ru615axhXJ" data-interval="false" id="slider2-x" style="background-image: linear-gradient(to right top, #4c73b1, #577dbb, #6286c5, #6d90cf, #789ad9, #71a2df, #6aaae3, #64b2e7, #4eb8e2, #42bdd8, #45c1cc, #55c4bd);
-                        background-repeat: no-repeat; background-attachment: fixed;">
+                <section class="carousel slide cid-ru615axhXJ" data-interval="false" id="slider2-x" style="background-image: linear-gradient(to bottom, #9937ae, #843eae, #6e43ad, #5846a9, #4148a4, #3e49a6, #3b49a8, #374aaa, #4b4ab4, #604abd, #7548c5, #8a44cb); background-repeat: no-repeat; background-attachment: fixed;">
                     @if ($errors->has('sugerencia'))
                         <div class="container">
                             <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -68,8 +67,7 @@
                         </div>
                     </div>
                 </section>
-                <section class="mbr-section content8 cid-ru63RlTe41" id="content8-z" style="background-image: linear-gradient(to right top, #4c73b1, #577dbb, #6286c5, #6d90cf, #789ad9, #71a2df, #6aaae3, #64b2e7, #4eb8e2, #42bdd8, #45c1cc, #55c4bd);
-                background-repeat: no-repeat; background-attachment: fixed;">
+                <section class="mbr-section content8 cid-ru63RlTe41" id="content8-z" style="background-image: linear-gradient(to bottom, #9937ae, #843eae, #6e43ad, #5846a9, #4148a4, #3e49a6, #3b49a8, #374aaa, #4b4ab4, #604abd, #7548c5, #8a44cb); background-repeat: no-repeat; background-attachment: fixed;">
                     <div class="container">
                         <div class="media-container-row title">
                             <div class="col-12 col-md-8">

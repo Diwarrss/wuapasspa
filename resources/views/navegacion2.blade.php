@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background:#3f3189;">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background:black">
     <a class="navbar-brand font-weight-bold" href="{{asset('/')}}">
         @foreach ($logoEmpresa as $item)
         <img src="/img/perfiles/{{$item->logo_empresa}}" width="50" height="50" class="d-inline-block align-top" alt="">
