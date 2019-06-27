@@ -28,7 +28,7 @@ class ServiciosController extends Controller
 
     public function showServicios(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
 
         $servicios = DB::table('servicios')
                     ->leftJoin('imagenes', 'servicios.imagenes_imagenes_id', '=', 'imagenes.id')

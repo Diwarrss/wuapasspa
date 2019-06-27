@@ -25,13 +25,18 @@ class WelcomeController extends Controller
                     ->orderBy('imagenes.id', 'desc')
                     ->get();
         $servicios = DB::table('servicios')
-                    ->select('id','empresas_empresas_id','nombre_servicio','descripcion_servicio','estado_servicio')
-                    ->where('estado_servicio', 1)
-                    ->orderBy('nombre_servicio', 'asc')
+                    ->join('categorias', 'servicios.categorias_categorias_id','=', 'categorias.id')
+                    ->select('servicios.id','servicios.empresas_empresas_id','servicios.nombre_servicio','servicios.descripcion_servicio','servicios.estado_servicio', 'categorias.nombre_categoria')
+                    ->where('servicios.estado_servicio', 1)
+                    ->orderBy('servicios.nombre_servicio', 'asc')
                     ->get();
-        
+        $categorias = DB::table('categorias')
+                    ->select('categorias.id','categorias.nombre_categoria','categorias.estado_categoria', 'categorias.url_video',
+                            'imagenes.empresas_empresas_id','imagenes.url_imagen')
+                    ->leftJoin('imagenes', 'categorias.imagenes_imagenes_id', '=', 'imagenes.id')
+                    ->get();
         //aqui enviamos un array llamado miEmpresa a la vista welcome
-        return view('welcome', ['miEmpresa' => $miEmpresa, 'imagenes' => $imagenes, 'servicios' => $servicios, 
+        return view('welcome', ['miEmpresa' => $miEmpresa, 'imagenes' => $imagenes, 'servicios' => $servicios, 'categorias' => $categorias,
                                 'logoEmpresa' => $logoEmpresa]);
     }
 }

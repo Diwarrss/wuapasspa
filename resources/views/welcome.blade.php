@@ -44,10 +44,17 @@
                             </div>
                         </div>
                     @endif
+                    <div class="container">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/0pO_x5Rd2fI?rel=0&amp;autoplay=1" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <br><br>
+                    <h3 class="align-center mbr-fonts-style display-2"><strong><i class="fas fa-images"></i> Imagenes</strong></h3>
                     <div class="container content-slider">
                         <div class="content-slider-wrap">
                             <div>
-                                <div class="mbr-slider slide carousel" data-pause="true" data-keyboard="false" data-ride="carousel" data-interval="3000">
+                                <div class="mbr-slider slide carousel" data-pause="true" data-keyboard="false" data-ride="carousel" data-interval="4000">
 
                                     <div class="carousel-inner" role="listbox">
                                         @foreach ($imagenes as $item)
@@ -72,7 +79,7 @@
                         <div class="media-container-row title">
                             <div class="col-12 col-md-8">
                                 <div class="mbr-section-btn align-center">
-                                    <a class="btn btn-primary display-7" href="/nuevaCita">
+                                    <a class="btn btn-warning display-7" href="/nuevaCita">
                                         <span class="mbri-edit mbr-iconfont mbr-iconfont-btn"></span> ¡Agenda Tu Cita Ahora!
                                     </a>
                                 </div>
@@ -102,20 +109,15 @@
                                     <i class="fas fa-list-ul"></i> Servicios</strong></h2>
                             </div>
                             <!--Card-1-->
-                            @foreach ($servicios as $item)
+                            @foreach ($categorias as $item)
                             <div class="card px-3 col-12 col-md-6">
                                 <div class="card-wrapper media-container-row media-container-row">
-                                    <div class="card-box">
+                                    <div class="card-box" >
                                         <div class="top-line pb-1">
                                             <h4 class="card-title mbr-fonts-style display-5">
-                                                <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45"> {{$item->nombre_servicio}}
+                                                <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45"> {{$item->nombre_categoria}}
                                             </h4>
                                             <p class="mbr-text card-title cost mbr-fonts-style m-0 display-4"></p>
-                                        </div>
-                                        <div class="bottom-line">
-                                            <p class="mbr-text mbr-fonts-style display-7">
-                                                {{$item->descripcion_servicio}}
-                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -125,7 +127,7 @@
                     </div>
                 </section>
 
-                <section class="mbr-section form1 cid-ru64LmyPnK mbr-parallax-background" id="form1-12" style="z-index: 0; background-image: url('img/carousel/_LCP1445-min.JPG'); position: relative;">
+                <section class="mbr-section form1 cid-ru64LmyPnK mbr-parallax-background" id="form1-12" style="z-index: 0; background-image: url('img/carousel/Imagen 1.jpeg'); position: relative;">
                     <div class="mbr-overlay" style="opacity: 0.9; background-color: rgb(193, 193, 193);">
                     </div>
                     <div class="container">
@@ -134,7 +136,7 @@
                                 <h2 class="mbr-section-title align-center pb-3 mbr-fonts-style display-2">
                                     <i class="far fa-bell"></i><strong> Envia tu sugerencia </strong></h2>
                                 <h3 class="mbr-section-subtitle align-center mbr-light pb-3 mbr-fonts-style display-5">
-                                    Tu opinión nos ayudará a mejorar nuestros servicios.</h3>
+                                    Tu opinión es muy importante para nosotros.</h3>
                             </div>
                         </div>
                     </div>

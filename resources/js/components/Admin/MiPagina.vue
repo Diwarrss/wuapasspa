@@ -694,7 +694,7 @@
                         showConfirmButton: false,
                         timer: 1500
                     }).then(function(){
-                        jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
+                        jQuery('#tablaServicios').DataTable().ajax.reload();
                         me.cerrarModal();
                     });
                     //console.log(response);
@@ -759,11 +759,19 @@
                                     }
                                 },
                                 {render: function (data, type, row) {
-                                    return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                    if (row.url_video == '') {
+                                        return '<span class="label label-info"> Sin video</span>'
+                                        }else{
+                                            return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                        }
                                     }
                                 },
                                 {render: function (data, type, row) {
-                                    return '<img class="img-responsive" height="100px" width="100px" src="img/categorias/'+ row.url_imagen + '">';
+                                    if (row.url_imagen == null) {
+                                            return '<span class="label label-info"> Sin imagen</span>';
+                                        }else{
+                                            return '<img class="img-responsive" height="100px" width="100px" src="img/categorias/'+ row.url_imagen + '">';
+                                        }
                                     }
                                 },
                                 {render: function (data, type, row) {
@@ -859,7 +867,14 @@
                         "ajax": "/showServicios",
                         "columns": [
                                 {data:'nombre_servicio'},
-                                {data:'descripcion_servicio'},
+                                {render: function (data, type, row) {
+                                    if (row.descripcion_servicio == 'null') {
+                                        return '<span class="label label-info"> Ninguna</span>'
+                                        }else{
+                                            return row.descripcion_servicio;
+                                        }
+                                    }
+                                },
                                 {data:'nombre_categoria'},
                                 {render: function (data, type, row) {
                                     if (row.estado_servicio === '1'){
@@ -871,11 +886,19 @@
                                 },
                                 {data:'valor_servicio'},
                                 {render: function (data, type, row) {
-                                    return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                    if (row.url_video == '') {
+                                            return '<span class="label label-info"> Sin video</span>';
+                                        }else{
+                                            return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                        }
                                     }
                                 },
                                 {render: function (data, type, row) {
-                                    return '<img class="img-responsive" height="100px" width="100px" src="img/servicios/'+ row.url_imagen + '">';
+                                    if (row.url_imagen == null) {
+                                            return '<span class="label label-info"> Sin imagen</span>';
+                                        }else{
+                                            return '<img class="img-responsive" height="100px" width="100px" src="img/servicios/'+ row.url_imagen + '">';
+                                        }
                                     }
                                 },
                                 {defaultContent:'<button class="btn btn-warning edit btn-sm" title="Editar Servicio"><i class="fas fa-edit"></i> Editar</button>'}
