@@ -1846,47 +1846,6 @@ var nAgt=navigator.userAgent;if(!jQuery.browser){jQuery.browser={},jQuery.browse
 	a.y="object"==typeof c?c.clientY+document.body.scrollTop-this.offset().top:"number"==typeof c?(a.opt.scale-a.opt.initialval-c)*e/a.opt.scale:a.opt.initialval*e/a.opt.scale;a.y=this.outerHeight()-a.y;a.scaleX=a.x*a.opt.scale/d;a.scaleY=a.y*a.opt.scale/e;a.outOfRangeX=a.scaleX>a.opt.scale?a.scaleX-a.opt.scale:0>a.scaleX?a.scaleX:0;a.outOfRangeY=a.scaleY>a.opt.scale?a.scaleY-a.opt.scale:0>a.scaleY?a.scaleY:0;a.outOfRange="h"==a.opt.orientation?a.outOfRangeX:a.outOfRangeY;a.value="undefined"!=typeof c?
 					"h"==a.opt.orientation?a.x>=this.outerWidth()?a.opt.scale:0>=a.x?0:a.scaleX:a.y>=this.outerHeight()?a.opt.scale:0>=a.y?0:a.scaleY:"h"==a.opt.orientation?a.scaleX:a.scaleY;"h"==a.opt.orientation?a.level.width(Math.floor(100*a.x/d)+"%"):a.level.height(Math.floor(100*a.y/e));"function"==typeof a.opt.callback&&a.opt.callback(a)}}};b.fn.simpleSlider=b.simpleSlider.init;b.fn.updateSliderVal=b.simpleSlider.updateSliderVal})(jQuery);
 
-var isBuilder = $('html').hasClass('is-builder');
-if (!isBuilder) {
-    if (typeof window.initSwitchArrowPlugin === 'undefined'){
-        window.initSwitchArrowPlugin = true;
-        $(document).ready(function() {
-            if ($('.accordionStyles').length!=0) {
-                    $('.accordionStyles .card-header a[role="button"]').each(function(){
-                        if(!$(this).hasClass('collapsed')){
-                            $(this).addClass('collapsed');
-                        }
-                    });
-                }
-        });
-
-        $('.accordionStyles .card-header a[role="button"]').click(function(){
-            var $id = $(this).closest('.accordionStyles').attr('id'),
-                $iscollapsing = $(this).closest('.card').find('.panel-collapse');
-
-            if (!$iscollapsing.hasClass('collapsing')) {
-                if ($id.indexOf('toggle') != -1){
-                    if ($(this).hasClass('collapsed')) {
-                        $(this).find('span.sign').removeClass('mbri-arrow-down').addClass('mbri-arrow-up'); 
-                    }
-                    else{
-                        $(this).find('span.sign').removeClass('mbri-arrow-up').addClass('mbri-arrow-down'); 
-                    }
-                }
-                else if ($id.indexOf('accordion')!=-1) {
-                    var $accordion =  $(this).closest('.accordionStyles ');
-                
-                    $accordion.children('.card').each(function() {
-                        $(this).find('span.sign').removeClass('mbri-arrow-up').addClass('mbri-arrow-down'); 
-                    });
-                    if ($(this).hasClass('collapsed')) {
-                        $(this).find('span.sign').removeClass('mbri-arrow-down').addClass('mbri-arrow-up'); 
-                    }
-                }
-            }
-        });
-    }
-};
 //
 // SmoothScroll for websites v1.4.9 (Balazs Galambosi)
 // http://www.smoothscroll.net/

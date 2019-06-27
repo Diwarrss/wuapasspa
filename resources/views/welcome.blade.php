@@ -113,34 +113,29 @@
                             <div class="card px-3 col-12 col-md-6">
                                 <div class="card-wrapper media-container-row media-container-row">
                                     <div class="card-box">
-
-                                        <div class="toggle-content">                                                
-                                                <div id="bootstrap-toggle" class="toggle-panel accordionStyles tab-content pt-5 mt-2">
-                                                    <div class="card">
-                                                        <div class="card-header" role="tab" id="headingOne">
-                                                            <a role="button" class="panel-title text-black collapsed" data-toggle="collapse" data-core="" href="#collapse{{$categoria->id}}" aria-expanded="false" aria-controls="collapse1">
-                                                                <h4 class="mbr-fonts-style display-5">
-                                                                    <span class="sign mbr-iconfont inactive mbri-arrow-down"></span> {{$categoria->nombre_categoria}} <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45">
-                                                                </h4>
-                                                            </a>
-                                                        </div>
-                                                        <div id="collapse{{$categoria->id}}" class="panel-collapse noScroll collapse" role="tabpanel" aria-labelledby="headingOne" style="">
-                                                            <div class="panel-body p-4">
-                                                                <p class="mbr-fonts-style panel-text display-7">
-                                                                        <ul class="list-group">
-                                                                        @foreach ($categoria->serviciosobj as $servicioka)
-                                                                        <li class="list-group-item">{{$servicioka['nombre_servicio']}}</li>
-                                                                        @endforeach
-                                                                    </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                   
+                                        <div id="bootstrap-accordion_3" class="panel-group accordionStyles accordion" role="tablist" aria-multiselectable="true">
+                                            <div class="card">
+                                                <div class="card-header" role="tab" id="headingOne">
+                                                    <a role="button" class="collapsed panel-title text-black" data-toggle="collapse" data-core="" href="#collapse{{$categoria->id}}" aria-expanded="false" aria-controls="collapse1">
+                                                        <h5 class="mbr-fonts-style display-7">
+                                                            <span class="sign mbr-iconfont mbri-arrow-down inactive"></span> {{$categoria->nombre_categoria}} <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45">
+                                                        </h5>
+                                                    </a>
+                                                </div>
+                                                <div id="collapse{{$categoria->id}}" class="panel-collapse noScroll collapse" role="tabpanel" aria-labelledby="headingOne" data-parent="#bootstrap-accordion_3">
+                                                    <div class="panel-body p-4">
+                                                        <ul class="list-group list-group-flush">
+                                                            @foreach ($categoria->serviciosobj as $servicioka)
+                                                            <li class="list-group-item"><i class="fas fa-check fa-1x"></i> {{$servicioka['nombre_servicio']}}</li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        
+                                        </div>
+
                                     </div>
                                 </div>
-                                
                             </div>
                             @endforeach
                         </div>
@@ -154,7 +149,7 @@
                         <div class="row justify-content-center">
                             <div class="title col-12 col-lg-8">
                                 <h2 class="mbr-section-title align-center pb-3 mbr-fonts-style display-2">
-                                    <i class="far fa-bell"></i><strong> Envia tu sugerencia </strong></h2>
+                                    <i class="far fa-bell"></i><strong> Sugerencias </strong></h2>
                                 <h3 class="mbr-section-subtitle align-center mbr-light pb-3 mbr-fonts-style display-5">
                                     Tu opinión es muy importante para nosotros.</h3>
                             </div>
@@ -169,7 +164,7 @@
                                     <div class="dragArea row">
                                         <div data-for="message" class="col-md-12 form-group">
                                             <label for="message-form1-12" class="form-control-label mbr-fonts-style display-7"></label>
-                                            <textarea name="sugerencia" id="sugerencia" data-form-field="Message" class="form-control display-7" placeholder="Escribir sugerencia" id="message-form1-12"></textarea>
+                                            <textarea name="sugerencia" id="sugerencia" data-form-field="Message" class="form-control display-7" placeholder="Escribir sugerencia anónima" id="message-form1-12"></textarea>
                                         </div>
                                         <div class="col-md-12 input-group-btn align-center">
                                             <button type="submit" class="btn btn-form btn-warning display-4">
