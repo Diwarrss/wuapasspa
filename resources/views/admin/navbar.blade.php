@@ -4,14 +4,14 @@
         @if(Auth::user()->roles_roles_id == 1)<!-- si es cliente-->
             <a href="{{ asset('/admin') }}" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class="logo-mini"><b>M</b>PL</span>
+                <span class="logo-mini"><b>GRID</b></span>
                 <!-- logo for regular state and mobile devices -->
                 <span class="logo-lg"><b>{{ config('app.name')}}</span>
             </a>
         @else
             <router-link to="/miAgenda" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class="logo-mini"><b>M</b>PL</span>
+                <span class="logo-mini"><b>GRID</b></span>
                 <!-- logo for regular state and mobile devices -->
                 <span class="logo-lg"><b>{{ config('app.name')}}</span>
             </router-link>

@@ -73,8 +73,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/actualizarEmpresa', 'EmpresaController@actualizarEmpresa')->name('actualizarEmpresa');
         Route::get('/showServicios', 'ServiciosController@showServicios')->name('showServicios');
         Route::post('/crearServicio', 'ServiciosController@crearServicio')->name('crearServicio');
-        Route::put('/actualizarServicio', 'ServiciosController@actualizarServicio')->name('actualizarServicio');
+        Route::post('/actualizarServicio', 'ServiciosController@actualizarServicio')->name('actualizarServicio');
         Route::post('/updateImagenEmpresa', 'EmpresaController@updateImagenEmpresa')->name('updateImagenEmpresa');
+        Route::post('/crearCategoria', 'CategoriaController@crearCategoria')->name('crearCategoria');
+        Route::get('/showCategoria', 'CategoriaController@showCategoria')->name('showCategoria');
+        Route::post('/updateCategoria', 'CategoriaController@updateCategoria')->name('updateCategoria');
+        Route::get('/showCategoriaActivas', 'CategoriaController@showCategoriaActivas')->name('showCategoriaActivas');
             //para las imagenes
         Route::get('/showImagenes', 'ImagenesController@showImagenes')->name('showImagenes');
         Route::post('/saveImagen', 'ImagenesController@saveImagen')->name('saveImagen');

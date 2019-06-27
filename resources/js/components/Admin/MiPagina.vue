@@ -83,6 +83,30 @@
                 <div class="col-md-8">
                     <div class="box box-success">
                         <div class="box-header">
+                            <h3 class="box-title"><i class="fas fa-layer-group"></i> Lista de Categorias</h3>
+                            <button type="button" class="btn btn-primary" @click="abrirModalCategorias()">
+                                <i class="fas fa-plus-circle"></i> Crear
+                            </button>
+                        </div>
+
+                        <div class="table-responsive container-fluid">
+                            <table id="tablaCategorias" class="table table-bordered table-hover" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Estado</th>
+                                        <th>Video</th>
+                                        <th>Imagen</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-success">
+                        <div class="box-header">
                             <h3 class="box-title"><i class="far fa-list-alt"></i> Lista de Servicios</h3>
                             <button type="button" class="btn btn-primary" @click="abrirModal()">
                                 <i class="fas fa-plus-circle"></i> Crear
@@ -240,12 +264,78 @@
                 <!-- /.modal-dialog -->
             </div>
         </section>
+        <!--Modal editar y crear Categoria-->
+        <section>
+            <div class="modal fade in" id="modalCategorias">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form class="form-horizontal" content-type="multipart/form-data">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                                <h4 class="modal-title" v-if="tipoAccionModal==1"><i class="fas fa-plus-circle"></i> Crear Categoria</h4>
+                                <h4 class="modal-title" v-if="tipoAccionModal==2"><i class="fas fa-edit"></i> Actualizar Categoria</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="nombreCategoria" class="col-sm-4 control-label hidden-xs">Nombre:</label>
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="text" class="form-control" id="nombreCategoria" v-model="nombreCategoria" placeholder="Nombre Categoria">
+                                            <p class="text-red" v-if="arrayErrors.nombreCategoria" v-text="arrayErrors.nombreCategoria[0]"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="urlVideoCategoria" class="col-sm-4 control-label hidden-xs">Url YouTube:</label>
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="text" class="form-control" id="urlVideoCategoria" v-model="urlVideoCategoria" placeholder="Url YouTube">
+                                            <p class="text-red" v-if="arrayErrors.urlVideoCategoria" v-text="arrayErrors.urlVideoCategoria[0]"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="files" class="col-sm-4 control-label hidden-xs">Imagen:</label>
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="file" class="form-control" name="files" id="files" @change="imagenSeleccionada2">
+                                            <p class="text-red" v-if="arrayErrors.imagenCategoria" v-text="arrayErrors.imagenCategoria[0]"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="estadoCategoria" class="col-sm-4 control-label hidden-xs">Estado</label>
+
+                                        <div class="col-sm-8 col-xs-12">
+                                            <select class="form-control" v-model="estadoCategoria">
+                                            <option value="" disabled>Seleccionar...</option>
+                                            <option value="1">Activo</option>
+                                            <option value="2">Inactivo</option>
+                                            </select>
+                                            <p class="text-red" v-if="arrayErrors.estadoCategoria" v-text="arrayErrors.estadoCategoria[0]"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger pull-left" data-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+                                <div v-if="tipoAccionModal==1">
+                                    <button type="button" class="btn btn-success" @click="crearCategoria()"><i class="fas fa-plus-circle"></i> Crear</button>
+                                </div>
+                                <div v-else>
+                                    <button type="button" class="btn btn-success" @click="updateCategoria()"><i class="fas fa-edit"></i> Actualizar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </section>
         <!--Modal editar y crear Servicio-->
         <section>
             <div class="modal fade in" id="modalServicios">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" content-type="multipart/form-data">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span></button>
@@ -254,6 +344,17 @@
                             </div>
                             <div class="modal-body">
                                 <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="categoriaServicio" class="col-sm-4 control-label hidden-xs">Elegir Categoria</label>
+
+                                        <div class="col-sm-8 col-xs-12">
+                                            <select class="form-control" v-model="categoriaServicio">
+                                                <option value="" disabled>Seleccionar Categoria...</option>
+                                                <option v-for="categoria in arrayCategorias" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre_categoria"></option>
+                                            </select>
+                                            <p class="text-red" v-if="arrayErrors.categoriaServicio" v-text="arrayErrors.categoriaServicio[0]"></p>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label for="Nombre" class="col-sm-4 control-label hidden-xs">Nombre:</label>
                                         <div class="col-sm-8 col-xs-12">
@@ -265,7 +366,7 @@
                                     <div class="form-group">
                                         <label for="descripcion" class="col-sm-4 control-label hidden-xs">Descripción:</label>
                                         <div class="col-sm-8 col-xs-12">
-                                            <input type="text" class="form-control" id="descripcion" v-model="descripcion" placeholder="Descripción del Servicio">
+                                            <textarea size="2" class="form-control" id="descripcion" v-model="descripcion" placeholder="Descripción del Servicio"></textarea>
                                             <p class="text-red" v-if="arrayErrors.descripcion" v-text="arrayErrors.descripcion[0]"></p>
                                         </div>
                                     </div>
@@ -279,6 +380,27 @@
                                             <option value="2">Inactivo</option>
                                             </select>
                                             <p class="text-red" v-if="arrayErrors.estadoServicio" v-text="arrayErrors.estadoServicio[0]"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="urlVideoServicio" class="col-sm-4 control-label hidden-xs">Url YouTube:</label>
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="text" class="form-control" id="urlVideoServicio" v-model="urlVideoServicio" placeholder="Url YouTube">
+                                            <p class="text-red" v-if="arrayErrors.urlVideoServicio" v-text="arrayErrors.urlVideoServicio[0]"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="files" class="col-sm-4 control-label hidden-xs">Imagen:</label>
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="file" class="form-control" name="files" id="files" @change="imagenSeleccionada2">
+                                            <p class="text-red" v-if="arrayErrors.imagenServicio" v-text="arrayErrors.imagenServicio[0]"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="valorServicio" class="col-sm-4 control-label hidden-xs">Valor Servicio:</label>
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="number" class="form-control" id="valorServicio" v-model="valorServicio" placeholder="Valor Servicio">
+                                            <p class="text-red" v-if="arrayErrors.valorServicio" v-text="arrayErrors.valorServicio[0]"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -373,7 +495,17 @@
                 tipoAccionModal: '',
                 file: '',
                 idImagen: '',
-                url_imagen: ''
+                url_imagen: '',
+                idCategoria:'',
+                nombreCategoria: '',
+                estadoCategoria: '',
+                urlVideoCategoria: '',
+                imagenCategoria: '',
+                arrayCategorias: [],
+                categoriaServicio: '',
+                urlVideoServicio: '',
+                imagenServicio: '',
+                valorServicio: 0
             }
         },
         methods: {
@@ -476,7 +608,6 @@
                 fileCargada.append('file', me.imagenSelect2);
                 fileCargada.append('nombreImagen', me.nombreImagen);
 
-
                 axios.post('/saveImagen', fileCargada)//le envio el parametro completo
                     .then(function (response) {
                         Swal.fire({
@@ -488,6 +619,36 @@
                         }).then(function(){
                             jQuery('#tablaImagenes').DataTable().ajax.reload();
                             me.cerrarModalImagen();
+                        });
+                        //console.log(response);
+                    })
+                    .catch(function (error) {
+                        if (error.response.status == 422) {//preguntamos si el error es 422
+                            me.arrayErrors = error.response.data.errors;//guardamos la respuesta del server de errores en el array arrayErrors
+                        };
+                        //console.log(error);
+                    });
+            },
+            crearCategoria(){
+                let me = this;
+
+                let fileCargada = new FormData();
+                fileCargada.append('imagenCategoria', me.imagenSelect2);
+                fileCargada.append('nombreCategoria', me.nombreCategoria);
+                fileCargada.append('estadoCategoria', me.estadoCategoria);
+                fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
+
+                axios.post('/crearCategoria', fileCargada)//le envio el parametro completo
+                    .then(function (response) {
+                        Swal.fire({
+                            position: 'top-end',
+                            type: 'success',
+                            title: 'Categoria creada con éxito!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(function(){
+                            jQuery('#tablaCategorias').DataTable().ajax.reload();
+                            me.cerrarModalCategorias();
                         });
                         //console.log(response);
                     })
@@ -542,6 +703,17 @@
             cerrarModalImagen(){
                 let me=this;
                 $("[data-dismiss=modal]").trigger({ type: "click" });//para cerrar la modal con boostrap 3
+                this.imagenSelect2=[];
+                this.nombreImagen='';
+            },cerrarModalCategorias(){
+                let me=this;
+                $("[data-dismiss=modal]").trigger({ type: "click" });//para cerrar la modal con boostrap 3
+                this.imagenSelect2= '';
+                this.nombreCategoria= '';
+                this.estadoCategoria='';
+                this.urlVideoCategoria='';
+                this.imagenCategoria=[];
+                this.arrayErrors = [];
             },
             actualizarServicio(){
                 //creamos variable q corresponde a this de mis variables de data()
@@ -577,6 +749,115 @@
                     console.log(error);
                     //console.log(me.arrayErrors);
                 });
+            },
+            //aquio enlistamos las categorias
+            listarCategorias(){
+                let me=this;//creamos esta variable para q nos reconozca los atributos de vuejs
+                jQuery(document).ready(function() {
+                    var tablaCategorias = jQuery('#tablaCategorias').DataTable({
+                        "language": {
+                                "url": "/jsonDTIdioma.json"
+                            },
+                        "processing": true,
+                        "lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "Todos"]],
+                        "responsive": true,
+                        "order": [],//no colocar ordenamiento
+                        //"order": [[ 0, "asc" ]],
+                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        "ajax": "/showCategoria",
+                        "columns": [
+                                {data:'nombre_categoria'},
+                                {render: function (data, type, row) {
+                                    if (row.estado_categoria === '1'){
+                                            return '<span class="label label-success"> Activa</span>';
+                                        }else{
+                                            return '<span class="label label-danger"> Desactivada</span>';
+                                        }
+                                    }
+                                },
+                                {render: function (data, type, row) {
+                                    return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                    }
+                                },
+                                {render: function (data, type, row) {
+                                    return '<img class="img-responsive" height="100px" width="100px" src="img/categorias/'+ row.url_imagen + '">';
+                                    }
+                                },
+                                {render: function (data, type, row) {
+                                    return '<button class="btn btn-warning editCategoria btn-sm" title="Editar Categoria"><i class="fas fa-edit"></i> Editar</button>';
+                                    }
+                                }
+                            ]
+                    });
+                    //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
+                    tablaCategorias.on('click', '.editCategoria', function () {
+                        jQuery.noConflict();// para evitar errores
+                        $('#modalCategorias').modal('show'); //mostramos la modal
+                        me.tipoAccionModal = 2; //para actualizar colocamos 2 en esta variable de vuejs
+
+                        //aplica para si no es responsiva la tabla
+
+                        //para si es responsivo obtenemos la data
+                        var current_row = $(this).parents('tr');//Get the current row
+                        if (current_row.hasClass('child')) {//Check if the current row is a child row
+                            current_row = current_row.prev();//If it is, then point to the row before it (its 'parent')
+                        }
+                        var data = tablaCategorias.row(current_row).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+
+                        me.idCategoria = data["id"];//el id es este q es de datatables o este id es de la consulta cualquiera sirve
+                        me.nombreCategoria = data["nombre_categoria"];
+                        me.urlVideoCategoria = 'https://www.youtube.com/watch?v='+data["url_video"];
+                        me.estadoCategoria = data["estado_categoria"];
+                    });
+                });
+            },
+            updateCategoria(){
+                let me = this;
+
+                let fileCargada = new FormData();
+                fileCargada.append('imagenCategoria', me.imagenSelect2);
+                fileCargada.append('idCategoria', me.idCategoria);
+                fileCargada.append('nombreCategoria', me.nombreCategoria);
+                fileCargada.append('estadoCategoria', me.estadoCategoria);
+                fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
+
+                axios.post('/updateCategoria', fileCargada)//le envio el parametro completo
+                    .then(function (response) {
+                        Swal.fire({
+                            position: 'top-end',
+                            type: 'success',
+                            title: 'Categoria actualizada!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(function(){
+                            jQuery('#tablaCategorias').DataTable().ajax.reload(null,false);
+                            me.cerrarModalCategorias();
+                            me.showCategoriaActivas();
+                        });
+                        //console.log(fileCargada);
+                    })
+                    .catch(function (error) {
+                        if (error.response.status == 422) {//preguntamos si el error es 422
+                            me.arrayErrors = error.response.data.errors;//guardamos la respuesta del server de errores en el array arrayErrors
+                        };
+                        //console.log(error);
+                    });
+            },
+            showCategoriaActivas(){
+                let data=this;
+                axios.get('/showCategoriaActivas')
+                    .then(function (response) {
+                        //guardamos la informacion en nuestro array
+                        data.arrayCategorias = response.data
+                        //console.log(data.arrayCategorias);
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // always executed
+                    });
             },
             //aqui tenemos el script para datatables
             listarServicios(){
@@ -720,6 +1001,18 @@
                 this.estadoServicio='';
                 this.arrayErrors = [];
             },
+            abrirModalCategorias(){
+                jQuery.noConflict();// para evitar errores al mostrar la modal
+                $('#modalCategorias').modal('show');
+                this.tipoAccionModal = 1; //para registrar
+                //reseteamos variables
+                this.empresas_empresas_id= 1;
+                this.nombreCategoria='';
+                this.estadoCategoria='';
+                this.urlVideoCategoria='';
+                this.imagenCategoria='';
+                this.arrayErrors = [];
+            },
             abrirModalImagen(){
                 jQuery.noConflict();// para evitar errores al mostrar la modal
                 $('#modalImagen').modal('show');
@@ -734,6 +1027,8 @@
             this.verPerfil();
             this.listarServicios();
             this.listarImagenes();
+            this.listarCategorias();
+            this.showCategoriaActivas();
         }
     }
 </script>

@@ -15,11 +15,17 @@ class CreateServiciosTable extends Migration
     {
         Schema::create('servicios', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('empresas_empresas_id');
-            $table->foreign('empresas_empresas_id')->references('id')->on('empresas');
             $table->string('nombre_servicio', 150);
             $table->string('descripcion_servicio', 255)->nullable();
             $table->enum('estado_servicio', [App\Servicio::ACTIVO, App\Servicio::DESACTIVADO])->default(\App\Servicio::ACTIVO);
+            $table->string('url_video',500)->nullable();
+            $table->decimal('valor_servicio', 12, 2);
+            $table->unsignedInteger('empresas_empresas_id');
+            $table->foreign('empresas_empresas_id')->references('id')->on('empresas');
+            $table->unsignedInteger('imagenes_imagenes_id')->nullable();
+            $table->foreign('imagenes_imagenes_id')->references('id')->on('imagenes');
+            $table->unsignedInteger('categorias_categorias_id');
+            $table->foreign('categorias_categorias_id')->references('id')->on('categorias');
             $table->timestamps();
         });
     }

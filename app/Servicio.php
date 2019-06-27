@@ -33,10 +33,14 @@ class Servicio extends Model
     const DESACTIVADO = 2;
 
     protected $fillable = [
-        'empresas_empresas_id',
         'nombre_servicio',
         'descripcion_servicio',
-        'estado_servicio'
+        'estado_servicio',
+        'url_video',
+        'valor_servicio',
+        'empresas_empresas_id',
+        'imagenes_imagenes_id',
+        'categorias_categorias_id',
     ];
 
     //para las relaciones Eloquent

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'AgendaGrid'),
+    'name' => env('APP_NAME', 'Agenda Grid'),
 
     /*
     |--------------------------------------------------------------------------

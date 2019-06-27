@@ -44,9 +44,13 @@ class ServiciosController extends Controller
 
         //para validar
         $request->validate([
-            'nombreServicio' => 'required|min:5|max:150|string|unique:servicios,nombre_servicio',
+            'categoriaServicio' => 'required',
+            'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
             'descripcion' => 'required|max:255',
-            'estadoServicio' => 'required'
+            'estadoServicio' => 'required',
+            'urlVideoServicio' => 'max:500',
+            'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'valorServicio' => 'required|max:12'
         ]);
 
         //para generear la transacccion
@@ -73,7 +77,11 @@ class ServiciosController extends Controller
             $request->validate([
                 'nombreServicio' => 'required|min:5|max:150|string|unique:servicios,nombre_servicio,'.$request->idServicio,
                 'descripcion' => 'required|max:255',
-                'estadoServicio' => 'required'
+                'estadoServicio' => 'required',
+                'categoriaServicio' => 'required',
+                'urlVideoServicio' => 'max:500',
+                'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'valorServicio' => 'required|numeric|max:12'
             ]);
 
             $servicios = Servicio::findOrFail($request->idServicio);

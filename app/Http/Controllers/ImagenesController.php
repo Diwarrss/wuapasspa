@@ -7,6 +7,7 @@ use App\Imagene;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Yajra\DataTables\Html\Editor\Select;
 
 class ImagenesController extends Controller
 {
@@ -15,7 +16,12 @@ class ImagenesController extends Controller
         if (!$request->ajax()) return redirect('/');
 
         $imagenes = DB::table('imagenes')
-                    ->orderBy('id', 'desc')
+                    ->select('imagenes.id','imagenes.nombre_imagen','imagenes.url_imagen','imagenes.created_at')
+                    ->leftJoin('categorias', 'imagenes.id', '=', 'categorias.imagenes_imagenes_id' )
+                    ->leftJoin('servicios', 'imagenes.id', '=', 'servicios.imagenes_imagenes_id' )
+                    ->where([['categorias.imagenes_imagenes_id', '=', null],
+                    ['servicios.imagenes_imagenes_id', '=', null]])
+                    ->orderBy('imagenes.id', 'desc')
                     ->get();
 
         return datatables($imagenes)

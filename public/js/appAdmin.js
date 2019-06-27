@@ -4229,6 +4229,128 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4248,7 +4370,17 @@ __webpack_require__.r(__webpack_exports__);
       tipoAccionModal: '',
       file: '',
       idImagen: '',
-      url_imagen: ''
+      url_imagen: '',
+      idCategoria: '',
+      nombreCategoria: '',
+      estadoCategoria: '',
+      urlVideoCategoria: '',
+      imagenCategoria: '',
+      arrayCategorias: [],
+      categoriaServicio: '',
+      urlVideoServicio: '',
+      imagenServicio: '',
+      valorServicio: 0
     };
   },
   methods: {
@@ -4369,6 +4501,34 @@ __webpack_require__.r(__webpack_exports__);
         ; //console.log(error);
       });
     },
+    crearCategoria: function crearCategoria() {
+      var me = this;
+      var fileCargada = new FormData();
+      fileCargada.append('imagenCategoria', me.imagenSelect2);
+      fileCargada.append('nombreCategoria', me.nombreCategoria);
+      fileCargada.append('estadoCategoria', me.estadoCategoria);
+      fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
+      axios.post('/crearCategoria', fileCargada) //le envio el parametro completo
+      .then(function (response) {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Categoria creada con éxito!',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(function () {
+          jQuery('#tablaCategorias').DataTable().ajax.reload();
+          me.cerrarModalCategorias();
+        }); //console.log(response);
+      })["catch"](function (error) {
+        if (error.response.status == 422) {
+          //preguntamos si el error es 422
+          me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+        }
+
+        ; //console.log(error);
+      });
+    },
     crearServicio: function crearServicio() {
       //creamos variable q corresponde a this de mis variables de data()
       var me = this; //reseteamos los errores
@@ -4416,6 +4576,22 @@ __webpack_require__.r(__webpack_exports__);
       $("[data-dismiss=modal]").trigger({
         type: "click"
       }); //para cerrar la modal con boostrap 3
+
+      this.imagenSelect2 = [];
+      this.nombreImagen = '';
+    },
+    cerrarModalCategorias: function cerrarModalCategorias() {
+      var me = this;
+      $("[data-dismiss=modal]").trigger({
+        type: "click"
+      }); //para cerrar la modal con boostrap 3
+
+      this.imagenSelect2 = '';
+      this.nombreCategoria = '';
+      this.estadoCategoria = '';
+      this.urlVideoCategoria = '';
+      this.imagenCategoria = [];
+      this.arrayErrors = [];
     },
     actualizarServicio: function actualizarServicio() {
       //creamos variable q corresponde a this de mis variables de data()
@@ -4449,6 +4625,116 @@ __webpack_require__.r(__webpack_exports__);
 
         ;
         console.log(error); //console.log(me.arrayErrors);
+      });
+    },
+    //aquio enlistamos las categorias
+    listarCategorias: function listarCategorias() {
+      var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+
+      jQuery(document).ready(function () {
+        var tablaCategorias = jQuery('#tablaCategorias').DataTable({
+          "language": {
+            "url": "/jsonDTIdioma.json"
+          },
+          "processing": true,
+          "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          "responsive": true,
+          "order": [],
+          //no colocar ordenamiento
+          //"order": [[ 0, "asc" ]],
+          "serverSide": true,
+          //Lado servidor activar o no mas de 20000 registros
+          "ajax": "/showCategoria",
+          "columns": [{
+            data: 'nombre_categoria'
+          }, {
+            render: function render(data, type, row) {
+              if (row.estado_categoria === '1') {
+                return '<span class="label label-success"> Activa</span>';
+              } else {
+                return '<span class="label label-danger"> Desactivada</span>';
+              }
+            }
+          }, {
+            render: function render(data, type, row) {
+              return '<iframe width="200" height="100" src="https://www.youtube.com/embed/' + row.url_video + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            }
+          }, {
+            render: function render(data, type, row) {
+              return '<img class="img-responsive" height="100px" width="100px" src="img/categorias/' + row.url_imagen + '">';
+            }
+          }, {
+            render: function render(data, type, row) {
+              return '<button class="btn btn-warning editCategoria btn-sm" title="Editar Categoria"><i class="fas fa-edit"></i> Editar</button>';
+            }
+          }]
+        }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
+
+        tablaCategorias.on('click', '.editCategoria', function () {
+          jQuery.noConflict(); // para evitar errores
+
+          $('#modalCategorias').modal('show'); //mostramos la modal
+
+          me.tipoAccionModal = 2; //para actualizar colocamos 2 en esta variable de vuejs
+          //aplica para si no es responsiva la tabla
+          //para si es responsivo obtenemos la data
+
+          var current_row = $(this).parents('tr'); //Get the current row
+
+          if (current_row.hasClass('child')) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+
+          var data = tablaCategorias.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+
+          me.idCategoria = data["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
+
+          me.nombreCategoria = data["nombre_categoria"];
+          me.urlVideoCategoria = 'https://www.youtube.com/watch?v=' + data["url_video"];
+          me.estadoCategoria = data["estado_categoria"];
+        });
+      });
+    },
+    updateCategoria: function updateCategoria() {
+      var me = this;
+      var fileCargada = new FormData();
+      fileCargada.append('imagenCategoria', me.imagenSelect2);
+      fileCargada.append('idCategoria', me.idCategoria);
+      fileCargada.append('nombreCategoria', me.nombreCategoria);
+      fileCargada.append('estadoCategoria', me.estadoCategoria);
+      fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
+      axios.post('/updateCategoria', fileCargada) //le envio el parametro completo
+      .then(function (response) {
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Categoria actualizada!',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(function () {
+          jQuery('#tablaCategorias').DataTable().ajax.reload(null, false);
+          me.cerrarModalCategorias();
+          me.showCategoriaActivas();
+        }); //console.log(fileCargada);
+      })["catch"](function (error) {
+        if (error.response.status == 422) {
+          //preguntamos si el error es 422
+          me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+        }
+
+        ; //console.log(error);
+      });
+    },
+    showCategoriaActivas: function showCategoriaActivas() {
+      var data = this;
+      axios.get('/showCategoriaActivas').then(function (response) {
+        //guardamos la informacion en nuestro array
+        data.arrayCategorias = response.data; //console.log(data.arrayCategorias);
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      })["finally"](function () {// always executed
       });
     },
     //aqui tenemos el script para datatables
@@ -4613,6 +4899,20 @@ __webpack_require__.r(__webpack_exports__);
       this.estadoServicio = '';
       this.arrayErrors = [];
     },
+    abrirModalCategorias: function abrirModalCategorias() {
+      jQuery.noConflict(); // para evitar errores al mostrar la modal
+
+      $('#modalCategorias').modal('show');
+      this.tipoAccionModal = 1; //para registrar
+      //reseteamos variables
+
+      this.empresas_empresas_id = 1;
+      this.nombreCategoria = '';
+      this.estadoCategoria = '';
+      this.urlVideoCategoria = '';
+      this.imagenCategoria = '';
+      this.arrayErrors = [];
+    },
     abrirModalImagen: function abrirModalImagen() {
       jQuery.noConflict(); // para evitar errores al mostrar la modal
 
@@ -4629,6 +4929,8 @@ __webpack_require__.r(__webpack_exports__);
     this.verPerfil();
     this.listarServicios();
     this.listarImagenes();
+    this.listarCategorias();
+    this.showCategoriaActivas();
   }
 });
 
@@ -39929,7 +40231,7 @@ var render = function() {
                   attrs: { type: "button" },
                   on: {
                     click: function($event) {
-                      return _vm.abrirModal()
+                      return _vm.abrirModalCategorias()
                     }
                   }
                 },
@@ -39954,6 +40256,31 @@ var render = function() {
                   attrs: { type: "button" },
                   on: {
                     click: function($event) {
+                      return _vm.abrirModal()
+                    }
+                  }
+                },
+                [
+                  _c("i", { staticClass: "fas fa-plus-circle" }),
+                  _vm._v(" Crear\n                        ")
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _vm._m(6)
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "box box-success" }, [
+            _c("div", { staticClass: "box-header" }, [
+              _vm._m(7),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
                       return _vm.abrirModalImagen()
                     }
                   }
@@ -39965,7 +40292,7 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _vm._m(6)
+            _vm._m(8)
           ])
         ])
       ])
@@ -39979,7 +40306,7 @@ var render = function() {
           _c("div", { staticClass: "modal-dialog" }, [
             _c("div", { staticClass: "modal-content" }, [
               _c("form", { staticClass: "form-horizontal" }, [
-                _vm._m(7),
+                _vm._m(9),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-body" }, [
                   _c(
@@ -40593,244 +40920,742 @@ var render = function() {
     _c("section", [
       _c(
         "div",
-        { staticClass: "modal fade in", attrs: { id: "modalServicios" } },
+        { staticClass: "modal fade in", attrs: { id: "modalCategorias" } },
         [
           _c("div", { staticClass: "modal-dialog" }, [
             _c("div", { staticClass: "modal-content" }, [
-              _c("form", { staticClass: "form-horizontal" }, [
-                _c("div", { staticClass: "modal-header" }, [
-                  _vm._m(8),
-                  _vm._v(" "),
-                  _vm.tipoAccionModal == 1
-                    ? _c("h4", { staticClass: "modal-title" }, [
-                        _c("i", { staticClass: "fas fa-plus-circle" }),
-                        _vm._v(" Crear Servicio")
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.tipoAccionModal == 2
-                    ? _c("h4", { staticClass: "modal-title" }, [
-                        _c("i", { staticClass: "fas fa-edit" }),
-                        _vm._v(" Actualizar Servicio")
-                      ])
-                    : _vm._e()
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "box-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-sm-4 control-label hidden-xs",
-                          attrs: { for: "Nombre" }
-                        },
-                        [_vm._v("Nombre:")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.nombreServicio,
-                              expression: "nombreServicio"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            id: "Nombre",
-                            placeholder: "Nombre Servicio"
-                          },
-                          domProps: { value: _vm.nombreServicio },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.nombreServicio = $event.target.value
-                            }
-                          }
-                        }),
-                        _vm._v(" "),
-                        _vm.arrayErrors.nombreServicio
-                          ? _c("p", {
-                              staticClass: "text-red",
-                              domProps: {
-                                textContent: _vm._s(
-                                  _vm.arrayErrors.nombreServicio[0]
-                                )
-                              }
-                            })
-                          : _vm._e()
-                      ])
-                    ]),
+              _c(
+                "form",
+                {
+                  staticClass: "form-horizontal",
+                  attrs: { "content-type": "multipart/form-data" }
+                },
+                [
+                  _c("div", { staticClass: "modal-header" }, [
+                    _vm._m(10),
                     _vm._v(" "),
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-sm-4 control-label hidden-xs",
-                          attrs: { for: "descripcion" }
-                        },
-                        [_vm._v("Descripción:")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.descripcion,
-                              expression: "descripcion"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            id: "descripcion",
-                            placeholder: "Descripción del Servicio"
-                          },
-                          domProps: { value: _vm.descripcion },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.descripcion = $event.target.value
-                            }
-                          }
-                        }),
-                        _vm._v(" "),
-                        _vm.arrayErrors.descripcion
-                          ? _c("p", {
-                              staticClass: "text-red",
-                              domProps: {
-                                textContent: _vm._s(
-                                  _vm.arrayErrors.descripcion[0]
-                                )
-                              }
-                            })
-                          : _vm._e()
-                      ])
-                    ]),
+                    _vm.tipoAccionModal == 1
+                      ? _c("h4", { staticClass: "modal-title" }, [
+                          _c("i", { staticClass: "fas fa-plus-circle" }),
+                          _vm._v(" Crear Categoria")
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-sm-4 control-label hidden-xs",
-                          attrs: { for: "estadoServicio" }
-                        },
-                        [_vm._v("Estado")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                    _vm.tipoAccionModal == 2
+                      ? _c("h4", { staticClass: "modal-title" }, [
+                          _c("i", { staticClass: "fas fa-edit" }),
+                          _vm._v(" Actualizar Categoria")
+                        ])
+                      : _vm._e()
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "box-body" }, [
+                      _c("div", { staticClass: "form-group" }, [
                         _c(
-                          "select",
+                          "label",
                           {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "nombreCategoria" }
+                          },
+                          [_vm._v("Nombre:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
                             directives: [
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.estadoServicio,
-                                expression: "estadoServicio"
+                                value: _vm.nombreCategoria,
+                                expression: "nombreCategoria"
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              id: "nombreCategoria",
+                              placeholder: "Nombre Categoria"
+                            },
+                            domProps: { value: _vm.nombreCategoria },
                             on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.estadoServicio = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.nombreCategoria = $event.target.value
                               }
                             }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.nombreCategoria
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.nombreCategoria[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "urlVideoCategoria" }
                           },
-                          [
-                            _c(
-                              "option",
-                              { attrs: { value: "", disabled: "" } },
-                              [_vm._v("Seleccionar...")]
-                            ),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "1" } }, [
-                              _vm._v("Activo")
-                            ]),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "2" } }, [
-                              _vm._v("Inactivo")
-                            ])
-                          ]
+                          [_vm._v("Url YouTube:")]
                         ),
                         _vm._v(" "),
-                        _vm.arrayErrors.estadoServicio
-                          ? _c("p", {
-                              staticClass: "text-red",
-                              domProps: {
-                                textContent: _vm._s(
-                                  _vm.arrayErrors.estadoServicio[0]
-                                )
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.urlVideoCategoria,
+                                expression: "urlVideoCategoria"
                               }
-                            })
-                          : _vm._e()
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              id: "urlVideoCategoria",
+                              placeholder: "Url YouTube"
+                            },
+                            domProps: { value: _vm.urlVideoCategoria },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.urlVideoCategoria = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.urlVideoCategoria
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.urlVideoCategoria[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "files" }
+                          },
+                          [_vm._v("Imagen:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
+                            staticClass: "form-control",
+                            attrs: { type: "file", name: "files", id: "files" },
+                            on: { change: _vm.imagenSeleccionada2 }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.imagenCategoria
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.imagenCategoria[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "estadoCategoria" }
+                          },
+                          [_vm._v("Estado")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.estadoCategoria,
+                                  expression: "estadoCategoria"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.estadoCategoria = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                { attrs: { value: "", disabled: "" } },
+                                [_vm._v("Seleccionar...")]
+                              ),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "1" } }, [
+                                _vm._v("Activo")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "2" } }, [
+                                _vm._v("Inactivo")
+                              ])
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _vm.arrayErrors.estadoCategoria
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.estadoCategoria[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
                       ])
                     ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-footer" }, [
-                  _vm._m(9),
+                  ]),
                   _vm._v(" "),
-                  _vm.tipoAccionModal == 1
-                    ? _c("div", [
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _vm._m(11),
+                    _vm._v(" "),
+                    _vm.tipoAccionModal == 1
+                      ? _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.crearCategoria()
+                                }
+                              }
+                            },
+                            [
+                              _c("i", { staticClass: "fas fa-plus-circle" }),
+                              _vm._v(" Crear")
+                            ]
+                          )
+                        ])
+                      : _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.updateCategoria()
+                                }
+                              }
+                            },
+                            [
+                              _c("i", { staticClass: "fas fa-edit" }),
+                              _vm._v(" Actualizar")
+                            ]
+                          )
+                        ])
+                  ])
+                ]
+              )
+            ])
+          ])
+        ]
+      )
+    ]),
+    _vm._v(" "),
+    _c("section", [
+      _c(
+        "div",
+        { staticClass: "modal fade in", attrs: { id: "modalServicios" } },
+        [
+          _c("div", { staticClass: "modal-dialog" }, [
+            _c("div", { staticClass: "modal-content" }, [
+              _c(
+                "form",
+                {
+                  staticClass: "form-horizontal",
+                  attrs: { "content-type": "multipart/form-data" }
+                },
+                [
+                  _c("div", { staticClass: "modal-header" }, [
+                    _vm._m(12),
+                    _vm._v(" "),
+                    _vm.tipoAccionModal == 1
+                      ? _c("h4", { staticClass: "modal-title" }, [
+                          _c("i", { staticClass: "fas fa-plus-circle" }),
+                          _vm._v(" Crear Servicio")
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.tipoAccionModal == 2
+                      ? _c("h4", { staticClass: "modal-title" }, [
+                          _c("i", { staticClass: "fas fa-edit" }),
+                          _vm._v(" Actualizar Servicio")
+                        ])
+                      : _vm._e()
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "box-body" }, [
+                      _c("div", { staticClass: "form-group" }, [
                         _c(
-                          "button",
+                          "label",
                           {
-                            staticClass: "btn btn-success",
-                            attrs: { type: "button" },
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "categoriaServicio" }
+                          },
+                          [_vm._v("Elegir Categoria")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.categoriaServicio,
+                                  expression: "categoriaServicio"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.categoriaServicio = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                { attrs: { value: "", disabled: "" } },
+                                [_vm._v("Seleccionar Categoria...")]
+                              ),
+                              _vm._v(" "),
+                              _vm._l(_vm.arrayCategorias, function(categoria) {
+                                return _c("option", {
+                                  key: categoria.id,
+                                  domProps: {
+                                    value: categoria.id,
+                                    textContent: _vm._s(
+                                      categoria.nombre_categoria
+                                    )
+                                  }
+                                })
+                              })
+                            ],
+                            2
+                          ),
+                          _vm._v(" "),
+                          _vm.arrayErrors.categoriaServicio
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.categoriaServicio[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "Nombre" }
+                          },
+                          [_vm._v("Nombre:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.nombreServicio,
+                                expression: "nombreServicio"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              id: "Nombre",
+                              placeholder: "Nombre Servicio"
+                            },
+                            domProps: { value: _vm.nombreServicio },
                             on: {
-                              click: function($event) {
-                                return _vm.crearServicio()
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.nombreServicio = $event.target.value
                               }
                             }
-                          },
-                          [
-                            _c("i", { staticClass: "fas fa-plus-circle" }),
-                            _vm._v(" Crear")
-                          ]
-                        )
-                      ])
-                    : _c("div", [
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.nombreServicio
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.nombreServicio[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
                         _c(
-                          "button",
+                          "label",
                           {
-                            staticClass: "btn btn-success",
-                            attrs: { type: "button" },
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "descripcion" }
+                          },
+                          [_vm._v("Descripción:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("textarea", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.descripcion,
+                                expression: "descripcion"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              size: "2",
+                              id: "descripcion",
+                              placeholder: "Descripción del Servicio"
+                            },
+                            domProps: { value: _vm.descripcion },
                             on: {
-                              click: function($event) {
-                                return _vm.actualizarServicio()
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.descripcion = $event.target.value
                               }
                             }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.descripcion
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.descripcion[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "estadoServicio" }
                           },
-                          [
-                            _c("i", { staticClass: "fas fa-edit" }),
-                            _vm._v(" Actualizar")
-                          ]
-                        )
+                          [_vm._v("Estado")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.estadoServicio,
+                                  expression: "estadoServicio"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.estadoServicio = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                { attrs: { value: "", disabled: "" } },
+                                [_vm._v("Seleccionar...")]
+                              ),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "1" } }, [
+                                _vm._v("Activo")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "2" } }, [
+                                _vm._v("Inactivo")
+                              ])
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _vm.arrayErrors.estadoServicio
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.estadoServicio[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "urlVideoServicio" }
+                          },
+                          [_vm._v("Url YouTube:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.urlVideoServicio,
+                                expression: "urlVideoServicio"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              id: "urlVideoServicio",
+                              placeholder: "Url YouTube"
+                            },
+                            domProps: { value: _vm.urlVideoServicio },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.urlVideoServicio = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.urlVideoServicio
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.urlVideoServicio[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "files" }
+                          },
+                          [_vm._v("Imagen:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
+                            staticClass: "form-control",
+                            attrs: { type: "file", name: "files", id: "files" },
+                            on: { change: _vm.imagenSeleccionada2 }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.imagenServicio
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.imagenServicio[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass: "col-sm-4 control-label hidden-xs",
+                            attrs: { for: "valorServicio" }
+                          },
+                          [_vm._v("Valor Servicio:")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.valorServicio,
+                                expression: "valorServicio"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "valorServicio",
+                              placeholder: "Valor Servicio"
+                            },
+                            domProps: { value: _vm.valorServicio },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.valorServicio = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.arrayErrors.valorServicio
+                            ? _c("p", {
+                                staticClass: "text-red",
+                                domProps: {
+                                  textContent: _vm._s(
+                                    _vm.arrayErrors.valorServicio[0]
+                                  )
+                                }
+                              })
+                            : _vm._e()
+                        ])
                       ])
-                ])
-              ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _vm._m(13),
+                    _vm._v(" "),
+                    _vm.tipoAccionModal == 1
+                      ? _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.crearServicio()
+                                }
+                              }
+                            },
+                            [
+                              _c("i", { staticClass: "fas fa-plus-circle" }),
+                              _vm._v(" Crear")
+                            ]
+                          )
+                        ])
+                      : _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.actualizarServicio()
+                                }
+                              }
+                            },
+                            [
+                              _c("i", { staticClass: "fas fa-edit" }),
+                              _vm._v(" Actualizar")
+                            ]
+                          )
+                        ])
+                  ])
+                ]
+              )
             ])
           ])
         ]
@@ -40852,7 +41677,7 @@ var render = function() {
                 },
                 [
                   _c("div", { staticClass: "modal-header" }, [
-                    _vm._m(10),
+                    _vm._m(14),
                     _vm._v(" "),
                     _vm.tipoAccionModal == 1
                       ? _c("h4", { staticClass: "modal-title" }, [
@@ -40952,7 +41777,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-footer" }, [
-                    _vm._m(11),
+                    _vm._m(15),
                     _vm._v(" "),
                     _vm.tipoAccionModal == 1
                       ? _c("div", [
@@ -41057,6 +41882,47 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("h3", { staticClass: "box-title" }, [
+      _c("i", { staticClass: "fas fa-layer-group" }),
+      _vm._v(" Lista de Categorias")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "table-responsive container-fluid" }, [
+      _c(
+        "table",
+        {
+          staticClass: "table table-bordered table-hover",
+          staticStyle: { width: "100%" },
+          attrs: { id: "tablaCategorias" }
+        },
+        [
+          _c("thead", [
+            _c("tr", [
+              _c("th", [_vm._v("Nombre")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Estado")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Video")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Imagen")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Acciones")])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("tbody")
+        ]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "box-title" }, [
       _c("i", { staticClass: "far fa-list-alt" }),
       _vm._v(" Lista de Servicios")
     ])
@@ -41153,6 +42019,36 @@ var staticRenderFns = [
         _vm._v(" Actualizar Empresa")
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-danger pull-left",
+        attrs: { type: "button", "data-dismiss": "modal" }
+      },
+      [_c("i", { staticClass: "fas fa-times" }), _vm._v(" Cancelar")]
+    )
   },
   function() {
     var _vm = this
