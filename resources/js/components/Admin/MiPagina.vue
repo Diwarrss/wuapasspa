@@ -83,6 +83,29 @@
                 <div class="col-md-8">
                     <div class="box box-success">
                         <div class="box-header">
+                            <h3 class="box-title"><i class="far fa-images"></i> Lista de Imagenes</h3>
+                            <button type="button" class="btn btn-primary" @click="abrirModalImagen()">
+                                <i class="fas fa-upload"></i> Subir
+                            </button>
+                        </div>
+
+                        <div class="table-responsive container-fluid">
+                            <table id="tablaImagenes" class="table table-bordered table-hover" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Creado el</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-success">
+                        <div class="box-header">
                             <h3 class="box-title"><i class="fas fa-layer-group"></i> Lista de Categorias</h3>
                             <button type="button" class="btn btn-primary" @click="abrirModalCategorias()">
                                 <i class="fas fa-plus-circle"></i> Crear
@@ -105,6 +128,10 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
                     <div class="box box-success">
                         <div class="box-header">
                             <h3 class="box-title"><i class="far fa-list-alt"></i> Lista de Servicios</h3>
@@ -119,31 +146,11 @@
                                     <tr>
                                         <th>Nombre</th>
                                         <th>Descripción</th>
+                                        <th>Categoría</th>
                                         <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="box box-success">
-                        <div class="box-header">
-                            <h3 class="box-title"><i class="far fa-images"></i> Lista de Imagenes</h3>
-                            <button type="button" class="btn btn-primary" @click="abrirModalImagen()">
-                                <i class="fas fa-upload"></i> Subir
-                            </button>
-                        </div>
-
-                        <div class="table-responsive container-fluid">
-                            <table id="tablaImagenes" class="table table-bordered table-hover" style="width:100%">
-                                <thead>
-                                    <tr>
+                                        <th>Precio</th>
+                                        <th>Video</th>
                                         <th>Imagen</th>
-                                        <th>Nombre</th>
-                                        <th>Creado el</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -636,7 +643,7 @@
                 fileCargada.append('imagenCategoria', me.imagenSelect2);
                 fileCargada.append('nombreCategoria', me.nombreCategoria);
                 fileCargada.append('estadoCategoria', me.estadoCategoria);
-                fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
+                fileCargada.append('urlVideoCategoria', 'https://www.youtube.com/watch?v='+me.urlVideoCategoria);
 
                 axios.post('/crearCategoria', fileCargada)//le envio el parametro completo
                     .then(function (response) {
@@ -670,7 +677,7 @@
                 fileCargada.append('nombreServicio', me.nombreServicio);
                 fileCargada.append('descripcion', me.descripcion);
                 fileCargada.append('estadoServicio', me.estadoServicio);
-                fileCargada.append('urlVideoServicio', me.urlVideoServicio);
+                fileCargada.append('urlVideoServicio', 'https://www.youtube.com/watch?v='+me.urlVideoServicio);
                 fileCargada.append('valorServicio', me.valorServicio);
 
                 //reseteamos los errores
@@ -708,7 +715,7 @@
                 this.estadoServicio='';
                 this.urlVideoServicio='';
                 this.imagenServicio=[];
-                this.valorServicio='';
+                this.valorServicio=0;
                 this.arrayErrors = [];
             },
             cerrarModalImagen(){
@@ -725,41 +732,6 @@
                 this.urlVideoCategoria='';
                 this.imagenCategoria=[];
                 this.arrayErrors = [];
-            },
-            actualizarServicio(){
-                //creamos variable q corresponde a this de mis variables de data()
-                let me=this;
-                //reseteamos los errores
-                this.arrayErrors=[];
-
-                axios.put('/actualizarServicio', {
-                    //enviamos los tados que hay en nuestros parametros
-                    'idServicio': this.idServicio,
-                    'empresas_empresas_id': this.empresas_empresas_id,
-                    'nombreServicio': this.nombreServicio,
-                    'descripcion': this.descripcion,
-                    'estadoServicio': this.estadoServicio
-                })
-                .then(function (response) {
-                    //para actualizar la tabla de datatables
-                    jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
-                    me.cerrarModal();
-                    Swal.fire({
-                        position: 'top-end',
-                        type: 'success',
-                        title: 'Servicio actualizado',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    console.log(response);
-                })
-                .catch(function (error) {
-                    if (error.response.status == 422) {//preguntamos si el error es 422
-                        me.arrayErrors = error.response.data.errors;//guardamos la respuesta del server de errores en el array arrayErrors
-                    };
-                    console.log(error);
-                    //console.log(me.arrayErrors);
-                });
             },
             //aquio enlistamos las categorias
             listarCategorias(){
@@ -888,15 +860,25 @@
                         "columns": [
                                 {data:'nombre_servicio'},
                                 {data:'descripcion_servicio'},
+                                {data:'nombre_categoria'},
                                 {render: function (data, type, row) {
-                                    if (row.estado_solicitud_nombre === 'Activo'){
-                                            return '<span class="label label-success">' + row.estado_solicitud_nombre + '</span>';
+                                    if (row.estado_servicio === '1'){
+                                            return '<span class="label label-success"> Activo</span>';
                                         }else{
-                                            return '<span class="label label-danger">' + row.estado_solicitud_nombre + '</span>';
+                                            return '<span class="label label-danger"> Desactivado</span>';
                                         }
                                     }
                                 },
-                                {defaultContent:'<button class="btn btn-warning edit btn-sm" title="Editar Servicio")><i class="fas fa-edit"></i> Editar</button>'}
+                                {data:'valor_servicio'},
+                                {render: function (data, type, row) {
+                                    return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                    }
+                                },
+                                {render: function (data, type, row) {
+                                    return '<img class="img-responsive" height="100px" width="100px" src="img/servicios/'+ row.url_imagen + '">';
+                                    }
+                                },
+                                {defaultContent:'<button class="btn btn-warning edit btn-sm" title="Editar Servicio"><i class="fas fa-edit"></i> Editar</button>'}
                             ]
                     });
                     //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
@@ -916,12 +898,52 @@
 
                         me.idServicio = data["id"];//el id es este q es de datatables o este id es de la consulta cualquiera sirve
                         me.empresas_empresas_id = 1;
+                        me.categoriaServicio = data["categorias_categorias_id"];
                         me.nombreServicio = data["nombre_servicio"];
                         me.descripcion = data["descripcion_servicio"];
                         me.estadoServicio = data["estado_servicio"];
+                        me.urlVideoServicio = 'https://www.youtube.com/watch?v='+data["url_video"];
+                        me.valorServicio = data["valor_servicio"];
                     });
 
                 } );
+            },
+            actualizarServicio(){
+                //creamos variable q corresponde a this de mis variables de data()
+                let me=this;
+
+                let fileCargada = new FormData();
+                fileCargada.append('idServicio', me.idServicio);
+                fileCargada.append('imagenServicio', me.imagenSelect2);
+                fileCargada.append('categoriaServicio', me.categoriaServicio);
+                fileCargada.append('nombreServicio', me.nombreServicio);
+                fileCargada.append('descripcion', me.descripcion);
+                fileCargada.append('estadoServicio', me.estadoServicio);
+                fileCargada.append('urlVideoServicio', me.urlVideoServicio);
+                fileCargada.append('valorServicio', me.valorServicio);
+
+                axios.post('/actualizarServicio', fileCargada)
+                .then(function (response) {
+                    //para actualizar la tabla de datatables
+                    Swal.fire({
+                        position: 'top-end',
+                        type: 'success',
+                        title: 'Servicio actualizado!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(function(){
+                        jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
+                        me.cerrarModal();
+                    });
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    if (error.response.status == 422) {//preguntamos si el error es 422
+                        me.arrayErrors = error.response.data.errors;//guardamos la respuesta del server de errores en el array arrayErrors
+                    };
+                    console.log(error);
+                    //console.log(me.arrayErrors);
+                });
             },
             listarImagenes(){
                 let me=this;//creamos esta variable para q nos reconozca los atributos de vuejs
@@ -1009,6 +1031,8 @@
                 this.empresas_empresas_id= 1;
                 this.nombreServicio='';
                 this.descripcion='';
+                this.urlVideoServicio='';
+                this.valorServicio=0;
                 this.estadoServicio='';
                 this.arrayErrors = [];
             },

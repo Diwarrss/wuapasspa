@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Servicio; //importa el model de servcios
+use App\Imagene;
 use Illuminate\Support\Facades\DB;
 
 class ServiciosController extends Controller
@@ -27,11 +28,14 @@ class ServiciosController extends Controller
 
     public function showServicios(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        //if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
 
         $servicios = DB::table('servicios')
-                    ->select('id','empresas_empresas_id','nombre_servicio','descripcion_servicio','estado_servicio',
-                        DB::raw("if(estado_servicio = 1, 'Activo', 'Inactivo') AS estado_solicitud_nombre"))
+                    ->leftJoin('imagenes', 'servicios.imagenes_imagenes_id', '=', 'imagenes.id')
+                    ->leftJoin('categorias', 'servicios.categorias_categorias_id', '=', 'categorias.id')
+                    ->select('servicios.id','servicios.nombre_servicio','servicios.descripcion_servicio','servicios.estado_servicio',
+                            'servicios.url_video','servicios.valor_servicio','imagenes.empresas_empresas_id','imagenes.url_imagen', 'categorias.nombre_categoria',
+                            'servicios.categorias_categorias_id')
                     ->get();
 
         return datatables($servicios)
@@ -100,7 +104,6 @@ class ServiciosController extends Controller
             $servicio->url_video = $url_Final;
             $servicio->valor_servicio = $request->valorServicio;
             $servicio->empresas_empresas_id = 1;
-            $servicio->imagenes_imagenes_id = $imagen->id;
             $servicio->categorias_categorias_id = $request->categoriaServicio;
             $servicio->save();
         }
@@ -108,19 +111,23 @@ class ServiciosController extends Controller
 
     public function actualizarServicio(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
-        //para validar los formularios
+        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+
+        //para validar
         $request->validate([
-            'imagenCategoria' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'nombreCategoria' => 'required|max:200|string|unique:categorias,nombre_categoria,'.$request->idCategoria,
-            'estadoCategoria' => 'required|string',
-            'urlVideoCategoria' => 'max:500'
+            'categoriaServicio' => 'required',
+            'nombreServicio' => 'required|max:150|string|',//unique:servicios,nombre_servicio,'.$request->idServicio
+            'descripcion' => 'required|max:255',
+            'estadoServicio' => 'required',
+            'urlVideoServicio' => 'max:500',
+            'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'valorServicio' => 'required|max:12'
         ]);
 
-        $categoria = Categoria::findOrFail($request->idCategoria);//actualizamos para el user logueado
-        $imagenFile = $request->imagenCategoria;//capturamos la imagen
+        $servicio = Servicio::findOrFail($request->idServicio);//actualizamos para el user logueado
+        $imagenFile = $request->imagenServicio;//capturamos la imagen
 
-        $url = $request->urlVideoCategoria;
+        $url = $request->urlVideoServicio;
 
         // break the URL into its components
         $parts = parse_url($url);
@@ -135,24 +142,28 @@ class ServiciosController extends Controller
 
         if ($imagenFile) {//validamos que alla una imagen
 
-            $idImagen = Imagene::find($categoria->imagenes_imagenes_id);
+            $idImagen = Imagene::find($servicio->imagenes_imagenes_id);
 
             if ($idImagen == null) {
-                $nombreImagen = $request->imagenCategoria->getClientOriginalName();//obtenemos el nombre de la imagen
+                $nombreImagen = $request->imagenServicio->getClientOriginalName();//obtenemos el nombre de la imagen
 
                 //Subimos la nueva imagen
-                $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
+                $imagenFile->move(public_path('/img/servicios/'), $nombreImagen);//guardamos la imagen en este directorio
 
                 $imagen = new Imagene();
                 $imagen->empresas_empresas_id = 1;
                 $imagen->url_imagen = $nombreImagen;
                 $imagen->save();
 
-                $categoria->nombre_categoria = $request->nombreCategoria;
-                $categoria->estado_categoria = $request->estadoCategoria;
-                $categoria->url_video = $url_Final;
-                $categoria->imagenes_imagenes_id = $imagen->id;
-                $categoria->save();
+                $servicio->nombre_servicio = $request->nombreServicio;
+                $servicio->descripcion_servicio = $request->descripcion;
+                $servicio->estado_servicio = $request->estadoServicio;
+                $servicio->url_video = $url_Final;
+                $servicio->valor_servicio = $request->valorServicio;
+                $servicio->empresas_empresas_id = 1;
+                $servicio->categorias_categorias_id = $request->categoriaServicio;
+                $servicio->imagenes_imagenes_id = $imagen->id;
+                $servicio->save();
             }else{
                 $nombreImagen = $request->imagenCategoria->getClientOriginalName();
                 //Subimos la nueva imagen
@@ -163,19 +174,27 @@ class ServiciosController extends Controller
                 $imagen->url_imagen = $nombreImagen;
                 $imagen->save();
 
-                $categoria->nombre_categoria = $request->nombreCategoria;
-                $categoria->estado_categoria = $request->estadoCategoria;
-                $categoria->url_video = $url_Final;
-                $categoria->imagenes_imagenes_id = $imagen->id;
-                $categoria->save();
+                $servicio->nombre_servicio = $request->nombreServicio;
+                $servicio->descripcion_servicio = $request->descripcion;
+                $servicio->estado_servicio = $request->estadoServicio;
+                $servicio->url_video = $url_Final;
+                $servicio->valor_servicio = $request->valorServicio;
+                $servicio->empresas_empresas_id = 1;
+                $servicio->categorias_categorias_id = $request->categoriaServicio;
+                $servicio->imagenes_imagenes_id = $imagen->id;
+                $servicio->save();
 
                 $idImagen->delete();
             }
         }else{
-            $categoria->nombre_categoria = $request->nombreCategoria;
-            $categoria->estado_categoria = $request->estadoCategoria;
-            $categoria->url_video = $url_Final;
-            $categoria->save();
+            $servicio->nombre_servicio = $request->nombreServicio;
+            $servicio->descripcion_servicio = $request->descripcion;
+            $servicio->estado_servicio = $request->estadoServicio;
+            $servicio->url_video = $url_Final;
+            $servicio->valor_servicio = $request->valorServicio;
+            $servicio->empresas_empresas_id = 1;
+            $servicio->categorias_categorias_id = $request->categoriaServicio;
+            $servicio->save();
         }
     }
 

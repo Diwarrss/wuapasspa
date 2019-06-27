@@ -4351,6 +4351,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4507,7 +4514,7 @@ __webpack_require__.r(__webpack_exports__);
       fileCargada.append('imagenCategoria', me.imagenSelect2);
       fileCargada.append('nombreCategoria', me.nombreCategoria);
       fileCargada.append('estadoCategoria', me.estadoCategoria);
-      fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
+      fileCargada.append('urlVideoCategoria', 'https://www.youtube.com/watch?v=' + me.urlVideoCategoria);
       axios.post('/crearCategoria', fileCargada) //le envio el parametro completo
       .then(function (response) {
         Swal.fire({
@@ -4539,7 +4546,7 @@ __webpack_require__.r(__webpack_exports__);
       fileCargada.append('nombreServicio', me.nombreServicio);
       fileCargada.append('descripcion', me.descripcion);
       fileCargada.append('estadoServicio', me.estadoServicio);
-      fileCargada.append('urlVideoServicio', me.urlVideoServicio);
+      fileCargada.append('urlVideoServicio', 'https://www.youtube.com/watch?v=' + me.urlVideoServicio);
       fileCargada.append('valorServicio', me.valorServicio); //reseteamos los errores
 
       this.arrayErrors = [];
@@ -4576,7 +4583,7 @@ __webpack_require__.r(__webpack_exports__);
       this.estadoServicio = '';
       this.urlVideoServicio = '';
       this.imagenServicio = [];
-      this.valorServicio = '';
+      this.valorServicio = 0;
       this.arrayErrors = [];
     },
     cerrarModalImagen: function cerrarModalImagen() {
@@ -4600,40 +4607,6 @@ __webpack_require__.r(__webpack_exports__);
       this.urlVideoCategoria = '';
       this.imagenCategoria = [];
       this.arrayErrors = [];
-    },
-    actualizarServicio: function actualizarServicio() {
-      //creamos variable q corresponde a this de mis variables de data()
-      var me = this; //reseteamos los errores
-
-      this.arrayErrors = [];
-      axios.put('/actualizarServicio', {
-        //enviamos los tados que hay en nuestros parametros
-        'idServicio': this.idServicio,
-        'empresas_empresas_id': this.empresas_empresas_id,
-        'nombreServicio': this.nombreServicio,
-        'descripcion': this.descripcion,
-        'estadoServicio': this.estadoServicio
-      }).then(function (response) {
-        //para actualizar la tabla de datatables
-        jQuery('#tablaServicios').DataTable().ajax.reload(null, false);
-        me.cerrarModal();
-        Swal.fire({
-          position: 'top-end',
-          type: 'success',
-          title: 'Servicio actualizado',
-          showConfirmButton: false,
-          timer: 1500
-        });
-        console.log(response);
-      })["catch"](function (error) {
-        if (error.response.status == 422) {
-          //preguntamos si el error es 422
-          me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
-        }
-
-        ;
-        console.log(error); //console.log(me.arrayErrors);
-      });
     },
     //aquio enlistamos las categorias
     listarCategorias: function listarCategorias() {
@@ -4768,15 +4741,27 @@ __webpack_require__.r(__webpack_exports__);
           }, {
             data: 'descripcion_servicio'
           }, {
+            data: 'nombre_categoria'
+          }, {
             render: function render(data, type, row) {
-              if (row.estado_solicitud_nombre === 'Activo') {
-                return '<span class="label label-success">' + row.estado_solicitud_nombre + '</span>';
+              if (row.estado_servicio === '1') {
+                return '<span class="label label-success"> Activo</span>';
               } else {
-                return '<span class="label label-danger">' + row.estado_solicitud_nombre + '</span>';
+                return '<span class="label label-danger"> Desactivado</span>';
               }
             }
           }, {
-            defaultContent: '<button class="btn btn-warning edit btn-sm" title="Editar Servicio")><i class="fas fa-edit"></i> Editar</button>'
+            data: 'valor_servicio'
+          }, {
+            render: function render(data, type, row) {
+              return '<iframe width="200" height="100" src="https://www.youtube.com/embed/' + row.url_video + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            }
+          }, {
+            render: function render(data, type, row) {
+              return '<img class="img-responsive" height="100px" width="100px" src="img/servicios/' + row.url_imagen + '">';
+            }
+          }, {
+            defaultContent: '<button class="btn btn-warning edit btn-sm" title="Editar Servicio"><i class="fas fa-edit"></i> Editar</button>'
           }]
         }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
 
@@ -4801,10 +4786,48 @@ __webpack_require__.r(__webpack_exports__);
           me.idServicio = data["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
 
           me.empresas_empresas_id = 1;
+          me.categoriaServicio = data["categorias_categorias_id"];
           me.nombreServicio = data["nombre_servicio"];
           me.descripcion = data["descripcion_servicio"];
           me.estadoServicio = data["estado_servicio"];
+          me.urlVideoServicio = 'https://www.youtube.com/watch?v=' + data["url_video"];
+          me.valorServicio = data["valor_servicio"];
         });
+      });
+    },
+    actualizarServicio: function actualizarServicio() {
+      //creamos variable q corresponde a this de mis variables de data()
+      var me = this;
+      var fileCargada = new FormData();
+      fileCargada.append('idServicio', me.idServicio);
+      fileCargada.append('imagenServicio', me.imagenSelect2);
+      fileCargada.append('categoriaServicio', me.categoriaServicio);
+      fileCargada.append('nombreServicio', me.nombreServicio);
+      fileCargada.append('descripcion', me.descripcion);
+      fileCargada.append('estadoServicio', me.estadoServicio);
+      fileCargada.append('urlVideoServicio', me.urlVideoServicio);
+      fileCargada.append('valorServicio', me.valorServicio);
+      axios.post('/actualizarServicio', fileCargada).then(function (response) {
+        //para actualizar la tabla de datatables
+        Swal.fire({
+          position: 'top-end',
+          type: 'success',
+          title: 'Servicio actualizado!',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(function () {
+          jQuery('#tablaServicios').DataTable().ajax.reload(null, false);
+          me.cerrarModal();
+        });
+        console.log(response);
+      })["catch"](function (error) {
+        if (error.response.status == 422) {
+          //preguntamos si el error es 422
+          me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+        }
+
+        ;
+        console.log(error); //console.log(me.arrayErrors);
       });
     },
     listarImagenes: function listarImagenes() {
@@ -4904,6 +4927,8 @@ __webpack_require__.r(__webpack_exports__);
       this.empresas_empresas_id = 1;
       this.nombreServicio = '';
       this.descripcion = '';
+      this.urlVideoServicio = '';
+      this.valorServicio = 0;
       this.estadoServicio = '';
       this.arrayErrors = [];
     },
@@ -40241,13 +40266,13 @@ var render = function() {
                   attrs: { type: "button" },
                   on: {
                     click: function($event) {
-                      return _vm.abrirModalCategorias()
+                      return _vm.abrirModalImagen()
                     }
                   }
                 },
                 [
-                  _c("i", { staticClass: "fas fa-plus-circle" }),
-                  _vm._v(" Crear\n                        ")
+                  _c("i", { staticClass: "fas fa-upload" }),
+                  _vm._v(" Subir\n                        ")
                 ]
               )
             ]),
@@ -40266,7 +40291,7 @@ var render = function() {
                   attrs: { type: "button" },
                   on: {
                     click: function($event) {
-                      return _vm.abrirModal()
+                      return _vm.abrirModalCategorias()
                     }
                   }
                 },
@@ -40278,8 +40303,12 @@ var render = function() {
             ]),
             _vm._v(" "),
             _vm._m(6)
-          ]),
-          _vm._v(" "),
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-12" }, [
           _c("div", { staticClass: "box box-success" }, [
             _c("div", { staticClass: "box-header" }, [
               _vm._m(7),
@@ -40291,13 +40320,13 @@ var render = function() {
                   attrs: { type: "button" },
                   on: {
                     click: function($event) {
-                      return _vm.abrirModalImagen()
+                      return _vm.abrirModal()
                     }
                   }
                 },
                 [
-                  _c("i", { staticClass: "fas fa-upload" }),
-                  _vm._v(" Subir\n                        ")
+                  _c("i", { staticClass: "fas fa-plus-circle" }),
+                  _vm._v(" Crear\n                        ")
                 ]
               )
             ]),
@@ -41892,6 +41921,45 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("h3", { staticClass: "box-title" }, [
+      _c("i", { staticClass: "far fa-images" }),
+      _vm._v(" Lista de Imagenes")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "table-responsive container-fluid" }, [
+      _c(
+        "table",
+        {
+          staticClass: "table table-bordered table-hover",
+          staticStyle: { width: "100%" },
+          attrs: { id: "tablaImagenes" }
+        },
+        [
+          _c("thead", [
+            _c("tr", [
+              _c("th", [_vm._v("Imagen")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Nombre")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Creado el")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Acciones")])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("tbody")
+        ]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "box-title" }, [
       _c("i", { staticClass: "fas fa-layer-group" }),
       _vm._v(" Lista de Categorias")
     ])
@@ -41956,46 +42024,15 @@ var staticRenderFns = [
               _vm._v(" "),
               _c("th", [_vm._v("Descripción")]),
               _vm._v(" "),
+              _c("th", [_vm._v("Categoría")]),
+              _vm._v(" "),
               _c("th", [_vm._v("Estado")]),
               _vm._v(" "),
-              _c("th", [_vm._v("Acciones")])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("tbody")
-        ]
-      )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("h3", { staticClass: "box-title" }, [
-      _c("i", { staticClass: "far fa-images" }),
-      _vm._v(" Lista de Imagenes")
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "table-responsive container-fluid" }, [
-      _c(
-        "table",
-        {
-          staticClass: "table table-bordered table-hover",
-          staticStyle: { width: "100%" },
-          attrs: { id: "tablaImagenes" }
-        },
-        [
-          _c("thead", [
-            _c("tr", [
+              _c("th", [_vm._v("Precio")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Video")]),
+              _vm._v(" "),
               _c("th", [_vm._v("Imagen")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Nombre")]),
-              _vm._v(" "),
-              _c("th", [_vm._v("Creado el")]),
               _vm._v(" "),
               _c("th", [_vm._v("Acciones")])
             ])
