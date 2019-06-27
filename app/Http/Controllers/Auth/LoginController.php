@@ -15,7 +15,7 @@ class LoginController extends Controller
 {
     public function showLoginForm(){
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
 
         return view('auth.login', ['logoEmpresa' => $logoEmpresa]);//retornamos la vista q esta en kla carpeta auth

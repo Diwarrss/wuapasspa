@@ -28,7 +28,7 @@ class Role extends Model
     const Administrador = 1;
     const Empleado = 2;
     const Cliente = 3;
-    const Agendador = 3;
+    const Agendador = 4;
 
     protected $fillable = [
         'nombre_rol',

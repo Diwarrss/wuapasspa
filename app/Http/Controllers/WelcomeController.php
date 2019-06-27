@@ -13,7 +13,7 @@ class WelcomeController extends Controller
     {
         $miEmpresa = Empresa::all();
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
         $imagenes = Imagene::all();
         $servicios = DB::table('servicios')

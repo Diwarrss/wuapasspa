@@ -163,7 +163,8 @@ return [
         'estado_usuario' => 'Estado',
         'imagen' => 'Imagen',
         'logo_empresa' =>'Logo Empresa',
-        'comentario' =>'Nota'
+        'comentario' =>'Nota', 
+        'roles_roles_id' =>'Rol'
     ],
 
 ];

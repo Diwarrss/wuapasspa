@@ -2384,12 +2384,16 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    listarReservaciones: function listarReservaciones() {
+    listarReservaciones: function listarReservaciones(sheluderXEmpelado) {
       var data = this;
-      axios.get('/listarTodo').then(function (response) {
+      axios.get('/listarTodo', {
+        params: {
+          empleadoID: sheluderXEmpelado
+        }
+      }).then(function (response) {
         // data.fechaprobable=response.data[0].fechaprobable;
         // data.comentario=response.data[0].comentario;
-        //console.log(response.data.data);
+        //console.log(response.data);
         data.objetodeCitas = response.data;
       })["catch"](function (error) {
         // handle error
@@ -2397,7 +2401,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     mostrarComentariosAgenda: function mostrarComentariosAgenda(objetoCitaEvento) {
-      return 'Cliente: ' + objetoCitaEvento.nombre_completo_cliente + '. Agendado A: ' + objetoCitaEvento.nombre_completo_empleado + '   ' + objetoCitaEvento.estado_reservacion_nombre;
+      return 'Cliente: ' + objetoCitaEvento.nombre_completo_cliente + '   ' + objetoCitaEvento.estado_reservacion_nombre;
     },
     listarEmpleados: function listarEmpleados() {
       var data = this;
@@ -2501,7 +2505,7 @@ __webpack_require__.r(__webpack_exports__);
                 }); //codigo para solo actualizar la fila que se esta llamando
 
                 jQuery('#tablaAgendasL').DataTable().ajax.reload(null, false);
-                data.listarReservaciones();
+                data.listarReservaciones(data.idEmpleadoElegido);
               })["catch"](function (error) {
                 if (error.response.status == 422) {
                   //preguntamos si el error es 422
@@ -2558,7 +2562,7 @@ __webpack_require__.r(__webpack_exports__);
                   timer: 1500
                 });
                 jQuery('#tablaAgendasL').DataTable().ajax.reload(null, false);
-                data.listarReservaciones();
+                data.listarReservaciones(data.idEmpleadoElegido);
               })["catch"](function (error) {
                 if (error.response.status == 422) {
                   //preguntamos si el error es 422
@@ -2601,7 +2605,7 @@ __webpack_require__.r(__webpack_exports__);
         // });
 
         jQuery('#tablaAgendasL').DataTable().ajax.reload();
-        data.listarReservaciones(); //refrescar todos los datos para el empleado seleccionado
+        data.listarReservaciones(data.idEmpleadoElegido); //refrescar todos los datos para el empleado seleccionado
         //console.log(event);
       })["catch"](function (error) {
         // if (error.response.status == 422) {//preguntamos si el error es 422
@@ -2640,7 +2644,7 @@ __webpack_require__.r(__webpack_exports__);
             }).then(function (response) {
               Swal.fire('Cita Cancelada!', '', 'success');
               jQuery('#tablaAgendasL').DataTable().ajax.reload();
-              data.listarReservaciones(); //refrescar todos los datos para el empleado seleccionado
+              data.listarReservaciones(data.idEmpleadoElegido); //refrescar todos los datos para el empleado seleccionado
             })["catch"](function (error) {
               if (error.response.status == 422) {
                 //preguntamos si el error es 422
@@ -2654,8 +2658,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     }
   },
+  watch: {
+    //apenas se sellecciona un peluqero que actualize los datos
+    idEmpleadoElegido: function idEmpleadoElegido() {
+      var data = this;
+      data.listarReservaciones(data.idEmpleadoElegido);
+    }
+  },
   mounted: function mounted() {
-    this.listarReservaciones();
+    //this.listarReservaciones();
     this.listarEmpleados();
     this.listarAgeAnonima();
   }
@@ -3380,14 +3391,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       id: 0,
       //id del empleado
-      roles_roles_id: 2,
-      //empleado
+      rol_user: '',
+      //empleado Rol
       empresas_empresas_id: 1,
       nombre_usuario: '',
       apellido_usuario: '',
@@ -3439,6 +3463,8 @@ __webpack_require__.r(__webpack_exports__);
               }
             }
           }, {
+            data: 'nombre_rol'
+          }, {
             render: function render(data, type, row) {
               if (row.estado_nombre === 'Activo') {
                 return '<button class="btn btn-warning edit btn-sm" title="Editar Empleado"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Empleado"><i class="fas fa-close"></i> Desactivar</button>';
@@ -3473,7 +3499,7 @@ __webpack_require__.r(__webpack_exports__);
 
           me.id = data["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
 
-          me.roles_roles_id = data["roles_roles_id"];
+          me.rol_user = data["roles_roles_id"];
           me.empresas_empresas_id = data["empresas_empresas_id"];
           me.nombre_usuario = data["nombre_usuario"];
           me.apellido_usuario = data["apellido_usuario"];
@@ -3606,7 +3632,7 @@ __webpack_require__.r(__webpack_exports__);
       this.arrayErrors = [];
       axios.post('/createEmpleado', {
         //enviamos los tados que hay en nuestros parametros
-        'roles_roles_id': this.roles_roles_id,
+        'roles_roles_id': this.rol_user,
         'empresas_empresas_id': this.empresas_empresas_id,
         'nombre_usuario': this.nombre_usuario,
         'apellido_usuario': this.apellido_usuario,
@@ -3646,7 +3672,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.put('/actualizarEmpleado', {
         //enviamos los tados que hay en nuestros parametros
         'id': this.id,
-        'roles_roles_id': this.roles_roles_id,
+        'roles_roles_id': this.rol_user,
         'empresas_empresas_id': this.empresas_empresas_id,
         'nombre_usuario': this.nombre_usuario,
         'apellido_usuario': this.apellido_usuario,
@@ -4187,6 +4213,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4195,6 +4237,7 @@ __webpack_require__.r(__webpack_exports__);
       urlLogotipo: '/img/perfiles/',
       logo_empresa: '',
       imagenSelect1: '',
+      nombreImagen: '',
       imagenSelect2: '',
       idServicio: 0,
       //el id del servicio
@@ -4304,6 +4347,7 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       var fileCargada = new FormData();
       fileCargada.append('file', me.imagenSelect2);
+      fileCargada.append('nombreImagen', me.nombreImagen);
       axios.post('/saveImagen', fileCargada) //le envio el parametro completo
       .then(function (response) {
         Swal.fire({
@@ -4490,6 +4534,8 @@ __webpack_require__.r(__webpack_exports__);
             render: function render(data, type, row) {
               return '<img class="img-responsive" height="100px" width="100px" src="img/carousel/' + row.url_imagen + '">';
             }
+          }, {
+            data: 'nombre_imagen'
           }, {
             data: 'created_at'
           }, {
@@ -33890,7 +33936,6 @@ function open(propsData) {
     }
 });
 
-
 /***/ }),
 
 /***/ "./node_modules/v-calendar-scheduler/components/mixins/IsView.js":
@@ -35917,7 +35962,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _EventDialogInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EventDialogInput */ "./node_modules/v-calendar-scheduler/components/dialog/EventDialogInput.vue");
-//
 //
 //
 //
@@ -39158,6 +39202,73 @@ var render = function() {
                       "label",
                       {
                         staticClass: "col-sm-4 control-label hidden-xs",
+                        attrs: { for: "rol_user" }
+                      },
+                      [_vm._v("Rol")]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.rol_user,
+                              expression: "rol_user"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.rol_user = $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            }
+                          }
+                        },
+                        [
+                          _c("option", { attrs: { value: "", disabled: "" } }, [
+                            _vm._v("Seleccionar...")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "2" } }, [
+                            _vm._v("Empleado")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "4" } }, [
+                            _vm._v("Agendador")
+                          ])
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _vm.arrayErrors.roles_roles_id
+                        ? _c("p", {
+                            staticClass: "text-red",
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.arrayErrors.roles_roles_id[0]
+                              )
+                            }
+                          })
+                        : _vm._e()
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "col-sm-4 control-label hidden-xs",
                         attrs: { for: "estado_usuario" }
                       },
                       [_vm._v("Estado")]
@@ -39337,6 +39448,8 @@ var staticRenderFns = [
                 _c("th", [_vm._v("WhatsApp")]),
                 _vm._v(" "),
                 _c("th", [_vm._v("Estado")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Rol")]),
                 _vm._v(" "),
                 _c("th", [_vm._v("Acciones")])
               ])
@@ -39923,6 +40036,60 @@ var render = function() {
                                       _vm.arrayErrors[
                                         "empresa.nombre_empresa"
                                       ][0]
+                                    )
+                                  }
+                                })
+                              : _vm._e()
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c(
+                            "label",
+                            {
+                              staticClass: "col-sm-4 control-label hidden-xs",
+                              attrs: { for: "NombreCorto" }
+                            },
+                            [_vm._v("Nombre Corto:")]
+                          ),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: empresa.nombre_corto,
+                                  expression: "empresa.nombre_corto"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                id: "NombreCorto",
+                                placeholder: "Nombres"
+                              },
+                              domProps: { value: empresa.nombre_corto },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    empresa,
+                                    "nombre_corto",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _vm.arrayErrors["empresa.nombre_corto"]
+                              ? _c("p", {
+                                  staticClass: "text-red",
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      _vm.arrayErrors["empresa.nombre_corto"][0]
                                     )
                                   }
                                 })
@@ -40725,6 +40892,61 @@ var render = function() {
                               : _vm._e()
                           ]
                         )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group row" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-12 col-sm-12 col-12 col-form-label d-none d-sm-block",
+                            attrs: { for: "password" }
+                          },
+                          [_vm._v("Nombre Imagen")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "col-md-12 col-sm-12 col-12" },
+                          [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.nombreImagen,
+                                  expression: "nombreImagen"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                id: "password",
+                                placeholder: "Nombre Imagen"
+                              },
+                              domProps: { value: _vm.nombreImagen },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.nombreImagen = $event.target.value
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _vm.arrayErrors.nombreImagen
+                              ? _c("p", {
+                                  staticClass: "text-red",
+                                  domProps: {
+                                    textContent: _vm._s(
+                                      _vm.arrayErrors.nombreImagen[0]
+                                    )
+                                  }
+                                })
+                              : _vm._e()
+                          ]
+                        )
                       ])
                     ])
                   ]),
@@ -40894,6 +41116,8 @@ var staticRenderFns = [
           _c("thead", [
             _c("tr", [
               _c("th", [_vm._v("Imagen")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Nombre")]),
               _vm._v(" "),
               _c("th", [_vm._v("Creado el")]),
               _vm._v(" "),

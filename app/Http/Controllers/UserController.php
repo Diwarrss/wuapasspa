@@ -22,10 +22,10 @@ class UserController extends Controller
         //creamos la consulta de los usuarios que pertenecen al rol Empleados
         $empleados = User::join('roles', 'users.roles_roles_id','=','roles.id')
                         ->select('users.id', 'users.roles_roles_id', 'empresas_empresas_id', 'nombre_usuario', 'apellido_usuario',
-                                'usuario', 'email', 'password', 'celular', 'fecha_cumple', 'imagen', 'estado_usuario',
+                                'usuario', 'email', 'password', 'celular', 'fecha_cumple', 'imagen', 'estado_usuario', 'roles.nombre_rol',
                                 DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre"),
                                 DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo"))
-                        ->where('roles_roles_id', 2)
+                        ->whereIn('roles_roles_id', [2,4])
                         ->orderBy('users.id','asc')
                         ->get();
 
@@ -67,10 +67,11 @@ class UserController extends Controller
             'celular' => ['required', 'string', 'max:100'],
             'fecha_cumple' => ['required', 'string', 'max:100'],
             'estado_usuario' => ['required'],
+            'roles_roles_id' => ['required']
         ]);
 
         $empleado =  new User();
-        $empleado->roles_roles_id = 2;
+        $empleado->roles_roles_id = $request->roles_roles_id;
         $empleado->empresas_empresas_id = 1;
         $empleado->nombre_usuario = $request->nombre_usuario;
         $empleado->apellido_usuario = $request->apellido_usuario;
@@ -103,9 +104,10 @@ class UserController extends Controller
                 'celular' => ['required', 'string', 'max:100'],
                 'fecha_cumple' => ['required', 'string', 'max:100'],
                 'estado_usuario' => ['required'],
+                'roles_roles_id' => ['required'],
             ]);
 
-            $empleado->roles_roles_id = 2;
+            $empleado->roles_roles_id = $request->roles_roles_id;
             $empleado->empresas_empresas_id = 1;
             $empleado->nombre_usuario = $request->nombre_usuario;
             $empleado->apellido_usuario = $request->apellido_usuario;

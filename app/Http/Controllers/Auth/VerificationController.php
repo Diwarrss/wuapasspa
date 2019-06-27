@@ -23,7 +23,7 @@ class VerificationController extends Controller
     public function show(Request $request)
     {
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
 
         return $request->user()->hasVerifiedEmail()

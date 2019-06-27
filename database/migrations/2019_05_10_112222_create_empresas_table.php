@@ -16,6 +16,7 @@ class CreateEmpresasTable extends Migration
         Schema::create('empresas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nombre_empresa', 200);
+            $table->string('nombre_corto', 100)->nullable();
             $table->integer('estado_empresa')->default(\App\Empresa::ACTIVO);//colocamos el estado por defecto de la varible cons del modelo empresa
             $table->string('nit_empresa', 12)->nullable();
             $table->string('direccion_empresa', 100)->nullable();
@@ -32,9 +33,9 @@ class CreateEmpresasTable extends Migration
         $now = new \DateTime();
 
         //inserto a la tabla datos registros
-        DB::table('empresas')->insert(array('id'=>'1','nombre_empresa'=>'Mayra Peluqueria','estado_empresa'=>'1', 'nit_empresa'=>'0000', 'direccion_empresa'=>'San Gil',
-            'correo_empresa'=>'mayrapelu@gmail.com', 'urlweb_empresa'=>'https://mayrapeluqueria.gridsoft.co/', 'facebook_empresa'=>'https://mayrapeluqueria.gridsoft.co/',
-            'instagram_empresa'=>'https://mayrapeluqueria.gridsoft.co/', 'celular_empresa'=>'3002154784', 'telefono_empresa'=>'0377244001', 'logo_empresa'=>'avatar.png', 'created_at'=>$now));
+        DB::table('empresas')->insert(array('id'=>'1','nombre_empresa'=>"Wuapa's Spa",'nombre_corto'=>'Spa','estado_empresa'=>'1', 'nit_empresa'=>'0', 'direccion_empresa'=>'San Gil',
+            'correo_empresa'=>'wuapasspa@gmail.com', 'urlweb_empresa'=>'https://wuapasspa.gridsoft.co/', 'facebook_empresa'=>'https://www.facebook.com/wuapasSpa/',
+            'instagram_empresa'=>'https://www.instagram.com/wuapas_spa/', 'celular_empresa'=>'3174588999', 'telefono_empresa'=>'0', 'logo_empresa'=>'logotipo.png', 'created_at'=>$now));
     }
 
     /**

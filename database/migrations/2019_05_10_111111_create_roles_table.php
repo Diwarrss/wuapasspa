@@ -26,6 +26,7 @@ class CreateRolesTable extends Migration
         DB::table('roles')->insert(array('id'=>'1','nombre_rol'=>'Administrador','descripcion_rol'=>'Usuario que se encarga del control total de su sitio web, agendar y administrar.', 'created_at'=>$now));
         DB::table('roles')->insert(array('id'=>'2','nombre_rol'=>'Empleado','descripcion_rol'=>'Usuario con la capacidad de verificar al cliente atentido.', 'created_at'=>$now));
         DB::table('roles')->insert(array('id'=>'3','nombre_rol'=>'Cliente','descripcion_rol'=>'Usuario que solicitara la cita desde la pagina web.', 'created_at'=>$now));
+        DB::table('roles')->insert(array('id'=>'4','nombre_rol'=>'Agendador','descripcion_rol'=>'Usuario encargado de agendar y facturar los servicios.', 'created_at'=>$now));
     }
 
     /**

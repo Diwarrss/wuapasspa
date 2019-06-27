@@ -1,13 +1,13 @@
 <?php
 
 return [
-    'name' => 'MayraPeluqueria',
+    'name' => "Wuapa's Spa",
     'manifest' => [
-        'name' => env('APP_NAME', 'Mayra Peluqueria'),
-        'short_name' => 'Mayra Peluqueria',
+        'name' => env('APP_NAME', "Wuapa's Spa"),
+        'short_name' => "Wuapa's Spa",
         'start_url' => '/',
-        'background_color' => '#4c73b1',
-        'theme_color' => '#555299',
+        'background_color' => '#232323',
+        'theme_color' => '#232323',
         'display' => 'standalone',
         'orientation'=> 'any',
         'icons' => [

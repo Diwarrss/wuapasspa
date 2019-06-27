@@ -155,6 +155,14 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label for="NombreCorto" class="col-sm-4 control-label hidden-xs">Nombre Corto:</label>
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" class="form-control" id="NombreCorto" v-model="empresa.nombre_corto" placeholder="Nombres">
+                                                <p class="text-red" v-if="arrayErrors['empresa.nombre_corto']" v-text="arrayErrors['empresa.nombre_corto'][0]"></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label for="nit" class="col-sm-4 control-label hidden-xs">Nit:</label>
                                             <div class="col-sm-8 col-xs-12">
                                                 <input type="text" class="form-control" id="nit" v-model="empresa.nit_empresa" placeholder="Nit">

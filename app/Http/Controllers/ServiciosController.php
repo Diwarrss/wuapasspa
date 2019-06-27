@@ -93,7 +93,7 @@ class ServiciosController extends Controller
     //mostrar componenets o vista
     public function componente(){
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
         return view('/cliente/nuevaCita', ['logoEmpresa' => $logoEmpresa]);
     }

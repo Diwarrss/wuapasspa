@@ -31,6 +31,7 @@
                                 <th>Email</th>
                                 <th>WhatsApp</th>
                                 <th>Estado</th>
+                                <th>Rol</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -115,6 +116,18 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label for="rol_user" class="col-sm-4 control-label hidden-xs">Rol</label>
+
+                                <div class="col-sm-8 col-xs-12">
+                                    <select class="form-control" v-model="rol_user">
+                                      <option value="" disabled>Seleccionar...</option>
+                                      <option value="2">Empleado</option>
+                                      <option value="4">Agendador</option>
+                                    </select>
+                                    <p class="text-red" v-if="arrayErrors.roles_roles_id" v-text="arrayErrors.roles_roles_id[0]"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="estado_usuario" class="col-sm-4 control-label hidden-xs">Estado</label>
 
                                 <div class="col-sm-8 col-xs-12">
@@ -147,7 +160,7 @@
         data() {
             return {
                 id: 0,//id del empleado
-                roles_roles_id: 2,//empleado
+                rol_user: '',//empleado Rol
                 empresas_empresas_id: 1,
                 nombre_usuario:'',
                 apellido_usuario:'',
@@ -194,6 +207,7 @@
                                         }
                                     }
                                 },
+                                {data:'nombre_rol'},
                                 {render: function (data, type, row) {
                                     if (row.estado_nombre === 'Activo'){
                                             return '<button class="btn btn-warning edit btn-sm" title="Editar Empleado"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Empleado"><i class="fas fa-close"></i> Desactivar</button>';
@@ -226,7 +240,7 @@
                         //console.log('Row data:' + data);
 
                         me.id = data["id"];//el id es este q es de datatables o este id es de la consulta cualquiera sirve
-                        me.roles_roles_id = data["roles_roles_id"];
+                        me.rol_user = data["roles_roles_id"];
                         me.empresas_empresas_id = data["empresas_empresas_id"];
                         me.nombre_usuario = data["nombre_usuario"];
                         me.apellido_usuario = data["apellido_usuario"];
@@ -350,7 +364,7 @@
 
                 axios.post('/createEmpleado', {
                     //enviamos los tados que hay en nuestros parametros
-                    'roles_roles_id': this.roles_roles_id,
+                    'roles_roles_id': this.rol_user,
                     'empresas_empresas_id': this.empresas_empresas_id,
                     'nombre_usuario': this.nombre_usuario,
                     'apellido_usuario': this.apellido_usuario,
@@ -392,7 +406,7 @@
                 axios.put('/actualizarEmpleado', {
                     //enviamos los tados que hay en nuestros parametros
                     'id': this.id,
-                    'roles_roles_id': this.roles_roles_id,
+                    'roles_roles_id': this.rol_user,
                     'empresas_empresas_id': this.empresas_empresas_id,
                     'nombre_usuario': this.nombre_usuario,
                     'apellido_usuario': this.apellido_usuario,

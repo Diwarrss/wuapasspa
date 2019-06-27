@@ -15,7 +15,7 @@ class EmpresaController extends Controller
 
         $miEmpresa = DB::table('empresas')
                     ->join('users', 'empresas.id', '=', 'users.empresas_empresas_id')
-                    ->select('empresas.id','empresas.nombre_empresa','empresas.estado_empresa','empresas.nit_empresa','empresas.direccion_empresa',
+                    ->select('empresas.id','empresas.nombre_empresa','empresas.nombre_corto','empresas.estado_empresa','empresas.nit_empresa','empresas.direccion_empresa',
                     'empresas.correo_empresa','empresas.urlweb_empresa',
                     'empresas.facebook_empresa','empresas.instagram_empresa',
                     'empresas.celular_empresa','empresas.telefono_empresa','logo_empresa')
@@ -31,7 +31,7 @@ class EmpresaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function actualizarEmpresa(Request $request)
     {
         if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
 
@@ -55,6 +55,7 @@ class EmpresaController extends Controller
             ]);
 
             $Empresa->nombre_empresa = $request->empresa['nombre_empresa'];
+            $Empresa->nombre_corto = $request->empresa['nombre_corto'];
             $Empresa->nit_empresa = $request->empresa['nit_empresa'];
             $Empresa->direccion_empresa = $request->empresa['direccion_empresa'];
             $Empresa->correo_empresa = $request->empresa['correo_empresa'];

@@ -27,7 +27,7 @@ class RegisterController extends Controller
     public function showRegistrationForm()
     {
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
 
         return view('auth.register', ['logoEmpresa' => $logoEmpresa]);

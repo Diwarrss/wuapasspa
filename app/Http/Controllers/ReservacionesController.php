@@ -401,7 +401,8 @@ class ReservacionesController extends Controller
                                                         WHEN 3 THEN 'No Asistió'
                                                         WHEN 4 THEN 'En Espera'
                                                         ELSE 'Cancelo' END) AS estado_reservacion_nombre"))
-                                       ->where('reservaciones.estado_reservacion','<>', '5');
+                                       ->where([['reservaciones.estado_reservacion','<>', '5'], 
+                                                ['users.id','=',$request->empleadoID]]);
 
 
         $anonimos =  DB::table('anonimos')->join('reservaciones', 'reservaciones.id', '=', 'anonimos.reservaciones_id')
@@ -417,7 +418,8 @@ class ReservacionesController extends Controller
                                                         WHEN 3 THEN 'No Asistió'
                                                         WHEN 4 THEN 'En Espera'
                                                         ELSE 'Cancelo' END) AS estado_reservacion_nombre"))
-                                        ->where('reservaciones.estado_reservacion','<>', '5')
+                                        ->where([['reservaciones.estado_reservacion','<>', '5'], 
+                                                        ['users.id','=',$request->empleadoID]])
                                         ->unionAll($reservaciones)
                                         ->get();
 

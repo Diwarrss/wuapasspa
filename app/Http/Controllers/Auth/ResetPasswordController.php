@@ -24,7 +24,7 @@ class ResetPasswordController extends Controller
     public function showResetForm(Request $request, $token = null)
     {
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
 
         return view('auth.passwords.reset', ['logoEmpresa' => $logoEmpresa])->with(

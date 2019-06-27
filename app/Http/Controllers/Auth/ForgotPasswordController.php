@@ -24,7 +24,7 @@ class ForgotPasswordController extends Controller
     public function showLinkRequestForm()
     {
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
 
         return view('auth.passwords.email', ['logoEmpresa' => $logoEmpresa]);

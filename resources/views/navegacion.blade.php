@@ -10,14 +10,14 @@
         </button>
         <div class="menu-logo">
             <div class="navbar-brand">
+                @foreach ($logoEmpresa as $item)
                 <span class="navbar-logo">
                     <a href="{{asset('/')}}">
-                        @foreach ($logoEmpresa as $item)
                         <img src="/img/perfiles/{{$item->logo_empresa}}" alt="Mobirise" title="" style="height: 3.8rem;">
-                        @endforeach
                     </a>
                 </span>
-                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="">Peluqueria</a></span>
+                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="">{{$item->nombre_corto}}</a></span>
+                @endforeach
             </div>
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">

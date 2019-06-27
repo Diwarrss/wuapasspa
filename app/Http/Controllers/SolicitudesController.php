@@ -172,7 +172,7 @@ class SolicitudesController extends Controller
 
     public function componente(){
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
 
         return view('/cliente/misCitas', ['logoEmpresa' => $logoEmpresa]);

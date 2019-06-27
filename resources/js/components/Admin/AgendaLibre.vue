@@ -128,21 +128,25 @@ export default {
         }
     },
     methods: {
-        listarReservaciones(){
+        listarReservaciones(sheluderXEmpelado){
                 var data = this;
-                axios.get('/listarTodo').then(function (response) {
+                axios.get('/listarTodo', {
+                            params: {
+                                empleadoID: sheluderXEmpelado
+                            }
+                        }).then(function (response) {
                     // data.fechaprobable=response.data[0].fechaprobable;
                     // data.comentario=response.data[0].comentario;
-                    //console.log(response.data.data);
+                    //console.log(response.data);
                     data.objetodeCitas=response.data;
                 })
                 .catch(function (error) {
                     // handle error
                     console.log(error);
                 });
-            },
+        },
         mostrarComentariosAgenda(objetoCitaEvento) {
-            return 'Cliente: ' + objetoCitaEvento.nombre_completo_cliente+ '. Agendado A: ' + objetoCitaEvento.nombre_completo_empleado
+            return 'Cliente: ' + objetoCitaEvento.nombre_completo_cliente
             +'   ' + objetoCitaEvento.estado_reservacion_nombre;
         },
         listarEmpleados(){
@@ -242,7 +246,7 @@ export default {
                                 });
                                 //codigo para solo actualizar la fila que se esta llamando
                                 jQuery('#tablaAgendasL').DataTable().ajax.reload(null,false);
-                                data.listarReservaciones();
+                                data.listarReservaciones(data.idEmpleadoElegido);
                             })
                             .catch(function (error) {
                                 if (error.response.status == 422) {//preguntamos si el error es 422
@@ -295,7 +299,7 @@ export default {
                                     timer: 1500
                                 });
                                 jQuery('#tablaAgendasL').DataTable().ajax.reload(null,false);
-                                data.listarReservaciones();
+                                data.listarReservaciones(data.idEmpleadoElegido);
                             })
                             .catch(function (error) {
                                 if (error.response.status == 422) {//preguntamos si el error es 422
@@ -336,7 +340,7 @@ export default {
                         //     window.location.href = "/admin";
                         // });
                         jQuery('#tablaAgendasL').DataTable().ajax.reload();
-                        data.listarReservaciones();//refrescar todos los datos para el empleado seleccionado
+                        data.listarReservaciones(data.idEmpleadoElegido);//refrescar todos los datos para el empleado seleccionado
                         //console.log(event);
                     })
                     .catch(function (error) {
@@ -382,7 +386,7 @@ export default {
                                     'success'
                                     );
                                     jQuery('#tablaAgendasL').DataTable().ajax.reload();
-                                    data.listarReservaciones();//refrescar todos los datos para el empleado seleccionado
+                                    data.listarReservaciones(data.idEmpleadoElegido);//refrescar todos los datos para el empleado seleccionado
                             })
                             .catch(function (error) {
                                 if (error.response.status == 422) {//preguntamos si el error es 422
@@ -401,8 +405,14 @@ export default {
 
             },
     },
+    watch: {//apenas se sellecciona un peluqero que actualize los datos
+            idEmpleadoElegido: function () {
+                var data = this;
+                data.listarReservaciones(data.idEmpleadoElegido);
+            }
+    },
     mounted() {
-        this.listarReservaciones();
+        //this.listarReservaciones();
         this.listarEmpleados();
         this.listarAgeAnonima();
     }

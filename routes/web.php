@@ -70,7 +70,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/showServices', 'ReportesController@showServices')->name('showServices');
         //vista Mi pagina
         Route::get('/mostrar', 'EmpresaController@index')->name('mostrarEmpresa');
-        Route::put('/actualizarEmpresa', 'EmpresaController@store')->name('actualizarEmpresa');
+        Route::put('/actualizarEmpresa', 'EmpresaController@actualizarEmpresa')->name('actualizarEmpresa');
         Route::get('/showServicios', 'ServiciosController@showServicios')->name('showServicios');
         Route::post('/crearServicio', 'ServiciosController@crearServicio')->name('crearServicio');
         Route::put('/actualizarServicio', 'ServiciosController@actualizarServicio')->name('actualizarServicio');
@@ -112,7 +112,7 @@ Route::group(['middleware' => 'auth'], function () {
         //Para ir a componente de miPerfil
         Route::get('/miPerfil', function () {
             $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa')
+                        ->select('logo_empresa','nombre_corto')
                         ->get();
             return view('/cliente/miPerfil', ['logoEmpresa' => $logoEmpresa]);})
             ->name('miPerfil');
