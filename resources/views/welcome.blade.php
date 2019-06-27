@@ -109,18 +109,38 @@
                                     <i class="fas fa-list-ul"></i> Servicios</strong></h2>
                             </div>
                             <!--Card-1-->
-                            @foreach ($categorias as $item)
+                            @foreach ($categorias as $categoria)
                             <div class="card px-3 col-12 col-md-6">
                                 <div class="card-wrapper media-container-row media-container-row">
-                                    <div class="card-box" >
-                                        <div class="top-line pb-1">
-                                            <h4 class="card-title mbr-fonts-style display-5">
-                                                <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45"> {{$item->nombre_categoria}}
-                                            </h4>
-                                            <p class="mbr-text card-title cost mbr-fonts-style m-0 display-4"></p>
-                                        </div>
+                                    <div class="card-box">
+
+                                        <div class="toggle-content">                                                
+                                                <div id="bootstrap-toggle" class="toggle-panel accordionStyles tab-content pt-5 mt-2">
+                                                    <div class="card">
+                                                        <div class="card-header" role="tab" id="headingOne">
+                                                            <a role="button" class="panel-title text-black collapsed" data-toggle="collapse" data-core="" href="#collapse{{$categoria->id}}" aria-expanded="false" aria-controls="collapse1">
+                                                                <h4 class="mbr-fonts-style display-5">
+                                                                    <span class="sign mbr-iconfont inactive mbri-arrow-down"></span> {{$categoria->nombre_categoria}} <img class="img-responsive" src="/img/logo/belleza.png" width="" height="45">
+                                                                </h4>
+                                                            </a>
+                                                        </div>
+                                                        <div id="collapse{{$categoria->id}}" class="panel-collapse noScroll collapse" role="tabpanel" aria-labelledby="headingOne" style="">
+                                                            <div class="panel-body p-4">
+                                                                <p class="mbr-fonts-style panel-text display-7">
+                                                                        <ul class="list-group">
+                                                                        @foreach ($categoria->serviciosobj as $servicioka)
+                                                                        <li class="list-group-item">{{$servicioka['nombre_servicio']}}</li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>                                                   
+                                                </div>
+                                            </div>
+                                        
                                     </div>
                                 </div>
+                                
                             </div>
                             @endforeach
                         </div>
