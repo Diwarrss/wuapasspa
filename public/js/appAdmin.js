@@ -4364,9 +4364,6 @@ __webpack_require__.r(__webpack_exports__);
       idServicio: 0,
       //el id del servicio
       empresas_empresas_id: 1,
-      nombreServicio: '',
-      descripcion: '',
-      estadoServicio: '',
       tipoAccionModal: '',
       file: '',
       idImagen: '',
@@ -4375,11 +4372,14 @@ __webpack_require__.r(__webpack_exports__);
       nombreCategoria: '',
       estadoCategoria: '',
       urlVideoCategoria: '',
-      imagenCategoria: '',
+      imagenCategoria: [],
       arrayCategorias: [],
+      nombreServicio: '',
+      descripcion: '',
+      estadoServicio: '',
       categoriaServicio: '',
       urlVideoServicio: '',
-      imagenServicio: '',
+      imagenServicio: [],
       valorServicio: 0
     };
   },
@@ -4519,6 +4519,7 @@ __webpack_require__.r(__webpack_exports__);
         }).then(function () {
           jQuery('#tablaCategorias').DataTable().ajax.reload();
           me.cerrarModalCategorias();
+          me.showCategoriaActivas();
         }); //console.log(response);
       })["catch"](function (error) {
         if (error.response.status == 422) {
@@ -4531,25 +4532,28 @@ __webpack_require__.r(__webpack_exports__);
     },
     crearServicio: function crearServicio() {
       //creamos variable q corresponde a this de mis variables de data()
-      var me = this; //reseteamos los errores
+      var me = this;
+      var fileCargada = new FormData();
+      fileCargada.append('imagenServicio', me.imagenSelect2);
+      fileCargada.append('categoriaServicio', me.categoriaServicio);
+      fileCargada.append('nombreServicio', me.nombreServicio);
+      fileCargada.append('descripcion', me.descripcion);
+      fileCargada.append('estadoServicio', me.estadoServicio);
+      fileCargada.append('urlVideoServicio', me.urlVideoServicio);
+      fileCargada.append('valorServicio', me.valorServicio); //reseteamos los errores
 
       this.arrayErrors = [];
-      axios.post('/crearServicio', {
-        //enviamos los tados que hay en nuestros parametros
-        'empresas_empresas_id': this.empresas_empresas_id,
-        'nombreServicio': this.nombreServicio,
-        'descripcion': this.descripcion,
-        'estadoServicio': this.estadoServicio
-      }).then(function (response) {
+      axios.post('/crearServicio', fileCargada).then(function (response) {
         //para actualizar la tabla de datatables
-        jQuery('#tablaServicios').DataTable().ajax.reload(null, false);
-        me.cerrarModal();
         Swal.fire({
           position: 'top-end',
           type: 'success',
           title: 'Servicio creado con éxito',
           showConfirmButton: false,
           timer: 1500
+        }).then(function () {
+          jQuery('#tablaServicios').DataTable().ajax.reload(null, false);
+          me.cerrarModal();
         }); //console.log(response);
       })["catch"](function (error) {
         if (error.response.status == 422) {
@@ -4566,9 +4570,13 @@ __webpack_require__.r(__webpack_exports__);
         type: "click"
       }); //para cerrar la modal con boostrap 3
 
+      this.categoriaServicio = '';
       this.nombreServicio = '';
       this.descripcion = '';
       this.estadoServicio = '';
+      this.urlVideoServicio = '';
+      this.imagenServicio = [];
+      this.valorServicio = '';
       this.arrayErrors = [];
     },
     cerrarModalImagen: function cerrarModalImagen() {
@@ -34238,6 +34246,7 @@ function open(propsData) {
     }
 });
 
+
 /***/ }),
 
 /***/ "./node_modules/v-calendar-scheduler/components/mixins/IsView.js":
@@ -36264,6 +36273,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _EventDialogInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EventDialogInput */ "./node_modules/v-calendar-scheduler/components/dialog/EventDialogInput.vue");
+//
 //
 //
 //
@@ -61290,7 +61300,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\wamp64\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
+module.exports = __webpack_require__(/*! c:\wamp64\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
 
 
 /***/ })

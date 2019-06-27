@@ -53,48 +53,129 @@ class ServiciosController extends Controller
             'valorServicio' => 'required|max:12'
         ]);
 
-        //para generear la transacccion
-        return DB::transaction(function () use ($request) {
-            //insertar el servicio
-            $servicios = new Servicio();
-            $servicios->empresas_empresas_id = $request->empresas_empresas_id;
-            $servicios->nombre_servicio = $request->nombreServicio;
-            $servicios->descripcion_servicio = $request->descripcion;
-            $servicios->estado_servicio = $request->estadoServicio;
-            $servicios->save();
-        });
+        //aqui guardamos la imagen en esta variable
+        $imagenFile = $request->imagenServicio;
+        //aqui guardamos la url del video para partirla
+        $url = $request->urlVideoServicio;
+
+        // break the URL into its components
+        $parts = parse_url($url);
+
+        // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
+
+        // parse variables into key=>value array
+        $query = array();
+        parse_str($parts['query'], $query);
+
+        $url_Final = $query['v']; // Z29MkJdMKqs
+
+        //insertar la Imagen
+        if ($imagenFile) {
+            $nombreImagen = $request->imagenServicio->getClientOriginalName();
+            //creamos la ruta dnd se va a guardar la imagen
+            //$path = Storage::disk('public')->put('img/carousel', $request->file('file'));//UN METODO DE SUBIR LA IMAGEN PERO SE REPITEN
+            $imagenFile->move(public_path('/img/servicios/'), $nombreImagen);
+
+            $imagen = new Imagene();
+            $imagen->empresas_empresas_id = 1;
+            $imagen->url_imagen = $nombreImagen;
+            $imagen->save();
+
+            $servicio = new Servicio();
+            $servicio->nombre_servicio = $request->nombreServicio;
+            $servicio->descripcion_servicio = $request->descripcion;
+            $servicio->estado_servicio = $request->estadoServicio;
+            $servicio->url_video = $url_Final;
+            $servicio->valor_servicio = $request->valorServicio;
+            $servicio->empresas_empresas_id = 1;
+            $servicio->imagenes_imagenes_id = $imagen->id;
+            $servicio->categorias_categorias_id = $request->categoriaServicio;
+            $servicio->save();
+
+        }else{
+            $servicio = new Servicio();
+            $servicio->nombre_servicio = $request->nombreServicio;
+            $servicio->descripcion_servicio = $request->descripcion;
+            $servicio->estado_servicio = $request->estadoServicio;
+            $servicio->url_video = $url_Final;
+            $servicio->valor_servicio = $request->valorServicio;
+            $servicio->empresas_empresas_id = 1;
+            $servicio->imagenes_imagenes_id = $imagen->id;
+            $servicio->categorias_categorias_id = $request->categoriaServicio;
+            $servicio->save();
+        }
     }
 
     public function actualizarServicio(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/');
+        //para validar los formularios
+        $request->validate([
+            'imagenCategoria' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nombreCategoria' => 'required|max:200|string|unique:categorias,nombre_categoria,'.$request->idCategoria,
+            'estadoCategoria' => 'required|string',
+            'urlVideoCategoria' => 'max:500'
+        ]);
 
-        try {
-            //usaremos transacciones
-            DB::beginTransaction();
+        $categoria = Categoria::findOrFail($request->idCategoria);//actualizamos para el user logueado
+        $imagenFile = $request->imagenCategoria;//capturamos la imagen
 
-            //para validar
-            $request->validate([
-                'nombreServicio' => 'required|min:5|max:150|string|unique:servicios,nombre_servicio,'.$request->idServicio,
-                'descripcion' => 'required|max:255',
-                'estadoServicio' => 'required',
-                'categoriaServicio' => 'required',
-                'urlVideoServicio' => 'max:500',
-                'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'valorServicio' => 'required|numeric|max:12'
-            ]);
+        $url = $request->urlVideoCategoria;
 
-            $servicios = Servicio::findOrFail($request->idServicio);
-            //insertar el servicio
-            $servicios->empresas_empresas_id = $request->empresas_empresas_id;
-            $servicios->nombre_servicio = $request->nombreServicio;
-            $servicios->descripcion_servicio = $request->descripcion;
-            $servicios->estado_servicio = $request->estadoServicio;
-            $servicios->save();
+        // break the URL into its components
+        $parts = parse_url($url);
 
-            DB::commit();//
-        } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+        // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
+
+        // parse variables into key=>value array
+        $query = array();
+        parse_str($parts['query'], $query);
+
+        $url_Final = $query['v']; // Z29MkJdMKqs
+
+        if ($imagenFile) {//validamos que alla una imagen
+
+            $idImagen = Imagene::find($categoria->imagenes_imagenes_id);
+
+            if ($idImagen == null) {
+                $nombreImagen = $request->imagenCategoria->getClientOriginalName();//obtenemos el nombre de la imagen
+
+                //Subimos la nueva imagen
+                $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
+
+                $imagen = new Imagene();
+                $imagen->empresas_empresas_id = 1;
+                $imagen->url_imagen = $nombreImagen;
+                $imagen->save();
+
+                $categoria->nombre_categoria = $request->nombreCategoria;
+                $categoria->estado_categoria = $request->estadoCategoria;
+                $categoria->url_video = $url_Final;
+                $categoria->imagenes_imagenes_id = $imagen->id;
+                $categoria->save();
+            }else{
+                $nombreImagen = $request->imagenCategoria->getClientOriginalName();
+                //Subimos la nueva imagen
+                $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
+
+                $imagen = new Imagene();
+                $imagen->empresas_empresas_id = 1;
+                $imagen->url_imagen = $nombreImagen;
+                $imagen->save();
+
+                $categoria->nombre_categoria = $request->nombreCategoria;
+                $categoria->estado_categoria = $request->estadoCategoria;
+                $categoria->url_video = $url_Final;
+                $categoria->imagenes_imagenes_id = $imagen->id;
+                $categoria->save();
+
+                $idImagen->delete();
+            }
+        }else{
+            $categoria->nombre_categoria = $request->nombreCategoria;
+            $categoria->estado_categoria = $request->estadoCategoria;
+            $categoria->url_video = $url_Final;
+            $categoria->save();
         }
     }
 

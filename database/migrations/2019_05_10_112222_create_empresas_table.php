@@ -26,6 +26,7 @@ class CreateEmpresasTable extends Migration
             $table->string('instagram_empresa', 500)->nullable();
             $table->string('celular_empresa', 45)->nullable();
             $table->string('telefono_empresa', 45)->nullable();
+            $table->string('horario_empresa', 200)->nullable();
             $table->string('logo_empresa', 150)->nullable();
             $table->timestamps();
         });
@@ -35,7 +36,7 @@ class CreateEmpresasTable extends Migration
         //inserto a la tabla datos registros
         DB::table('empresas')->insert(array('id'=>'1','nombre_empresa'=>"Wuapa's Spa",'nombre_corto'=>'Spa','estado_empresa'=>'1', 'nit_empresa'=>'0', 'direccion_empresa'=>'San Gil',
             'correo_empresa'=>'wuapasspa@gmail.com', 'urlweb_empresa'=>'https://wuapasspa.gridsoft.co/', 'facebook_empresa'=>'https://www.facebook.com/wuapasSpa/',
-            'instagram_empresa'=>'https://www.instagram.com/wuapas_spa/', 'celular_empresa'=>'3174588999', 'telefono_empresa'=>'0', 'logo_empresa'=>'logotipo.png', 'created_at'=>$now));
+            'instagram_empresa'=>'https://www.instagram.com/wuapas_spa/', 'celular_empresa'=>'3174588999', 'telefono_empresa'=>'0', 'horario_empresa'=>'7:00 am a 8:00 pm','logo_empresa'=>'logotipo.png', 'created_at'=>$now));
     }
 
     /**

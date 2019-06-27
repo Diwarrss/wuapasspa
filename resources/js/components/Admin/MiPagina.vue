@@ -489,9 +489,6 @@
                 imagenSelect2: '',
                 idServicio:0,//el id del servicio
                 empresas_empresas_id: 1,
-                nombreServicio:'',
-                descripcion:'',
-                estadoServicio: '',
                 tipoAccionModal: '',
                 file: '',
                 idImagen: '',
@@ -500,11 +497,14 @@
                 nombreCategoria: '',
                 estadoCategoria: '',
                 urlVideoCategoria: '',
-                imagenCategoria: '',
+                imagenCategoria: [],
                 arrayCategorias: [],
+                nombreServicio:'',
+                descripcion:'',
+                estadoServicio: '',
                 categoriaServicio: '',
                 urlVideoServicio: '',
-                imagenServicio: '',
+                imagenServicio: [],
                 valorServicio: 0
             }
         },
@@ -649,6 +649,7 @@
                         }).then(function(){
                             jQuery('#tablaCategorias').DataTable().ajax.reload();
                             me.cerrarModalCategorias();
+                            me.showCategoriaActivas();
                         });
                         //console.log(response);
                     })
@@ -662,26 +663,32 @@
             crearServicio(){
                 //creamos variable q corresponde a this de mis variables de data()
                 let me=this;
+
+                let fileCargada = new FormData();
+                fileCargada.append('imagenServicio', me.imagenSelect2);
+                fileCargada.append('categoriaServicio', me.categoriaServicio);
+                fileCargada.append('nombreServicio', me.nombreServicio);
+                fileCargada.append('descripcion', me.descripcion);
+                fileCargada.append('estadoServicio', me.estadoServicio);
+                fileCargada.append('urlVideoServicio', me.urlVideoServicio);
+                fileCargada.append('valorServicio', me.valorServicio);
+
                 //reseteamos los errores
                 this.arrayErrors=[];
 
-                axios.post('/crearServicio', {
-                    //enviamos los tados que hay en nuestros parametros
-                    'empresas_empresas_id': this.empresas_empresas_id,
-                    'nombreServicio': this.nombreServicio,
-                    'descripcion': this.descripcion,
-                    'estadoServicio': this.estadoServicio
-                })
+                axios.post('/crearServicio', fileCargada)
                 .then(function (response) {
                     //para actualizar la tabla de datatables
-                    jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
-                    me.cerrarModal();
+
                     Swal.fire({
                         position: 'top-end',
                         type: 'success',
                         title: 'Servicio creado con éxito',
                         showConfirmButton: false,
                         timer: 1500
+                    }).then(function(){
+                        jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
+                        me.cerrarModal();
                     });
                     //console.log(response);
                 })
@@ -695,9 +702,13 @@
             },
             cerrarModal(){
                 $("[data-dismiss=modal]").trigger({ type: "click" });//para cerrar la modal con boostrap 3
+                this.categoriaServicio='';
                 this.nombreServicio= '';
                 this.descripcion= '';
                 this.estadoServicio='';
+                this.urlVideoServicio='';
+                this.imagenServicio=[];
+                this.valorServicio='';
                 this.arrayErrors = [];
             },
             cerrarModalImagen(){

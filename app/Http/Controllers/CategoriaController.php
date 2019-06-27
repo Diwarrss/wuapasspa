@@ -24,7 +24,7 @@ class CategoriaController extends Controller
 
         //aqui guardamos la imagen en esta variable
         $imagenFile = $request->imagenCategoria;
-        
+
         $url = $request->urlVideoCategoria;
 
         // break the URL into its components
@@ -37,7 +37,7 @@ class CategoriaController extends Controller
         parse_str($parts['query'], $query);
 
         $url_Final = $query['v']; // Z29MkJdMKqs
-        
+
         //insertar la Imagen
         if ($imagenFile) {
             $nombreImagen = $request->imagenCategoria->getClientOriginalName();
@@ -82,7 +82,7 @@ class CategoriaController extends Controller
     public function showCategoriaActivas(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
-        
+
         $categoriashow = DB::table('categorias')
                     ->select('id','nombre_categoria', 'estado_categoria')
                     ->where('estado_categoria', 1)
@@ -117,14 +117,14 @@ class CategoriaController extends Controller
         parse_str($parts['query'], $query);
 
         $url_Final = $query['v']; // Z29MkJdMKqs
-        
+
         if ($imagenFile) {//validamos que alla una imagen
-            
+
             $idImagen = Imagene::find($categoria->imagenes_imagenes_id);
 
             if ($idImagen == null) {
                 $nombreImagen = $request->imagenCategoria->getClientOriginalName();//obtenemos el nombre de la imagen
-                
+
                 //Subimos la nueva imagen
                 $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
 
@@ -155,7 +155,7 @@ class CategoriaController extends Controller
                 $categoria->save();
 
                 $idImagen->delete();
-            }            
+            }
         }else{
             $categoria->nombre_categoria = $request->nombreCategoria;
             $categoria->estado_categoria = $request->estadoCategoria;
