@@ -27,8 +27,8 @@ class ResetPasswordController extends Controller
                         ->select('logo_empresa','nombre_corto')
                         ->get();
 
-        return view('auth.passwords.reset', ['logoEmpresa' => $logoEmpresa])->with(
-            ['token' => $token, 'email' => $request->email]
+        return view('auth.passwords.reset')->with(
+            ['token' => $token, 'email' => $request->email, 'logoEmpresa' => $logoEmpresa]
         );
     }
 
