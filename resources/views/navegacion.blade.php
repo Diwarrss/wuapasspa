@@ -13,7 +13,7 @@
                 @foreach ($logoEmpresa as $item)
                 <span class="navbar-logo">
                     <a href="{{asset('/')}}">
-                        <img src="/img/perfiles/{{$item->logo_empresa}}" alt="Mobirise" title="" style="height: 3.8rem;">
+                        <img src="/img/perfiles/{{$item->logo_empresa}}" title="" style="height: 3.8rem;">
                     </a>
                 </span>
                 <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="">{{$item->nombre_corto}}</a></span>

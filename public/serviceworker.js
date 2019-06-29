@@ -37,7 +37,7 @@ self.addEventListener("install", event => {
                 return cache.addAll(filesToCache);
             })
     )
-    console.log('Instalado Service Worker');
+    console.log('Service Worker Instalado');
 });
 
 // Clear cache on activate
@@ -52,7 +52,7 @@ self.addEventListener('activate', event => {
             );
         })
     );
-    console.log('Service Worker listo para controllar la App');
+    console.log('Service Worker listo para controlar la App');
 });
 
 // Serve from Cache

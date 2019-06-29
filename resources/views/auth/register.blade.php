@@ -2,16 +2,17 @@
 
 @section('content')
 <div class="container py-5">
-    <div class="row justify-content-center py-5">
+    <div class="row justify-content-center py-3">
         <div class="col-md-5 mx-auto">
+            <div class="text-center py-3">
+                <img src="/img/perfiles/Logo-GridSoft.png" height="35">
+            </div> 
             <div class="card">
-                <div class="card-header">
-                    <div class="col-md-12 text-center">
-                        <h4><i class="far fa-id-card"></i> Registro</h4>
-                    </div>
-                </div>
-
                 <div class="card-body">
+                    <div class="col-md-12 text-center py-3">
+                        <span class="text-muted"><i class="far fa-id-card"></i> Regístrate para apartar tu cita ya!</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
                     <form method="POST" action="{{ route('register') }}" novalidate>
                         @csrf
 
@@ -111,15 +112,19 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="dropdown-divider"></div>
-                        <div class="form-group mb-0">
+                    </form>
+                </div>
+            </div>
+            <div class="py-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group mb-3">
                             <div class="col-md-12 text-center">
-                                <a class="btn btn-block btn-outline-danger" href="{{ route('login') }}">
-                                    <i class="fas fa-plus-circle"></i> Ingresar
-                                </a>
+                                ¿Tienes una cuenta?
+                                <a class="mb-2" href="{{ route('login') }}">Entrar</a>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

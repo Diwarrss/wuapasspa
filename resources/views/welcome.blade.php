@@ -276,14 +276,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="align-center">
-                                    Copyright © <a href="https://www.gridsoft.co/" target="_blank">GridSoft</a>
-                                </div>
+                                
                             </div>
                         </section>
                         @endforeach
                     </div>
                 </section>
+                <div class="align-center">
+                    © Copyright 2019 <a href="https://www.gridsoft.co/" target="_blank">GridSoft</a> All Rights Reserved
+                </div>
             </main>
         </div>
         <!--Importando todos los Js del webpack vue y boostrap-->

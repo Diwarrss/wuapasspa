@@ -25,7 +25,19 @@
                 @yield('content')
             </div>
         </main>
+        <footer class="footer mt-auto py-3">
+            <div class="fixed-bottom">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="align-center">
+                            © Copyright 2019 <a href="https://www.gridsoft.co/" target="_blank">GridSoft</a> All Rights Reserved
+                        </div>
+                    </div>            
+                </div>
+            </div>
+        </footer>
     </div>
+    
     <!--Importando todos los Js del webpack vue y boostrap-->
     <script src="{{asset('js/misLibrerias.js')}}"></script>
     <script src="{{ asset('js/appCliente.js') }}"></script>

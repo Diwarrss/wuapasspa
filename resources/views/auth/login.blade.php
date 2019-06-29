@@ -2,16 +2,18 @@
 
 @section('content')
 <div class="container py-5">
-    <div class="row justify-content-center py-5">
+    <div class="row justify-content-center py-3">
         <div class="col-md-5 mx-auto">
+            <div class="text-center py-3">
+                <img src="/img/perfiles/Logo-GridSoft.png" height="35">
+            </div>            
             <div class="card">
-                <div class="card-header">
-                    <div class="col-md-12 text-center">
-                        <h4><i class="fas fa-sign-in-alt"></i> Login</h4>
-                    </div>
-                </div>
-
                 <div class="card-body">
+                    <div class="text-center py-2">
+                        @foreach ($logoEmpresa as $item)
+                        <img src="/img/perfiles/{{$item->logo_empresa}}" height="60" style="border: medium">
+                        @endforeach
+                    </div>
                     <form method="POST" action="{{ route('login') }}" novalidate>
                         @csrf
                         <div class="form-group row">
@@ -44,25 +46,33 @@
 
                         <div class="form-group mb-0">
                             <div class="col-md-12 text-center">
-                                <button type="submit" class="btn btn-block btn-primary tx-tfm">
-                                    <i class="fas fa-sign-in-alt"></i> Ingresar
-                                </button>
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link text-primary" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
+                                <button type="submit" class="btn btn-block btn-primary tx-tfm mb-2">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                </button>                                
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <div class="form-group mb-0">
+                        @if (Route::has('password.request'))
+                        <div class="col-md-12 text-center">
+                            <a class="btn btn-link text-primary" href="{{ route('password.request') }}">
+                                ¿Has olvidado la contraseña?
+                            </a>
+                        </div>
+                        @endif
+                    </form>
+                </div>
+            </div>
+            <div class="py-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group mb-3">
                             <div class="col-md-12 text-center">
-                                <a class="btn btn-block btn-outline-danger" href="{{ route('register') }}">
-                                    <i class="fas fa-plus-circle"></i> Registrarme
-                                </a>
+                                <span>¿No tienes una cuenta?
+                                    <a class="mb-2" href="{{ route('register') }}">Registrate</a>
+                                </span> 
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
