@@ -4,8 +4,8 @@ var filesToCache = [
     '/css/misLibrerias.css',
     '/css/miWelcome.css',
     '/js/adminlte.js',
-    //'/js/appAdmin.js',
-    //'/js/appCliente.js',
+    '/js/appAdmin.js',
+    '/js/appCliente.js',
     '/js/misLibrerias.js',
     '/js/miWelcome.js',
     '/img/icons/icon-72x72.png',
@@ -37,6 +37,7 @@ self.addEventListener("install", event => {
                 return cache.addAll(filesToCache);
             })
     )
+    console.log('Instalado Service Worker');
 });
 
 // Clear cache on activate
@@ -51,6 +52,7 @@ self.addEventListener('activate', event => {
             );
         })
     );
+    console.log('Service Worker listo para controllar la App');
 });
 
 // Serve from Cache

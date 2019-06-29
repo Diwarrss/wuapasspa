@@ -6,10 +6,10 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="description" content="Mayra Peluqueria sitio web para solicitar mi Cita para ser atendido." />
-        <meta name="keywords" content="Mayra Peluqueria, San Gil, Agendar, Pagina Web" />
+        <meta name="description" content="Sitio web para solicitar mi Cita para ser atendido." />
+        <meta name="keywords" content="San Gil, Agendar, Pagina Web" />
 
-        <title>{{ config('app.name', 'Mayra Peluqueria') }}</title>
+        <title>{{ config('app.name', "Wuapa's Spa") }}</title>
 
         <!--importamos todos los css generados con webpack-->
         <link type="text/css" rel="stylesheet" href="{{asset('css/miWelcome.css')}}"/>
