@@ -16,9 +16,6 @@ class EmpleadoMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user()->roles_roles_id === 3) {
-            abort(403);
-        }
         return $next($request);
     }
 }

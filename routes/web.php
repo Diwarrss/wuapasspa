@@ -11,24 +11,25 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', 'WelcomeController@index')->name('welcome');//ruta de welcome para usuario cliente o invitado por defecto el middleware permite esta ruta ya que esta como guest o invitado
-Route::post('/enviarSugerencia', 'SugerenciaController@enviarSugerencia');
+//todos los no autenticados los invitados
+    Route::get('/', 'WelcomeController@index')->name('welcome');//ruta de welcome para usuario cliente o invitado por defecto el middleware permite esta ruta ya que esta como guest o invitado
+    Route::post('/enviarSugerencia', 'SugerenciaController@enviarSugerencia');
 
-//link personalizacion Login
-Route::post('/login', 'Auth\LoginController@login')->name('login');
+    //link personalizacion Login
+    Route::post('/login', 'Auth\LoginController@login')->name('login');
 
-Auth::routes();//ruta de sistema login laravel Ya tienen implementado los Middleware
+    Auth::routes();//ruta de sistema login laravel Ya tienen implementado los Middleware
 
+//para todos los usuarios autenticados
 Route::group(['middleware' => 'auth'], function () {
     //controlador vista MiPerfil
     Route::get('/showPerfil', 'UserController@showPerfil')->name('showPerfil');
     Route::put('/actualizarPerfil', 'UserController@actualizarPerfil')->name('actualizarPerfil');
     Route::put('/actualizarPassword', 'UserController@actualizarPassword')->name('actualizarPassword');
     Route::post('/updateImagen', 'UserController@updateImagen')->name('updateImagen');
-});
 
-//middleware que solo permite acceso a admin
-    Route::group(['middleware' => ['auth','admin']], function() {
+    //middleware que solo permite acceso a admin
+    Route::group(['middleware' => ['admin']], function () {
         Route::get('/admin', 'AdminController@index')->name('admin');
         //controlador vista Roles
         Route::get('/showrolesDT', 'RolController@showrolesDT')->name('showrolesDT');//ruta para usarlos con datatables
@@ -93,8 +94,48 @@ Route::group(['middleware' => 'auth'], function () {
 
     });
 
-//middleware que solo permite acceso a empleado
-    Route::group(['middleware' => ['auth','empleado']], function() {
+    //middleware que solo permite acceso a agendador
+    Route::group(['middleware' => ['agendador']], function () {
+        Route::get('/admin', 'AdminController@index')->name('admin');
+        //controlador vista Empleados
+        Route::get('/showEmpleadosDT', 'UserController@showEmpleadosDT')->name('showEmpleadosDT');//ruta para usarlos con datatables
+        Route::get('/showEmpleado', 'UserController@showEmpleado')->name('showEmpleado');//ruta para usarlos en select de agendar
+        Route::post('/createEmpleado', 'UserController@createEmpleado')->name('createEmpleado');
+        Route::put('/actualizarEmpleado', 'UserController@actualizarEmpleado')->name('actualizarEmpleado');
+        Route::put('/updateEstadoEmple', 'UserController@updateEstadoEmple')->name('updateEstadoEmple');
+        //controlador vista Clientes
+        Route::get('/showClientesDT', 'UserController@showClientesDT')->name('showClientesDT');
+        Route::post('/createCliente', 'UserController@createCliente')->name('createCliente');
+        Route::put('/actualizarCliente', 'UserController@actualizarCliente')->name('actualizarCliente');
+        Route::get('/showCumpleClientes', 'UserController@showCumpleClientes')->name('showCumpleClientes');
+        //controlador vista Solicitudes
+        Route::get('/showSolicitudesPendientes', 'SolicitudesController@showSolicitudesPendientes')->name('showSolicitudesPendientes');
+        Route::get('/contarSolicitudes', 'SolicitudesController@contarSolicitudes')->name('contarSolicitudes');
+        //solo para sheluder
+        Route::get('/sheluder', 'AdminController@sheluder')->name('sheluder');
+        //controlador para Reservaciones
+        Route::post('/storeReservaciones', 'ReservacionesController@store')->name('storeReservaciones');
+        Route::get('/listarReservaciones', 'ReservacionesController@listar')->name('listReservaciones');
+        Route::put('/cancelarReservaciones', 'ReservacionesController@cancelar')->name('cancelReservaciones');
+        Route::get('/showReservaAgendada', 'ReservacionesController@showReservaAgendada')->name('showReservaAgendada');
+        Route::get('/contarAgendadas', 'ReservacionesController@contarAgendadas')->name('contarAgendadas');
+        Route::put('/clienteAsistio', 'ReservacionesController@clienteAsistio')->name('clienteAsistio');
+        Route::put('/clienteNoAsistio', 'ReservacionesController@clienteNoAsistio')->name('clienteNoAsistio');
+        Route::put('/clienteConfirmar', 'ReservacionesController@clienteConfirmar')->name('clienteConfirmar');
+        //Vista Admin menu Agenda
+        Route::get('/showEnEspera', 'ReservacionesController@showEnEspera')->name('showEnEspera');
+        Route::get('/showAtendidos', 'ReservacionesController@showAtendidos')->name('showAtendidos');
+        Route::get('/showNoAsistio', 'ReservacionesController@showNoAsistio')->name('showNoAsistio');
+        Route::get('/showCanceladas', 'ReservacionesController@showCanceladas')->name('showCanceladas');
+        //vista buzon de sugerencias
+        Route::get('/showBuzon', 'SugerenciaController@showBuzon')->name('showBuzon');
+        //agenda anonima
+        Route::get('/listarTodo', 'ReservacionesController@listarTodo')->name('listarTodo');
+        Route::get('/listarAnonimas', 'ReservacionesController@listarAnonimas')->name('listarAnonimas');
+        Route::post('/storeReservacionesA', 'ReservacionesController@storeAnonimo')->name('storeReservacionesA');
+    });
+    //middleware que solo permite acceso a empleado
+    Route::group(['middleware' => ['empleado']], function() {
         Route::get('/admin', 'AdminController@index')->name('admin');
         //mostrar agenda por empleado
         Route::get('/showReservaciones', 'ReservacionesController@showReservaciones')->name('showReservaciones');
@@ -103,8 +144,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/clienteNoAsistio', 'ReservacionesController@clienteNoAsistio')->name('clienteNoAsistio');
     });
 
-//middleware que solo permite acceso a cliente
-    Route::group(['middleware' => ['auth','cliente']], function() {
+    //middleware que solo permite acceso a cliente
+    Route::group(['middleware' => ['cliente']], function() {
         Route::get('/miSolicitud', 'SolicitudesController@componente')->name('componenteSolicitude');//para mostrar el componente
         Route::get('/listarSolicitudesCliente', 'SolicitudesController@index')->name('listarSolicitudesCliente');
         Route::post('/crearSolicitudesCliente', 'SolicitudesController@store')->name('crearSolicitudesCliente');
@@ -121,6 +162,7 @@ Route::group(['middleware' => 'auth'], function () {
             return view('/cliente/miPerfil', ['logoEmpresa' => $logoEmpresa]);})
             ->name('miPerfil');
     });
+});
 
 //Rutas para el login con redes sociales
 Route::get('login/{driver}', 'Auth\LoginController@redirectToProvider')->name('social_auth');//le pasamos la variable driver "facebook, google"

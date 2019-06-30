@@ -13,6 +13,8 @@
         <title>Admin - {{ config('app.name')}}</title>
     @elseif(Auth::user()->roles_roles_id == 2)<!-- si es empleado-->
         <title>Empleado - {{ config('app.name')}}</title>
+    @elseif(Auth::user()->roles_roles_id == 4)<!-- si es agendador-->
+        <title>Agendador - {{ config('app.name')}}</title>
     @endif
     <!-- Todos los css se importan de aqui todos con webpack -->
     <link type="text/css" rel="stylesheet" href="{{asset('css/adminlte.css')}}">
@@ -38,9 +40,11 @@
             <!-- validar auth sesion -->
             @if(Auth::check())<!-- si esta autenticado el usuario actual-->
                 @if(Auth::user()->roles_roles_id == 1)<!-- si es administrador-->
-                        <navegacionadmin></navegacionadmin>
-                    @elseif(Auth::user()->roles_roles_id == 2)<!-- si es empleado-->
-                        <navegacionempleado></navegacionempleado>
+                    <navegacionadmin></navegacionadmin>
+                @elseif(Auth::user()->roles_roles_id == 2)<!-- si es empleado-->
+                    <navegacionempleado></navegacionempleado>
+                @elseif(Auth::user()->roles_roles_id == 4)<!-- si es empleado-->
+                    <navegacionagendador></navegacionagendador>
                 @endif
             @endif
 

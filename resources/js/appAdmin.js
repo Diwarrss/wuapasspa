@@ -88,6 +88,7 @@ Vue.component('clientes', require('./components/Admin/Clientes.vue').default);
 //componente de navegacion del Admin
 Vue.component('navegacionadmin', require('./components/Admin/NavegacionAdmin.vue').default);
 Vue.component('navegacionempleado', require('./components/Empleado/NavegacionEmpleado.vue').default);
+Vue.component('navegacionagendador', require('./components/Agendador/NavegacionAgendador.vue').default);
 
 //componentes para optimizar todo
 Vue.component('imagenperfil', require('./components/Admin/ImagenPerfil.vue').default);

@@ -59,6 +59,21 @@
                                 @csrf
                             </form>
                         </a>
+                    @elseif(Auth::user()->roles_roles_id == 4)<!-- si es agendador-->
+                        <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4">
+                            <i class="far fa-user"></i> {{ Auth::user()->nombre_usuario }}</a>
+                        </span>
+
+                        <a class="btn btn-sm btn-primary display-4" href="/admin#/miAgenda">
+                            <span class="mbri-setting mbr-iconfont mbr-iconfont-btn"></span>Mi Panel<br>
+                        </a>
+                        <a class="btn btn-sm btn-info display-4" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();">
+                            <span class="mbri-logout mbr-iconfont mbr-iconfont-btn"></span>Cerrar Sesión<br>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </a>
                     @else
                         <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4">
                             <i class="far fa-user"></i> {{ Auth::user()->nombre_usuario }}</a>

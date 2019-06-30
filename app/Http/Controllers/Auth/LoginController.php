@@ -32,6 +32,8 @@ class LoginController extends Controller
             return redirect('/admin#/miAgenda');
         }elseif(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'estado_usuario' => 1, 'roles_roles_id' => 3])){
             return redirect('/');
+        }elseif(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'estado_usuario' => 1, 'roles_roles_id' => 4])){
+            return redirect()->route('admin');
         }
 
         return back()

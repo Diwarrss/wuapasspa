@@ -1,4 +1,4 @@
-var staticCacheName = "pwa-v" + new Date().getTime();
+var staticCacheName = "pwa-version" + new Date().getTime();
 var filesToCache = [
     '/css/adminlte.css',
     '/css/misLibrerias.css',
