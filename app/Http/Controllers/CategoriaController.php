@@ -19,7 +19,7 @@ class CategoriaController extends Controller
             'imagenCategoria' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombreCategoria' => 'required|max:200|string|unique:categorias,nombre_categoria',
             'estadoCategoria' => 'required',
-            'urlVideoCategoria' => 'max:500',
+            'urlVideoCategoria' => 'nullable|regex:/^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/watch\?v\=\w+$/|max:500',
         ]);
 
         //aqui guardamos la imagen en esta variable
@@ -27,16 +27,20 @@ class CategoriaController extends Controller
 
         $url = $request->urlVideoCategoria;
 
-        // break the URL into its components
-        $parts = parse_url($url);
+        if ($url) {
+            // break the URL into its components
+            $parts = parse_url($url);
 
-        // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
+            // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
 
-        // parse variables into key=>value array
-        $query = array();
-        parse_str($parts['query'], $query);
+            // parse variables into key=>value array
+            $query = array();
+            parse_str($parts['query'], $query);
 
-        $url_Final = $query['v']; // Z29MkJdMKqs
+            $url_Final = 'https://www.youtube.com/watch?v='+ $query['v']; // Z29MkJdMKqs
+        }else {
+            $url_Final ='';
+        }
 
         //insertar la Imagen
         if ($imagenFile) {

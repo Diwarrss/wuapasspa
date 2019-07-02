@@ -889,7 +889,7 @@
                                     if (row.url_video == '') {
                                             return '<span class="label label-info"> Sin video</span>';
                                         }else{
-                                            return '<iframe width="200" height="100" src="https://www.youtube.com/embed/'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                            return '<iframe width="200" height="100" src="'+row.url_video+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
                                         }
                                     }
                                 },
@@ -925,7 +925,7 @@
                         me.nombreServicio = data["nombre_servicio"];
                         me.descripcion = data["descripcion_servicio"];
                         me.estadoServicio = data["estado_servicio"];
-                        me.urlVideoServicio = 'https://www.youtube.com/watch?v='+data["url_video"];
+                        me.urlVideoServicio = data["url_video"];
                         me.valorServicio = data["valor_servicio"];
                     });
 

@@ -2441,7 +2441,7 @@ __webpack_require__.r(__webpack_exports__);
             data: 'notas'
           }, {
             render: function render(data, type, row) {
-              return '<a href="https://wa.me/57' + row.celular + '?text=Hola, ' + row.nombre_completo_cliente + ', Tu Cita en Mayra Peluqueria es el ' + row.fecha_reserva + '. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
+              return '<a href="https://wa.me/57' + row.celular + '?text=Hola, ' + row.nombre_completo_cliente + ', Tu Cita en Wuapas Spa es el ' + row.fecha_reserva + '. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
             }
           }, {
             render: function render(data, type, row) {
@@ -4771,7 +4771,7 @@ __webpack_require__.r(__webpack_exports__);
               if (row.url_video == '') {
                 return '<span class="label label-info"> Sin video</span>';
               } else {
-                return '<iframe width="200" height="100" src="https://www.youtube.com/embed/' + row.url_video + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                return '<iframe width="200" height="100" src="' + row.url_video + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
               }
             }
           }, {
@@ -4812,7 +4812,7 @@ __webpack_require__.r(__webpack_exports__);
           me.nombreServicio = data["nombre_servicio"];
           me.descripcion = data["descripcion_servicio"];
           me.estadoServicio = data["estado_servicio"];
-          me.urlVideoServicio = 'https://www.youtube.com/watch?v=' + data["url_video"];
+          me.urlVideoServicio = data["url_video"];
           me.valorServicio = data["valor_servicio"];
         });
       });
@@ -6381,7 +6381,7 @@ __webpack_require__.r(__webpack_exports__);
             data: 'fecha_reserva'
           }, {
             render: function render(data, type, row) {
-              return '<a href="https://wa.me/57' + row.celular + '?text=Hola, ' + row.nombre_cliente + ', Tu Cita en Mayra Peluqueria es el ' + row.fecha_reserva + '. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
+              return '<a href="https://wa.me/57' + row.celular + '?text=Hola, ' + row.nombre_cliente + ', Tu Cita en Wuapas Spa es el ' + row.fecha_reserva + '. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
             }
           }, {
             render: function render(data, type, row) {
@@ -34453,6 +34453,7 @@ function open(propsData) {
     }
 });
 
+
 /***/ }),
 
 /***/ "./node_modules/v-calendar-scheduler/components/mixins/IsView.js":
@@ -36479,6 +36480,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _EventDialogInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EventDialogInput */ "./node_modules/v-calendar-scheduler/components/dialog/EventDialogInput.vue");
+//
 //
 //
 //
@@ -61921,7 +61923,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! c:\laragon\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
+module.exports = __webpack_require__(/*! c:\wamp64\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
 
 
 /***/ })

@@ -52,7 +52,7 @@ self.addEventListener('activate', event => {
             );
         })
     );
-    console.log('Service Worker listo para controlar la App');
+    console.log('Service Worker listo controlando app');
 });
 
 // Serve from Cache

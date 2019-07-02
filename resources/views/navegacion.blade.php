@@ -64,7 +64,7 @@
                             <i class="far fa-user"></i> {{ Auth::user()->nombre_usuario }}</a>
                         </span>
 
-                        <a class="btn btn-sm btn-primary display-4" href="/admin#/miAgenda">
+                        <a class="btn btn-sm btn-primary display-4" href="{{ route('admin') }}">
                             <span class="mbri-setting mbr-iconfont mbr-iconfont-btn"></span>Mi Panel<br>
                         </a>
                         <a class="btn btn-sm btn-info display-4" href="{{ route('logout') }}" onclick="event.preventDefault();

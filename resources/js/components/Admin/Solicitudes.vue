@@ -376,7 +376,7 @@
                                 {data:'nombre_cliente'},
                                 {data:'fecha_reserva'},
                                 {render: function (data, type, row) {
-                                    return '<a href="https://wa.me/57'+ row.celular +'?text=Hola, '+ row.nombre_cliente +', Tu Cita en Mayra Peluqueria es el '+ row.fecha_reserva +'. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
+                                    return '<a href="https://wa.me/57'+ row.celular +'?text=Hola, '+ row.nombre_cliente +', Tu Cita en Wuapas Spa es el '+ row.fecha_reserva +'. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
                                     }
                                 },
                                 {render: function (data, type, row) {

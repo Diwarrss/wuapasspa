@@ -68,7 +68,7 @@
                                 <i class="fas fa-user"></i> {{ Auth::user()->nombre_usuario }}
                             </button>
                             <div class="dropdown-menu dropdown-menu-right dropdown-default">
-                                <a class="dropdown-item text-primary" href="/admin#/miAgenda"><i class="fas fa-id-card"></i> Mi Panel</a>
+                                <a class="dropdown-item text-primary" href="{{ route('admin') }}"><i class="fas fa-id-card"></i> Mi Panel</a>
                                 <a class="dropdown-item text-success" href="{{ url('/') }}"><i class="fas fa-home"></i> Página Web</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="{{ route('logout') }}"
