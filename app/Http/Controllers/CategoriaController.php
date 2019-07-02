@@ -19,12 +19,11 @@ class CategoriaController extends Controller
             'imagenCategoria' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombreCategoria' => 'required|max:200|string|unique:categorias,nombre_categoria',
             'estadoCategoria' => 'required',
-            'urlVideoCategoria' => 'nullable|regex:/^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/watch\?v\=\w+$/|max:500',
+            'urlVideoCategoria' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/']
         ]);
 
         //aqui guardamos la imagen en esta variable
         $imagenFile = $request->imagenCategoria;
-
         $url = $request->urlVideoCategoria;
 
         if ($url) {
@@ -37,7 +36,7 @@ class CategoriaController extends Controller
             $query = array();
             parse_str($parts['query'], $query);
 
-            $url_Final = 'https://www.youtube.com/watch?v='+ $query['v']; // Z29MkJdMKqs
+            $url_Final = $query['v']; // Z29MkJdMKqs
         }else {
             $url_Final ='';
         }
@@ -103,7 +102,7 @@ class CategoriaController extends Controller
             'imagenCategoria' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombreCategoria' => 'required|max:200|string|unique:categorias,nombre_categoria,'.$request->idCategoria,
             'estadoCategoria' => 'required|string',
-            'urlVideoCategoria' => 'max:500'
+            'urlVideoCategoria' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/']
         ]);
 
         $categoria = Categoria::findOrFail($request->idCategoria);//actualizamos para el user logueado
@@ -111,16 +110,20 @@ class CategoriaController extends Controller
 
         $url = $request->urlVideoCategoria;
 
-        // break the URL into its components
-        $parts = parse_url($url);
+        if ($url) {
+            // break the URL into its components
+            $parts = parse_url($url);
 
-        // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
+            // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
 
-        // parse variables into key=>value array
-        $query = array();
-        parse_str($parts['query'], $query);
+            // parse variables into key=>value array
+            $query = array();
+            parse_str($parts['query'], $query);
 
-        $url_Final = $query['v']; // Z29MkJdMKqs
+            $url_Final = $query['v']; // Z29MkJdMKqs
+        }else {
+            $url_Final ='';
+        }
 
         if ($imagenFile) {//validamos que alla una imagen
 

@@ -52,7 +52,7 @@ class ServiciosController extends Controller
             'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
             'descripcion' => 'required|max:255',
             'estadoServicio' => 'required',
-            'urlVideoServicio' => 'max:500',
+            'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
             'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'valorServicio' => 'required|max:12'
         ]);
@@ -62,16 +62,20 @@ class ServiciosController extends Controller
         //aqui guardamos la url del video para partirla
         $url = $request->urlVideoServicio;
 
-        // break the URL into its components
-        $parts = parse_url($url);
+        if ($url) {
+            // break the URL into its components
+            $parts = parse_url($url);
 
-        // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
+            // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
 
-        // parse variables into key=>value array
-        $query = array();
-        parse_str($parts['query'], $query);
+            // parse variables into key=>value array
+            $query = array();
+            parse_str($parts['query'], $query);
 
-        $url_Final = $query['v']; // Z29MkJdMKqs
+            $url_Final = $query['v']; // Z29MkJdMKqs
+        }else {
+            $url_Final ='';
+        }
 
         //insertar la Imagen
         if ($imagenFile) {
@@ -119,7 +123,7 @@ class ServiciosController extends Controller
             'nombreServicio' => 'required|max:150|string|',//unique:servicios,nombre_servicio,'.$request->idServicio
             'descripcion' => 'required|max:255',
             'estadoServicio' => 'required',
-            'urlVideoServicio' => 'max:500',
+            'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
             'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'valorServicio' => 'required|max:12'
         ]);
@@ -129,16 +133,20 @@ class ServiciosController extends Controller
 
         $url = $request->urlVideoServicio;
 
-        // break the URL into its components
-        $parts = parse_url($url);
+        if ($url) {
+            // break the URL into its components
+            $parts = parse_url($url);
 
-        // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
+            // $parts['query'] contains the query string: 'v=Z29MkJdMKqs&feature=grec_index'
 
-        // parse variables into key=>value array
-        $query = array();
-        parse_str($parts['query'], $query);
+            // parse variables into key=>value array
+            $query = array();
+            parse_str($parts['query'], $query);
 
-        $url_Final = $query['v']; // Z29MkJdMKqs
+            $url_Final = $query['v']; // Z29MkJdMKqs
+        }else {
+            $url_Final ='';
+        }
 
         if ($imagenFile) {//validamos que alla una imagen
 

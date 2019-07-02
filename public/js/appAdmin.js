@@ -4358,6 +4358,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4514,7 +4515,7 @@ __webpack_require__.r(__webpack_exports__);
       fileCargada.append('imagenCategoria', me.imagenSelect2);
       fileCargada.append('nombreCategoria', me.nombreCategoria);
       fileCargada.append('estadoCategoria', me.estadoCategoria);
-      fileCargada.append('urlVideoCategoria', 'https://www.youtube.com/watch?v=' + me.urlVideoCategoria);
+      fileCargada.append('urlVideoCategoria', me.urlVideoCategoria);
       axios.post('/crearCategoria', fileCargada) //le envio el parametro completo
       .then(function (response) {
         Swal.fire({
@@ -4546,7 +4547,7 @@ __webpack_require__.r(__webpack_exports__);
       fileCargada.append('nombreServicio', me.nombreServicio);
       fileCargada.append('descripcion', me.descripcion);
       fileCargada.append('estadoServicio', me.estadoServicio);
-      fileCargada.append('urlVideoServicio', 'https://www.youtube.com/watch?v=' + me.urlVideoServicio);
+      fileCargada.append('urlVideoServicio', me.urlVideoServicio);
       fileCargada.append('valorServicio', me.valorServicio); //reseteamos los errores
 
       this.arrayErrors = [];
@@ -4680,7 +4681,13 @@ __webpack_require__.r(__webpack_exports__);
           me.idCategoria = data["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
 
           me.nombreCategoria = data["nombre_categoria"];
-          me.urlVideoCategoria = 'https://www.youtube.com/watch?v=' + data["url_video"];
+
+          if (data["url_video"]) {
+            me.urlVideoCategoria = 'https://www.youtube.com/watch?v=' + data["url_video"];
+          } else {
+            me.urlVideoCategoria = '';
+          }
+
           me.estadoCategoria = data["estado_categoria"];
         });
       });
@@ -4771,7 +4778,7 @@ __webpack_require__.r(__webpack_exports__);
               if (row.url_video == '') {
                 return '<span class="label label-info"> Sin video</span>';
               } else {
-                return '<iframe width="200" height="100" src="' + row.url_video + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                return '<iframe width="200" height="100" src="https://www.youtube.com/embed/' + row.url_video + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
               }
             }
           }, {
@@ -4812,7 +4819,13 @@ __webpack_require__.r(__webpack_exports__);
           me.nombreServicio = data["nombre_servicio"];
           me.descripcion = data["descripcion_servicio"];
           me.estadoServicio = data["estado_servicio"];
-          me.urlVideoServicio = data["url_video"];
+
+          if (data["url_video"]) {
+            me.urlVideoServicio = 'https://www.youtube.com/watch?v=' + data["url_video"];
+          } else {
+            me.urlVideoServicio = '';
+          }
+
           me.valorServicio = data["valor_servicio"];
         });
       });
@@ -61923,7 +61936,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! c:\wamp64\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
 
 
 /***/ })
