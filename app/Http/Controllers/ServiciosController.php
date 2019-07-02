@@ -79,7 +79,7 @@ class ServiciosController extends Controller
 
         //insertar la Imagen
         if ($imagenFile) {
-            $nombreImagen = $request->imagenServicio->getClientOriginalName();
+            $nombreImagen = time().'.'. $request->imagenServicio->getClientOriginalExtension();
             //creamos la ruta dnd se va a guardar la imagen
             //$path = Storage::disk('public')->put('img/carousel', $request->file('file'));//UN METODO DE SUBIR LA IMAGEN PERO SE REPITEN
             $imagenFile->move(public_path('/img/servicios/'), $nombreImagen);
@@ -153,7 +153,7 @@ class ServiciosController extends Controller
             $idImagen = Imagene::find($servicio->imagenes_imagenes_id);
 
             if ($idImagen == null) {
-                $nombreImagen = $request->imagenServicio->getClientOriginalName();//obtenemos el nombre de la imagen
+                $nombreImagen = time().'.'. $request->imagenServicio->getClientOriginalExtension();//obtenemos el nombre de la imagen
 
                 //Subimos la nueva imagen
                 $imagenFile->move(public_path('/img/servicios/'), $nombreImagen);//guardamos la imagen en este directorio
@@ -173,7 +173,7 @@ class ServiciosController extends Controller
                 $servicio->imagenes_imagenes_id = $imagen->id;
                 $servicio->save();
             }else{
-                $nombreImagen = $request->imagenCategoria->getClientOriginalName();
+                $nombreImagen = $request->imagenServicio->getClientOriginalName();
                 //Subimos la nueva imagen
                 $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
 

@@ -24,7 +24,7 @@ class EmpresaController extends Controller
 
         return $miEmpresa;
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -84,7 +84,7 @@ class EmpresaController extends Controller
         $empresa = Empresa::findOrFail(1);//actualizamos para el user logueado
 
         $imagenFile = $request->logo_empresa;//capturamos la imagen
-        $nombreImagen = $request->logo_empresa->getClientOriginalName();//obtenemos el nombre de la imagen
+        $nombreImagen = time().'.'. $request->logo_empresa->getClientOriginalExtension();//obtenemos el nombre de la imagen
 
         if ($imagenFile) {//validamos que alla una imagen
 

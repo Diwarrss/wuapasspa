@@ -43,7 +43,7 @@ class CategoriaController extends Controller
 
         //insertar la Imagen
         if ($imagenFile) {
-            $nombreImagen = $request->imagenCategoria->getClientOriginalName();
+            $nombreImagen = time().'.'. $request->imagenCategoria->getClientOriginalExtension();
             //creamos la ruta dnd se va a guardar la imagen
             //$path = Storage::disk('public')->put('img/carousel', $request->file('file'));//UN METODO DE SUBIR LA IMAGEN PERO SE REPITEN
             $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);
@@ -130,7 +130,7 @@ class CategoriaController extends Controller
             $idImagen = Imagene::find($categoria->imagenes_imagenes_id);
 
             if ($idImagen == null) {
-                $nombreImagen = $request->imagenCategoria->getClientOriginalName();//obtenemos el nombre de la imagen
+                $nombreImagen = time().'.'. $request->imagenCategoria->getClientOriginalExtension();//obtenemos el nombre de la imagen
 
                 //Subimos la nueva imagen
                 $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
@@ -146,7 +146,7 @@ class CategoriaController extends Controller
                 $categoria->imagenes_imagenes_id = $imagen->id;
                 $categoria->save();
             }else{
-                $nombreImagen = $request->imagenCategoria->getClientOriginalName();
+                $nombreImagen = time().'.'. $request->imagenCategoria->getClientOriginalExtension();
                 //Subimos la nueva imagen
                 $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
 

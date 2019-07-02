@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Imagene;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
-use Yajra\DataTables\Html\Editor\Select;
+// import the Intervention Image Manager Class
+use Image;
 
 class ImagenesController extends Controller
 {
@@ -41,7 +41,7 @@ class ImagenesController extends Controller
 
         //aqui guardamos la imagen en esta variable
         $imagenFile = $request->file;
-        $nombreImagen = $request->file->getClientOriginalName();
+        $nombreImagen = time().'.'. $request->file->getClientOriginalExtension();
 
         //insertar la Imagen
         if ($imagenFile) {
@@ -64,11 +64,8 @@ class ImagenesController extends Controller
 
         if($url_imagen){
             //borrar imagen del disco OJO NINGUNA SIRVE NO BORRA
-            $image_path = public_path('/img/carousel', $url_imagen);
-            Storage::disk('public')->delete('/img/carousel', $url_imagen);
+            $image_path = public_path('/img/carousel/'.$url_imagen);
             Storage::delete($image_path);
-            File::delete($image_path);
-            //unlink($image_path);
             //para borrar el registro de la BD
             $idImagen = Imagene::findOrFail($request->id);
             $idImagen->delete();
