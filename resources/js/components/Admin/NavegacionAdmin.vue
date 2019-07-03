@@ -68,6 +68,21 @@
                     </li>
                     <li class="treeview">
                         <a href="#">
+                            <i class="fas fa-cash-register text-white"></i> <span>Facturación</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <router-link to="/facturacion" data-toggle="push-menu">
+                                    <i class="fa fa-money-check text-green" aria-hidden="true"></i> <span>Facturar</span>
+                                </router-link>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
                             <i class="fas fa-user-check text-white"></i> <span>Clientes</span>
                         <span class="pull-right-container">
                             <i class="fa fa-angle-left pull-right"></i>
