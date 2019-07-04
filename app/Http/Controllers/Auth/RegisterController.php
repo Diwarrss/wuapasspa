@@ -32,7 +32,7 @@ class RegisterController extends Controller
 
         return view('auth.register', ['logoEmpresa' => $logoEmpresa]);
     }
-    
+
 
     /**
      * Where to redirect users after registration.
@@ -65,7 +65,7 @@ class RegisterController extends Controller
             //'usuario' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'celular' => ['required', 'string', 'max:100'],
+            'celular' => ['required', 'string', 'max:10'],
             //'fecha_cumpleaños' => ['required', 'string'],
         ]);
     }
