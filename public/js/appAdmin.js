@@ -113,7 +113,6 @@ var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/
 var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ "./node_modules/axios/lib/helpers/parseHeaders.js");
 var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ "./node_modules/axios/lib/helpers/isURLSameOrigin.js");
 var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/axios/lib/core/createError.js");
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(/*! ./../helpers/btoa */ "./node_modules/axios/lib/helpers/btoa.js");
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -125,22 +124,6 @@ module.exports = function xhrAdapter(config) {
     }
 
     var request = new XMLHttpRequest();
-    var loadEvent = 'onreadystatechange';
-    var xDomain = false;
-
-    // For IE 8/9 CORS support
-    // Only supports POST and GET calls and doesn't returns the response headers.
-    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ( true &&
-        typeof window !== 'undefined' &&
-        window.XDomainRequest && !('withCredentials' in request) &&
-        !isURLSameOrigin(config.url)) {
-      request = new window.XDomainRequest();
-      loadEvent = 'onload';
-      xDomain = true;
-      request.onprogress = function handleProgress() {};
-      request.ontimeout = function handleTimeout() {};
-    }
 
     // HTTP basic authentication
     if (config.auth) {
@@ -155,8 +138,8 @@ module.exports = function xhrAdapter(config) {
     request.timeout = config.timeout;
 
     // Listen for ready state
-    request[loadEvent] = function handleLoad() {
-      if (!request || (request.readyState !== 4 && !xDomain)) {
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
         return;
       }
 
@@ -173,15 +156,26 @@ module.exports = function xhrAdapter(config) {
       var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
       var response = {
         data: responseData,
-        // IE sends 1223 instead of 204 (https://github.com/axios/axios/issues/201)
-        status: request.status === 1223 ? 204 : request.status,
-        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+        status: request.status,
+        statusText: request.statusText,
         headers: responseHeaders,
         config: config,
         request: request
       };
 
       settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
 
       // Clean up request
       request = null;
@@ -214,8 +208,8 @@ module.exports = function xhrAdapter(config) {
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies.read(config.xsrfCookieName) :
-          undefined;
+        cookies.read(config.xsrfCookieName) :
+        undefined;
 
       if (xsrfValue) {
         requestHeaders[config.xsrfHeaderName] = xsrfValue;
@@ -302,6 +296,7 @@ module.exports = function xhrAdapter(config) {
 var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios/lib/utils.js");
 var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
 var Axios = __webpack_require__(/*! ./core/Axios */ "./node_modules/axios/lib/core/Axios.js");
+var mergeConfig = __webpack_require__(/*! ./core/mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
 var defaults = __webpack_require__(/*! ./defaults */ "./node_modules/axios/lib/defaults.js");
 
 /**
@@ -331,7 +326,7 @@ axios.Axios = Axios;
 
 // Factory for creating new instances
 axios.create = function create(instanceConfig) {
-  return createInstance(utils.merge(defaults, instanceConfig));
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
 };
 
 // Expose Cancel & CancelToken
@@ -480,10 +475,11 @@ module.exports = function isCancel(value) {
 "use strict";
 
 
-var defaults = __webpack_require__(/*! ./../defaults */ "./node_modules/axios/lib/defaults.js");
 var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
+var buildURL = __webpack_require__(/*! ../helpers/buildURL */ "./node_modules/axios/lib/helpers/buildURL.js");
 var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/axios/lib/core/InterceptorManager.js");
 var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/axios/lib/core/dispatchRequest.js");
+var mergeConfig = __webpack_require__(/*! ./mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
 
 /**
  * Create a new instance of Axios
@@ -507,13 +503,14 @@ Axios.prototype.request = function request(config) {
   /*eslint no-param-reassign:0*/
   // Allow for axios('example/url'[, config]) a la fetch API
   if (typeof config === 'string') {
-    config = utils.merge({
-      url: arguments[0]
-    }, arguments[1]);
+    config = arguments[1] || {};
+    config.url = arguments[0];
+  } else {
+    config = config || {};
   }
 
-  config = utils.merge(defaults, {method: 'get'}, this.defaults, config);
-  config.method = config.method.toLowerCase();
+  config = mergeConfig(this.defaults, config);
+  config.method = config.method ? config.method.toLowerCase() : 'get';
 
   // Hook up interceptors middleware
   var chain = [dispatchRequest, undefined];
@@ -532,6 +529,11 @@ Axios.prototype.request = function request(config) {
   }
 
   return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
 };
 
 // Provide aliases for supported request methods
@@ -778,9 +780,93 @@ module.exports = function enhanceError(error, config, code, request, response) {
   if (code) {
     error.code = code;
   }
+
   error.request = request;
   error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code
+    };
+  };
   return error;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/axios/lib/core/mergeConfig.js":
+/*!****************************************************!*\
+  !*** ./node_modules/axios/lib/core/mergeConfig.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios/lib/utils.js");
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  utils.forEach(['url', 'method', 'params', 'data'], function valueFromConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    }
+  });
+
+  utils.forEach(['headers', 'auth', 'proxy'], function mergeDeepProperties(prop) {
+    if (utils.isObject(config2[prop])) {
+      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
+    } else if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (utils.isObject(config1[prop])) {
+      config[prop] = utils.deepMerge(config1[prop]);
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  utils.forEach([
+    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
+    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
+    'socketPath'
+  ], function defaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  return config;
 };
 
 
@@ -807,8 +893,7 @@ var createError = __webpack_require__(/*! ./createError */ "./node_modules/axios
  */
 module.exports = function settle(resolve, reject, response) {
   var validateStatus = response.config.validateStatus;
-  // Note: status is not exposed by XDomainRequest
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
+  if (!validateStatus || validateStatus(response.status)) {
     resolve(response);
   } else {
     reject(createError(
@@ -881,12 +966,13 @@ function setContentTypeIfUnset(headers, value) {
 
 function getDefaultAdapter() {
   var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(/*! ./adapters/xhr */ "./node_modules/axios/lib/adapters/xhr.js");
-  } else if (typeof process !== 'undefined') {
+  // Only Node.JS has a process variable that is of [[Class]] process
+  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
     adapter = __webpack_require__(/*! ./adapters/http */ "./node_modules/axios/lib/adapters/xhr.js");
+  } else if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(/*! ./adapters/xhr */ "./node_modules/axios/lib/adapters/xhr.js");
   }
   return adapter;
 }
@@ -895,6 +981,7 @@ var defaults = {
   adapter: getDefaultAdapter(),
 
   transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
     normalizeHeaderName(headers, 'Content-Type');
     if (utils.isFormData(data) ||
       utils.isArrayBuffer(data) ||
@@ -988,54 +1075,6 @@ module.exports = function bind(fn, thisArg) {
 
 /***/ }),
 
-/***/ "./node_modules/axios/lib/helpers/btoa.js":
-/*!************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/btoa.js ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-
-var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-
-function E() {
-  this.message = 'String contains an invalid character';
-}
-E.prototype = new Error;
-E.prototype.code = 5;
-E.prototype.name = 'InvalidCharacterError';
-
-function btoa(input) {
-  var str = String(input);
-  var output = '';
-  for (
-    // initialize result and counter
-    var block, charCode, idx = 0, map = chars;
-    // if the next str index does not exist:
-    //   change the mapping table to "="
-    //   check if d has no fractional digits
-    str.charAt(idx | 0) || (map = '=', idx % 1);
-    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-  ) {
-    charCode = str.charCodeAt(idx += 3 / 4);
-    if (charCode > 0xFF) {
-      throw new E();
-    }
-    block = block << 8 | charCode;
-  }
-  return output;
-}
-
-module.exports = btoa;
-
-
-/***/ }),
-
 /***/ "./node_modules/axios/lib/helpers/buildURL.js":
 /*!****************************************************!*\
   !*** ./node_modules/axios/lib/helpers/buildURL.js ***!
@@ -1105,6 +1144,11 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   }
 
   if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
     url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
   }
 
@@ -1156,50 +1200,50 @@ module.exports = (
   utils.isStandardBrowserEnv() ?
 
   // Standard browser envs support document.cookie
-  (function standardBrowserEnv() {
-    return {
-      write: function write(name, value, expires, path, domain, secure) {
-        var cookie = [];
-        cookie.push(name + '=' + encodeURIComponent(value));
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
 
-        if (utils.isNumber(expires)) {
-          cookie.push('expires=' + new Date(expires).toGMTString());
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
         }
-
-        if (utils.isString(path)) {
-          cookie.push('path=' + path);
-        }
-
-        if (utils.isString(domain)) {
-          cookie.push('domain=' + domain);
-        }
-
-        if (secure === true) {
-          cookie.push('secure');
-        }
-
-        document.cookie = cookie.join('; ');
-      },
-
-      read: function read(name) {
-        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-        return (match ? decodeURIComponent(match[3]) : null);
-      },
-
-      remove: function remove(name) {
-        this.write(name, '', Date.now() - 86400000);
-      }
-    };
-  })() :
+      };
+    })() :
 
   // Non standard browser env (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return {
-      write: function write() {},
-      read: function read() { return null; },
-      remove: function remove() {}
-    };
-  })()
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
 );
 
 
@@ -1248,64 +1292,64 @@ module.exports = (
 
   // Standard browser envs have full support of the APIs needed to test
   // whether the request URL is of the same origin as current location.
-  (function standardBrowserEnv() {
-    var msie = /(msie|trident)/i.test(navigator.userAgent);
-    var urlParsingNode = document.createElement('a');
-    var originURL;
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
 
-    /**
+      /**
     * Parse a URL to discover it's components
     *
     * @param {String} url The URL to be parsed
     * @returns {Object}
     */
-    function resolveURL(url) {
-      var href = url;
+      function resolveURL(url) {
+        var href = url;
 
-      if (msie) {
+        if (msie) {
         // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
         urlParsingNode.setAttribute('href', href);
-        href = urlParsingNode.href;
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
       }
 
-      urlParsingNode.setAttribute('href', href);
+      originURL = resolveURL(window.location.href);
 
-      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-      return {
-        href: urlParsingNode.href,
-        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-        host: urlParsingNode.host,
-        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-        hostname: urlParsingNode.hostname,
-        port: urlParsingNode.port,
-        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-                  urlParsingNode.pathname :
-                  '/' + urlParsingNode.pathname
-      };
-    }
-
-    originURL = resolveURL(window.location.href);
-
-    /**
+      /**
     * Determine if a URL shares the same origin as the current location
     *
     * @param {String} requestURL The URL to test
     * @returns {boolean} True if URL shares the same origin, otherwise false
     */
-    return function isURLSameOrigin(requestURL) {
-      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-      return (parsed.protocol === originURL.protocol &&
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
             parsed.host === originURL.host);
-    };
-  })() :
+      };
+    })() :
 
   // Non standard browser envs (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return function isURLSameOrigin() {
-      return true;
-    };
-  })()
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
 );
 
 
@@ -1450,7 +1494,7 @@ module.exports = function spread(callback) {
 
 
 var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-var isBuffer = __webpack_require__(/*! is-buffer */ "./node_modules/is-buffer/index.js");
+var isBuffer = __webpack_require__(/*! is-buffer */ "./node_modules/axios/node_modules/is-buffer/index.js");
 
 /*global toString:true*/
 
@@ -1626,9 +1670,13 @@ function trim(str) {
  *
  * react-native:
  *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
  */
 function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
     return false;
   }
   return (
@@ -1710,6 +1758,32 @@ function merge(/* obj1, obj2, obj3, ... */) {
 }
 
 /**
+ * Function equal to merge with the difference being that no reference
+ * to original objects is kept.
+ *
+ * @see merge
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function deepMerge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = deepMerge(result[key], val);
+    } else if (typeof val === 'object') {
+      result[key] = deepMerge({}, val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
  * Extends object a by mutably adding to it the properties of object b.
  *
  * @param {Object} a The object to be extended
@@ -1747,9 +1821,32 @@ module.exports = {
   isStandardBrowserEnv: isStandardBrowserEnv,
   forEach: forEach,
   merge: merge,
+  deepMerge: deepMerge,
   extend: extend,
   trim: trim
 };
+
+
+/***/ }),
+
+/***/ "./node_modules/axios/node_modules/is-buffer/index.js":
+/*!************************************************************!*\
+  !*** ./node_modules/axios/node_modules/is-buffer/index.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+module.exports = function isBuffer (obj) {
+  return obj != null && obj.constructor != null &&
+    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
 
 
 /***/ }),
@@ -5490,6 +5587,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -7295,7 +7407,7 @@ exports = module.exports = __webpack_require__(/*! ../../css-loader/lib/css-base
 
 
 // module
-exports.push([module.i, ".v-cal-dialog {\n    position: fixed;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n    z-index: 999;\n    -webkit-box-sizing: border-box;\n    box-sizing: border-box;\n}\n.v-cal-dialog * {\n    -webkit-box-sizing: inherit;\n    box-sizing: inherit;\n}\n.v-cal-dialog .v-cal-dialog__bg {\n    background-color: rgba(0, 0, 0, 0.3);\n    position: absolute;\n    width: 100%;\n    height: 100%}\n.v-cal-dialog .v-cal-dialog-card {\n    position: absolute;\n    background: #fff;\n    width: 90%;\n    top: 50%;\n    left: 50%;\n    -webkit-transform: translate(-50%,  -50%);\n    transform: translate(-50%,  -50%);\n    max-width: 500px;\n    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);\n    box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);\n}\n.v-cal-dialog .v-cal-dialog-card__header {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -ms-flex-align: center;\n    align-items: center;\n    padding: 20px;\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__title {\n    font-size: 13px;\n    margin: 0;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close {\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n    -moz-appearance: none;\n    -webkit-appearance: none;\n    background-color: transparent;\n    border: none;\n    cursor: pointer;\n    display: inline-block;\n    -webkit-box-flex: 0;\n    -ms-flex-positive: 0;\n    flex-grow: 0;\n    -ms-flex-negative: 0;\n    flex-shrink: 0;\n    font-size: 0;\n    height: 18px;\n    max-height: 18px;\n    max-width: 18px;\n    min-height: 18px;\n    min-width: 18px;\n    outline: none;\n    position: relative;\n    vertical-align: top;\n    width: 18px;\n    padding: 0;\n    margin-left: auto;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before, .v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after {\n    background-color: #BCBCCB;\n    content: \"\";\n    display: block;\n    left: 50%;\n    position: absolute;\n    top: 50%;\n    -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);\n    transform: translateX(-50%) translateY(-50%) rotate(45deg);\n    -webkit-transform-origin: center center;\n    transform-origin: center center;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before {\n    height: 2px;\n    width: 100%}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after {\n    height: 100%;\n    width: 2px;\n}\n.v-cal-dialog .v-cal-dialog-card__body {\n    max-height: 550px;\n    overflow: auto;\n    padding: 20px;\n}\n.v-cal-dialog .v-cal-fields {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -ms-flex-wrap: wrap;\n    flex-wrap: wrap;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -ms-flex-wrap: wrap;\n    flex-wrap: wrap;\n    padding: 10px;\n    width: 100%}\n.v-cal-dialog .v-cal-fields .v-cal-input-group>label {\n    width: 100%;\n    margin-bottom: 5px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"checkbox\"], .v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"radio\"] {\n    margin-right: 5px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input {\n    width: auto;\n    -webkit-box-flex: 1;\n    -ms-flex: 1;\n    flex: 1;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:first-of-type {\n    padding-left: 0;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:last-of-type {\n    padding-right: 0;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input {\n    padding: 10px;\n    width: 100%}\n.v-cal-dialog .v-cal-fields .v-cal-input.is-inline label {\n    margin-bottom: 0;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input.is-radio input, .v-cal-dialog .v-cal-fields .v-cal-input.is-checkbox input {\n    margin-right: 5px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input label {\n    display: inline-block;\n    margin-bottom: 10px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"], .v-cal-dialog .v-cal-fields .v-cal-input textarea, .v-cal-dialog .v-cal-fields .v-cal-input select {\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n    display: block;\n    font-family: inherit;\n    width: 100%;\n    border: 1px solid #E8E9EC;\n    border-radius: 4px;\n    padding: 10px 12px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input textarea:hover, .v-cal-dialog .v-cal-fields .v-cal-input select:hover {\n    border-color: #808495;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input textarea:focus, .v-cal-dialog .v-cal-fields .v-cal-input textarea:active, .v-cal-dialog .v-cal-fields .v-cal-input select:focus, .v-cal-dialog .v-cal-fields .v-cal-input select:active {\n    border-color: #3B86FF;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input textarea {\n    min-width: 100%;\n    max-width: 100%;\n    min-height: 100px;\n    max-height: 150px;\n}\n.v-cal-dialog .v-cal-dialog-card__footer {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -ms-flex-align: center;\n    align-items: center;\n    padding: 20px;\n    border-top: 1px solid #EAF0F4;\n    -webkit-box-pack: end;\n    -ms-flex-pack: end;\n    justify-content: flex-end;\n}\n.v-cal {\n    font-family: inherit;\n    font-size: inherit;\n    padding: 20px;\n    background-color: #fff;\n    color: #4D4F5C;\n    -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);\n    -webkit-box-sizing: border-box;\n    box-sizing: border-box;\n}\n.v-cal * {\n    -webkit-box-sizing: inherit;\n    box-sizing: inherit;\n}\n.v-cal-button {\n    cursor: pointer;\n    background: #fff;\n    padding: 8px 18px;\n    border: 1px solid #D7DAE2;\n    -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);\n    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);\n    font-size: 13px;\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n}\n.v-cal-button.is-rounded {\n    border-radius: 4px;\n}\n.v-cal-button.v-cal-button--is-active {\n    background-color: #fff;\n    color: #3B86FF;\n}\n.v-cal-button:hover {\n    color: #3B86FF;\n    background-color: #fcfcfc;\n}\n.v-cal-button.is-primary {\n    border-color: #3B86FF;\n    background-color: #3B86FF;\n    color: #fff;\n}\n.v-cal-button:disabled, .v-cal-button:disabled:hover {\n    background-color: #f0f0f0;\n    color: #d0d0d0;\n    cursor: not-allowed;\n    border-color: #D7DAE2;\n}\n.v-cal-header {\n    padding: 0 0 40px;\n}/*\n.v-cal-header__actions {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-pack: justify;\n    -ms-flex-pack: justify;\n    justify-content: space-between;\n}\n.v-cal-header__actions .actions-left, .v-cal-header__actions .actions-right {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n}\n.v-cal-header__actions .v-cal-button:first-child {\n    border-bottom-left-radius: 4px;\n    border-top-left-radius: 4px;\n}\n.v-cal-header__actions .v-cal-button:last-child {\n    border-bottom-right-radius: 4px;\n    border-top-right-radius: 4px;\n}\n.v-cal-header__actions .v-cal-button:not(:last-child) {\n    border-right: none;\n}*/\n.v-cal-header__title-bar .v-cal-header__title {\n    margin: 0;\n    font-size: 18px;\n    font-weight: normal;\n    text-align: center;\n}\n.v-cal-content {\n    border: 1px solid #EAF0F4;\n}\n.v-cal-content .v-cal-weekdays, .v-cal-content .v-cal-days {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n}\n.v-cal-content .v-cal-event-item {\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n    position: relative;\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n    background-color: #3B86FF;\n    color: #3B86FF;\n    border-radius: 4px;\n    padding: 7px 14px;\n    text-align: left;\n    white-space: nowrap;\n    overflow: hidden;\n    cursor: pointer;\n}\n.v-cal-content .v-cal-event-item::after {\n    content: '';\n    display: block;\n    position: absolute;\n    width: 14px;\n    height: 100%;\n    top: 0;\n    right: 0;\n    background: -webkit-gradient(linear,  left top,  right top,  from(transparent),  color-stop(75%,  currentColor));\n    background: linear-gradient(to right,  transparent 0%,  currentColor 75%);\n}\n.v-cal-content .v-cal-event-item:not(:last-child) {\n    margin-bottom: 1px;\n}\n.v-cal-content .v-cal-event-item .v-cal-event-time, .v-cal-content .v-cal-event-item .v-cal-event-name {\n    color: #fff;\n}\n.v-cal-content .v-cal-event-item .v-cal-event-time {\n    font-weight: bold;\n    font-size: 12px;\n}\n.v-cal-content .v-cal-event-item .v-cal-event-name {\n    margin-left: 5px;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day, .v-cal-content.v-cal-content--week .v-cal-days .v-cal-day, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-day {\n    background: #fff;\n}\n.v-cal-content.v-cal-content--month .v-cal-weekdays, .v-cal-content.v-cal-content--week .v-cal-weekdays, .v-cal-content.v-cal-content--day .v-cal-weekdays {\n    background-color: #F5F6FA;\n    color: #A3A6B4;\n    text-transform: uppercase;\n    font-size: 13px;\n    font-weight: bold;\n    text-align: center;\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item, .v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday-item, .v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item {\n    padding: 15px 0;\n}\n.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item, .v-cal-content.v-cal-content--month .v-cal-days .v-cal-day {\n    width: 14.28571%}\n.v-cal-content.v-cal-content--month .v-cal-days:not(:last-child) {\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day {\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n    position: relative;\n    text-align: right;\n    min-height: 140px;\n    padding-bottom: 2px;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month {\n    overflow: hidden;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month.is-extended {\n    height: auto;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-today {\n    background-color: #F5F6FA;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-different-month {\n    color: rgba(67, 66, 93, 0.3);\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(:last-child) {\n    border-right: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(.is-disabled):hover {\n    background-color: #fcfcfc;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day .v-cal-day__number {\n    display: block;\n    font-size: 12px;\n    padding: 10px;\n}\n.v-cal-content.v-cal-content--month .v-cal-day.is-disabled, .v-cal-content.v-cal-content--week .v-cal-day.is-disabled {\n    background-color: #f0f0f0;\n    color: #b0b0b0;\n}\n.v-cal-content.v-cal-content--week .v-cal-hour.all-day, .v-cal-content.v-cal-content--week .v-cal-day__hour-block.all-day, .v-cal-content.v-cal-content--day .v-cal-hour.all-day, .v-cal-content.v-cal-content--day .v-cal-day__hour-block.all-day {\n    border-width: 3px !important;\n}\n.v-cal-content.v-cal-content--week .v-cal-times, .v-cal-content.v-cal-content--day .v-cal-times {\n    background: #fff;\n    font-size: 12px;\n    font-weight: normal;\n    border-right: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour, .v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour {\n    padding: 15px;\n}\n.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour.is-now, .v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour.is-now {\n    font-weight: bold;\n}\n.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour:not(:last-child) {\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day {\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today {\n    background-color: #F5F6FA;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month {\n    color: rgba(67, 66, 93, 0.3);\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child) {\n    border-right: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block {\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n    padding: 18px;\n    position: relative;\n    background-color: rgba(0, 0, 0, 0);\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover {\n    background-color: #fcfcfc;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child) {\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill {\n    display: block;\n    font-size: .8125rem;\n    visibility: hidden;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content {\n    position: absolute;\n    left: 0;\n    top: 0;\n    right: 0;\n    bottom: 0;\n    width: 100%;\n    height: 100%}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -ms-flex-wrap: wrap;\n    flex-wrap: wrap;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item {\n    -webkit-box-flex: 0;\n    -ms-flex: none;\n    flex: none;\n    width: 15px;\n    height: 15px;\n    padding: 0;\n    font-size: 0;\n    border-radius: 50%}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child) {\n    margin-right: 2px;\n    margin-bottom: 2px;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item {\n    z-index: 1;\n    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);\n    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);\n    width: 100%;\n    padding: 3px 14px;\n    font-size: 12px;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping {\n    -webkit-box-flex: 0;\n    -ms-flex: none;\n    flex: none;\n}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before {\n    content: '';\n    display: block;\n    position: absolute;\n    top: 0;\n    left: 0;\n    background-color: #3B86FF;\n}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now::after {\n    width: calc(100% + 1px);\n    height: 1px;\n}\n.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now::before {\n    width: 9px;\n    height: 9px;\n    border-radius: 50%;\n    -webkit-transform: translate(-50%,  -50%);\n    transform: translate(-50%,  -50%);\n}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before {\n    top: 16.66667%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before {\n    top: 33.33333%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before {\n    top: 50%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before {\n    top: 66.66667%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before {\n    top: 83.33333%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before {\n    top: 100%}\n.v-cal-content.v-cal-content--week .v-cal-weekdays {\n    max-height: 3rem;\n    text-transform: none;\n}\n.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekdays__padding {\n    visibility: hidden;\n    padding:4px;\n}\n.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper .v-cal-weekday-item {\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--day .v-cal-weekdays {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    text-transform: none;\n}\n.v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item {\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n", ""]);
+exports.push([module.i, ".v-cal-dialog{position:fixed;left:0;right:0;top:0;bottom:0;z-index:999;-webkit-box-sizing:border-box;box-sizing:border-box}.v-cal-dialog *{-webkit-box-sizing:inherit;box-sizing:inherit}.v-cal-dialog .v-cal-dialog__bg{background-color:rgba(0,0,0,0.3);position:absolute;width:100%;height:100%}.v-cal-dialog .v-cal-dialog-card{position:absolute;background:#fff;width:90%;top:50%;left:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);max-width:500px;-webkit-box-shadow:0 0 6px rgba(0,0,0,0.4);box-shadow:0 0 6px rgba(0,0,0,0.4)}.v-cal-dialog .v-cal-dialog-card__header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:20px;border-bottom:1px solid #EAF0F4}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__title{font-size:13px;margin:0}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-moz-appearance:none;-webkit-appearance:none;background-color:transparent;border:none;cursor:pointer;display:inline-block;-webkit-box-flex:0;-ms-flex-positive:0;flex-grow:0;-ms-flex-negative:0;flex-shrink:0;font-size:0;height:18px;max-height:18px;max-width:18px;min-height:18px;min-width:18px;outline:none;position:relative;vertical-align:top;width:18px;padding:0;margin-left:auto}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before,.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after{background-color:#BCBCCB;content:\"\";display:block;left:50%;position:absolute;top:50%;-webkit-transform:translateX(-50%) translateY(-50%) rotate(45deg);transform:translateX(-50%) translateY(-50%) rotate(45deg);-webkit-transform-origin:center center;transform-origin:center center}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before{height:2px;width:100%}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after{height:100%;width:2px}.v-cal-dialog .v-cal-dialog-card__body{max-height:550px;overflow:auto;padding:20px}.v-cal-dialog .v-cal-fields{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap}.v-cal-dialog .v-cal-fields .v-cal-input-group{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;padding:10px;width:100%}.v-cal-dialog .v-cal-fields .v-cal-input-group>label{width:100%;margin-bottom:5px}.v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"checkbox\"],.v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"radio\"]{margin-right:5px}.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input{width:auto;-webkit-box-flex:1;-ms-flex:1;flex:1}.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:first-of-type{padding-left:0}.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:last-of-type{padding-right:0}.v-cal-dialog .v-cal-fields .v-cal-input{padding:10px;width:100%}.v-cal-dialog .v-cal-fields .v-cal-input.is-inline label{margin-bottom:0}.v-cal-dialog .v-cal-fields .v-cal-input.is-radio input,.v-cal-dialog .v-cal-fields .v-cal-input.is-checkbox input{margin-right:5px}.v-cal-dialog .v-cal-fields .v-cal-input label{display:inline-block;margin-bottom:10px}.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"],.v-cal-dialog .v-cal-fields .v-cal-input textarea,.v-cal-dialog .v-cal-fields .v-cal-input select{-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out;display:block;font-family:inherit;width:100%;border:1px solid #E8E9EC;border-radius:4px;padding:10px 12px}.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input textarea:hover,.v-cal-dialog .v-cal-fields .v-cal-input select:hover{border-color:#808495}.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input textarea:focus,.v-cal-dialog .v-cal-fields .v-cal-input textarea:active,.v-cal-dialog .v-cal-fields .v-cal-input select:focus,.v-cal-dialog .v-cal-fields .v-cal-input select:active{border-color:#3B86FF}.v-cal-dialog .v-cal-fields .v-cal-input textarea{min-width:100%;max-width:100%;min-height:100px;max-height:150px}.v-cal-dialog .v-cal-dialog-card__footer{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:20px;border-top:1px solid #EAF0F4;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end}.v-cal{font-family:inherit;font-size:inherit;padding:20px;background-color:#fff;color:#4D4F5C;-webkit-box-shadow:0 2px 6px rgba(0,0,0,0.04);box-shadow:0 2px 6px rgba(0,0,0,0.04);-webkit-box-sizing:border-box;box-sizing:border-box}.v-cal *{-webkit-box-sizing:inherit;box-sizing:inherit}.v-cal-button{cursor:pointer;background:#fff;padding:8px 18px;border:1px solid #D7DAE2;-webkit-box-shadow:0 2px 3px rgba(0,0,0,0.05);box-shadow:0 2px 3px rgba(0,0,0,0.05);font-size:13px;-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out}.v-cal-button.is-rounded{border-radius:4px}.v-cal-button.v-cal-button--is-active{background-color:#fff;color:#3B86FF}.v-cal-button:hover{color:#3B86FF;background-color:#fcfcfc}.v-cal-button.is-primary{border-color:#3B86FF;background-color:#3B86FF;color:#fff}.v-cal-button:disabled,.v-cal-button:disabled:hover{background-color:#f0f0f0;color:#d0d0d0;cursor:not-allowed;border-color:#D7DAE2}.v-cal-header{padding:0 0 40px}.v-cal-header__actions{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.v-cal-header__actions .actions-left,.v-cal-header__actions .actions-right{display:-webkit-box;display:-ms-flexbox;display:flex}.v-cal-header__actions .v-cal-button:first-child{border-bottom-left-radius:4px;border-top-left-radius:4px}.v-cal-header__actions .v-cal-button:last-child{border-bottom-right-radius:4px;border-top-right-radius:4px}.v-cal-header__actions .v-cal-button:not(:last-child){border-right:none}.v-cal-header__title-bar .v-cal-header__title{margin:0;font-size:18px;font-weight:normal;text-align:center}.v-cal-content{border:1px solid #EAF0F4}.v-cal-content .v-cal-weekdays,.v-cal-content .v-cal-days{display:-webkit-box;display:-ms-flexbox;display:flex}.v-cal-content .v-cal-event-item{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;position:relative;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;background-color:#3B86FF;color:#3B86FF;border-radius:4px;padding:7px 14px;text-align:left;white-space:nowrap;overflow:hidden;cursor:pointer}.v-cal-content .v-cal-event-item::after{content:'';display:block;position:absolute;width:14px;height:100%;top:0;right:0;background:-webkit-gradient(linear, left top, right top, from(transparent), color-stop(75%, currentColor));background:linear-gradient(to right, transparent 0%, currentColor 75%)}.v-cal-content .v-cal-event-item:not(:last-child){margin-bottom:1px}.v-cal-content .v-cal-event-item .v-cal-event-time,.v-cal-content .v-cal-event-item .v-cal-event-name{color:#fff}.v-cal-content .v-cal-event-item .v-cal-event-time{font-weight:bold;font-size:.85rem}.v-cal-content .v-cal-event-item .v-cal-event-name{margin-left:5px}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day,.v-cal-content.v-cal-content--week .v-cal-days .v-cal-day,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-day{background:#fff}.v-cal-content.v-cal-content--month .v-cal-weekdays,.v-cal-content.v-cal-content--week .v-cal-weekdays,.v-cal-content.v-cal-content--day .v-cal-weekdays{background-color:#F5F6FA;color:#A3A6B4;text-transform:uppercase;font-size:.75rem;font-weight:bold;text-align:center;border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item,.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday-item,.v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item{padding:15px 0}.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item,.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day{width:14.28571%}.v-cal-content.v-cal-content--month .v-cal-days:not(:last-child){border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day{-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out;position:relative;text-align:right;min-height:140px;padding-bottom:2px}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month{overflow:hidden}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month.is-extended{height:auto}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-today{background-color:#F5F6FA}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-different-month{color:rgba(67,66,93,0.3)}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(:last-child){border-right:1px solid #EAF0F4}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(.is-disabled):hover{background-color:#fcfcfc}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day .v-cal-day__number{display:block;font-size:.75rem;padding:10px}.v-cal-content.v-cal-content--month .v-cal-day.is-disabled,.v-cal-content.v-cal-content--week .v-cal-day.is-disabled{background-color:#f0f0f0;color:#b0b0b0}.v-cal-content.v-cal-content--week .v-cal-hour.all-day,.v-cal-content.v-cal-content--week .v-cal-day__hour-block.all-day,.v-cal-content.v-cal-content--day .v-cal-hour.all-day,.v-cal-content.v-cal-content--day .v-cal-day__hour-block.all-day{border-width:3px !important}.v-cal-content.v-cal-content--week .v-cal-times,.v-cal-content.v-cal-content--day .v-cal-times{background:#fff;font-size:.8125rem;font-weight:normal;border-right:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour,.v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour{padding:15px}.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour.is-now,.v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour.is-now{font-weight:bold}.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour:not(:last-child){border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today{background-color:#F5F6FA}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month{color:rgba(67,66,93,0.3)}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child){border-right:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block{-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out;padding:15px;position:relative;background-color:rgba(0,0,0,0)}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover{background-color:#fcfcfc}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child){border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill{display:block;font-size:.8125rem;visibility:hidden}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content{position:absolute;left:0;top:0;right:0;bottom:0;width:100%;height:100%}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list{display:-webkit-box;display:-ms-flexbox;display:flex}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item{-webkit-box-flex:0;-ms-flex:none;flex:none;width:15px;height:15px;padding:0;font-size:0;border-radius:50%}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child){margin-right:2px;margin-bottom:2px}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item{z-index:1;-webkit-box-shadow:0 0 5px rgba(0,0,0,0.25);box-shadow:0 0 5px rgba(0,0,0,0.25);width:100%;padding:3px 14px;font-size:.9rem}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping{-webkit-box-flex:0;-ms-flex:none;flex:none}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before{content:'';display:block;position:absolute;top:0;left:0;background-color:#3B86FF}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now::after{width:calc(100% + 1px);height:1px}.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now::before{width:9px;height:9px;border-radius:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%)}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before{top:16.66667%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before{top:33.33333%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before{top:50%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before{top:66.66667%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before{top:83.33333%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before{top:100%}.v-cal-content.v-cal-content--week .v-cal-weekdays{max-height:3rem;text-transform:none}.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekdays__padding{visibility:hidden}.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper .v-cal-weekday-item{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--day .v-cal-weekdays{display:-webkit-box;display:-ms-flexbox;display:flex;text-transform:none}.v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}", ""]);
 
 // exports
 
@@ -7422,38 +7534,6 @@ function toComment(sourceMap) {
 	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
 
 	return '/*# ' + data + ' */';
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/is-buffer/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/is-buffer/index.js ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-// The _isBuffer check is for Safari 5-7 support, because it's missing
-// Object.prototype.constructor. Remove this eventually
-module.exports = function (obj) {
-  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-}
-
-function isBuffer (obj) {
-  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
-
-// For Node v0.10 support. Remove this eventually.
-function isSlowBuffer (obj) {
-  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
 
@@ -34433,7 +34513,7 @@ function open(propsData) {
             {
                 name: 'date',   //  Required
                 type: 'date',   //  def: 'text'
-                label: 'Fecha',  //  def: this.name
+                label: 'Date',  //  def: this.name
                 // showLabel: false,    //  def: true
                 required: true, //  def: false,
                 value: propsData.date,   //  def: null
@@ -34442,19 +34522,19 @@ function open(propsData) {
 
         if ( propsData.enableTimeInputs )
             defaultFields.splice(1, 0, {
-                label: 'Hora',
+                label: 'Times',
                 fields: [
                     {
                         name: 'startTime',
                         type: 'time',
-                        label: 'Hora Inicio',
+                        label: 'Start Time',
                         required: true,
                         value: propsData.startTime
                     },
                     {
                         name: 'endTime',
                         type: 'time',
-                        label: 'Hora Fin',
+                        label: 'End Time',
                         required: true,
                         value: propsData.endTime
                     }
@@ -34465,7 +34545,6 @@ function open(propsData) {
         return open(propsData);
     }
 });
-
 
 /***/ }),
 
@@ -34999,7 +35078,7 @@ const defaultLabels = {
 const defaultViews = ['month', 'week', 'day'];
 
 let config = {
-    locale: 'es',
+    locale: 'en',
     showTodayButton: true,
     minDate: null,
     maxDate: null,
@@ -36155,10 +36234,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 
 
@@ -36493,7 +36568,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _EventDialogInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EventDialogInput */ "./node_modules/v-calendar-scheduler/components/dialog/EventDialogInput.vue");
-//
 //
 //
 //
@@ -37196,69 +37270,63 @@ var render = function() {
     { staticClass: "v-cal" },
     [
       _c("header", { staticClass: "v-cal-header" }, [
-        _c("div", [
-          _c("div", { staticClass: "col-12 col-xs-6 col-sm-6" }, [
-            _c("div", { staticClass: "btn-group" }, [
-              _vm.showTodayButton
-                ? _c(
-                    "button",
-                    {
-                      staticClass: "v-cal-button",
-                      class: {
-                        "v-cal-button--is-active":
-                          _vm.activeDate &&
-                          _vm.activeDate.isSame(_vm.today, "day")
-                      },
-                      on: { click: _vm.goToToday }
-                    },
-                    [_vm._v(_vm._s(_vm.labels.today))]
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _c("button", {
-                staticClass: "v-cal-button",
-                attrs: { disabled: !_vm.isPrevAllowed },
-                domProps: { innerHTML: _vm._s(_vm.labels.back) },
-                on: { click: _vm.prev }
-              }),
-              _vm._v(" "),
-              _c("button", {
-                staticClass: "v-cal-button",
-                attrs: { disabled: !_vm.isNextAllowed },
-                domProps: { innerHTML: _vm._s(_vm.labels.next) },
-                on: { click: _vm.next }
-              })
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-xs-6 col-sm-6" }, [
-            _c(
-              "div",
-              { staticClass: "btn-group" },
-              _vm._l(_vm.availableViews, function(view) {
-                return _c(
+        _c("div", { staticClass: "v-cal-header__actions" }, [
+          _c("div", { staticClass: "actions-left" }, [
+            _vm.showTodayButton
+              ? _c(
                   "button",
                   {
                     staticClass: "v-cal-button",
                     class: {
-                      "v-cal-button--is-active": _vm.activeView === view
+                      "v-cal-button--is-active":
+                        _vm.activeDate &&
+                        _vm.activeDate.isSame(_vm.today, "day")
                     },
-                    on: {
-                      click: function($event) {
-                        return _vm.switchView(view)
-                      }
-                    }
+                    on: { click: _vm.goToToday }
                   },
-                  [
-                    _vm._v(
-                      _vm._s(_vm._f("capitalizeFirstLetter")(_vm.labels[view]))
-                    )
-                  ]
+                  [_vm._v(_vm._s(_vm.labels.today))]
                 )
-              }),
-              0
-            )
-          ])
+              : _vm._e(),
+            _vm._v(" "),
+            _c("button", {
+              staticClass: "v-cal-button",
+              attrs: { disabled: !_vm.isPrevAllowed },
+              domProps: { innerHTML: _vm._s(_vm.labels.back) },
+              on: { click: _vm.prev }
+            }),
+            _vm._v(" "),
+            _c("button", {
+              staticClass: "v-cal-button",
+              attrs: { disabled: !_vm.isNextAllowed },
+              domProps: { innerHTML: _vm._s(_vm.labels.next) },
+              on: { click: _vm.next }
+            })
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "actions-right" },
+            _vm._l(_vm.availableViews, function(view) {
+              return _c(
+                "button",
+                {
+                  staticClass: "v-cal-button",
+                  class: { "v-cal-button--is-active": _vm.activeView === view },
+                  on: {
+                    click: function($event) {
+                      return _vm.switchView(view)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    _vm._s(_vm._f("capitalizeFirstLetter")(_vm.labels[view]))
+                  )
+                ]
+              )
+            }),
+            0
+          )
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "v-cal-header__title-bar" }, [
@@ -37327,7 +37395,7 @@ var render = function() {
               [
                 _c("header", { staticClass: "v-cal-dialog-card__header" }, [
                   _c("h5", { staticClass: "v-cal-dialog__title" }, [
-                    _vm._v("Agendar Solicitud")
+                    _vm._v(_vm._s(_vm.title))
                   ]),
                   _vm._v(" "),
                   _c("button", {
@@ -37359,20 +37427,33 @@ var render = function() {
                             : _c(
                                 "div",
                                 { staticClass: "v-cal-input-group" },
-                                _vm._l(field.fields, function(subfield, index) {
-                                  return _c("event-dialog-input", {
-                                    key: subfield.name + "-" + index,
-                                    attrs: { field: subfield },
-                                    model: {
-                                      value: _vm.event[subfield.name],
-                                      callback: function($$v) {
-                                        _vm.$set(_vm.event, subfield.name, $$v)
-                                      },
-                                      expression: "event[subfield.name]"
-                                    }
+                                [
+                                  field.label
+                                    ? _c("label", [_vm._v(_vm._s(field.label))])
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _vm._l(field.fields, function(
+                                    subfield,
+                                    index
+                                  ) {
+                                    return _c("event-dialog-input", {
+                                      key: subfield.name + "-" + index,
+                                      attrs: { field: subfield },
+                                      model: {
+                                        value: _vm.event[subfield.name],
+                                        callback: function($$v) {
+                                          _vm.$set(
+                                            _vm.event,
+                                            subfield.name,
+                                            $$v
+                                          )
+                                        },
+                                        expression: "event[subfield.name]"
+                                      }
+                                    })
                                   })
-                                }),
-                                1
+                                ],
+                                2
                               )
                         ]
                       })
@@ -37385,26 +37466,10 @@ var render = function() {
                   _c(
                     "button",
                     {
-                      staticClass: "v-cal-button is-rounded is-default",
-                      attrs: { type: "button" },
-                      on: { click: _vm.cancel }
-                    },
-                    [
-                      _c("i", { staticClass: "fas fa-times" }),
-                      _vm._v(" Cerrar")
-                    ]
-                  ),
-                  _vm._v("  \n                    "),
-                  _c(
-                    "button",
-                    {
                       staticClass: "v-cal-button is-rounded is-primary",
                       attrs: { type: "submit" }
                     },
-                    [
-                      _c("i", { staticClass: "fas fa-check" }),
-                      _vm._v(" Agendar")
-                    ]
+                    [_vm._v(_vm._s(_vm.createButtonLabel))]
                   )
                 ])
               ]
@@ -43319,6 +43384,36 @@ var render = function() {
                     _c(
                       "router-link",
                       {
+                        attrs: {
+                          to: "/facturacion",
+                          "data-toggle": "push-menu"
+                        }
+                      },
+                      [
+                        _c("i", {
+                          staticClass: "fa fa-money-check text-green",
+                          attrs: { "aria-hidden": "true" }
+                        }),
+                        _vm._v(" "),
+                        _c("span", [_vm._v("Facturar")])
+                      ]
+                    )
+                  ],
+                  1
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("li", { staticClass: "treeview" }, [
+              _vm._m(2),
+              _vm._v(" "),
+              _c("ul", { staticClass: "treeview-menu" }, [
+                _c(
+                  "li",
+                  [
+                    _c(
+                      "router-link",
+                      {
                         attrs: { to: "/clientes", "data-toggle": "push-menu" }
                       },
                       [
@@ -43413,7 +43508,7 @@ var render = function() {
             ),
             _vm._v(" "),
             _c("li", { staticClass: "treeview" }, [
-              _vm._m(2),
+              _vm._m(3),
               _vm._v(" "),
               _c("ul", { staticClass: "treeview-menu" }, [
                 _c(
@@ -43539,6 +43634,20 @@ var staticRenderFns = [
       _c("i", { staticClass: "far fa-calendar-alt text-white" }),
       _vm._v(" "),
       _c("span", [_vm._v("Agenda")]),
+      _vm._v(" "),
+      _c("span", { staticClass: "pull-right-container" }, [
+        _c("i", { staticClass: "fa fa-angle-left pull-right" })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("a", { attrs: { href: "#" } }, [
+      _c("i", { staticClass: "fas fa-cash-register text-white" }),
+      _vm._v(" "),
+      _c("span", [_vm._v("Facturación")]),
       _vm._v(" "),
       _c("span", { staticClass: "pull-right-container" }, [
         _c("i", { staticClass: "fa fa-angle-left pull-right" })
