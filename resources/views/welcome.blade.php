@@ -215,7 +215,7 @@
                                                     Celular:</h5>
                                                 <p class="mbr-text align-left mbr-fonts-style display-7">
                                                     <i class="fas fa-phone"></i> {{$item->telefono_empresa}} <br>
-                                                    <a target="_blank" href="https://api.whatsapp.com/send?phone=57{{$item->celular_empresa}}&text=Hola, quiero conocer mas información de {{$item->nombre_empresa}}.">
+                                                    <a target="_blank" href="https://api.whatsapp.com/send?phone=57{{$item->celular_empresa}}&text=Hola {{$item->nombre_empresa}} me encanta lo que hacen, quiero probar de sus servicios. Por favor! Como apartó una cita con ustedes?.">
                                                         <i class="fab fa-whatsapp text-green"></i> WhatsApp, {{$item->celular_empresa}}
                                                     </a>
                                                 </p>
@@ -266,7 +266,7 @@
                                                 <a target="_blank" class="btn btn-social" title="Instagram" href="{{$item->instagram_empresa}}">
                                                     <i class="fab fa-instagram"></i>
                                                 </a>
-                                                <a target="_blank" class="btn btn-social" title="WhatsApp" href="https://api.whatsapp.com/send?phone=57{{$item->celular_empresa}}&text=Hola, quiero conocer mas información de {{$item->nombre_empresa}}.">
+                                                <a target="_blank" class="btn btn-social" title="WhatsApp" href="https://api.whatsapp.com/send?phone=57{{$item->celular_empresa}}&text=Hola {{$item->nombre_empresa}} me encanta lo que hacen, quiero probar de sus servicios. Por favor! Como apartó una cita con ustedes?.">
                                                     <i class="fab fa-whatsapp"></i>
                                                 </a>
                                                 <a target="_blank" class="btn btn-social" title="Mi Pagina" href="{{$item->urlweb_empresa}}">

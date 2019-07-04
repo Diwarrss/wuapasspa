@@ -14,12 +14,12 @@ class ReportesController extends Controller
         //capturamos año actual
         $year= date('Y');
 
-        $citasMes = DB::table('solicitudes')
+        $citasMes = DB::table('reservaciones')
                     ->select(DB::raw("count(created_at) as cantidad"),
                         DB::raw("DATE_FORMAT(created_at, '%m') as month"),
                         DB::raw("YEAR(created_at) as year"))
                     //->whereYear('created_at', $year)
-                    ->where('estado_solicitud', '<>', 3)
+                    ->where('estado_reservacion', '<>', 5)
                     ->groupBy('month')
                     ->get();
 
@@ -31,12 +31,12 @@ class ReportesController extends Controller
         //capturamos año actual
         $year= date('Y');
 
-        $citasMes = DB::table('solicitudes')
+        $citasMes = DB::table('reservaciones')
                     ->select(DB::raw("count(created_at) as cantidad"),
                         DB::raw("DATE_FORMAT(created_at, '%m') as month"),
                         DB::raw("YEAR(created_at) as year"))
                     ->whereYear('created_at', $year)
-                    ->where('estado_solicitud', '=', 5)
+                    ->where('estado_reservacion', '=', 2)
                     ->groupBy('month')
                     ->get();
 
@@ -48,12 +48,12 @@ class ReportesController extends Controller
         //capturamos año actual
         $year= date('Y');
 
-        $citasMes = DB::table('solicitudes')
+        $citasMes = DB::table('reservaciones')
                     ->select(DB::raw("count(created_at) as cantidad"),
                         DB::raw("DATE_FORMAT(created_at, '%m') as month"),
                         DB::raw("YEAR(created_at) as year"))
                     ->whereYear('created_at', $year)
-                    ->where('estado_solicitud', '=', 6)
+                    ->where('estado_reservacion', '=', 3)
                     ->groupBy('month')
                     ->get();
 
