@@ -125,8 +125,8 @@
                                                 <div id="collapse{{$categoria->id}}" class="panel-collapse noScroll collapse" role="tabpanel" aria-labelledby="headingOne" data-parent="#bootstrap-accordion_3">
                                                     <div class="panel-body p-4">
                                                         <ul class="list-group list-group-flush">
-                                                            @foreach ($categoria->serviciosobj as $servicioka)
-                                                            <li class="list-group-item"><i class="fas fa-check fa-1x"></i> {{$servicioka['nombre_servicio']}}</li>
+                                                            @foreach ($categoria->servicios as $servicio)
+                                                            <li class="list-group-item"><i class="fas fa-check fa-1x"></i> {{$servicio->nombre_servicio}}</li>
                                                             @endforeach
                                                         </ul>
                                                     </div>
@@ -276,7 +276,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </section>
                         @endforeach

@@ -37,19 +37,11 @@ class WelcomeController extends Controller
                     ->leftJoin('imagenes', 'categorias.imagenes_imagenes_id', '=', 'imagenes.id')
                     ->get();
 
-                    $serviciosObjetos = array();
-                    foreach ($categorias as $categoria) {
-                        
-                        foreach ($servicios as $servicio) {
-                            if($categoria->id == $servicio->id_catogoria){
-                                $serviciosObjetos[$servicio->id] =  (array)$servicio;                             
-                            }
-                        }
-                        $categoria->serviciosobj = (object)$serviciosObjetos; 
-                        $serviciosObjetos = array();
-                    }
+
+        $catergoriasLazy = Categoria::with('servicios')->get();//para traer json categoria->servicios tipo hijos atrabez de relaciones hastomany en el modelo de categoria
+
         //aqui enviamos un array llamado miEmpresa a la vista welcome
-        return view('welcome', ['miEmpresa' => $miEmpresa, 'imagenes' => $imagenes, 'servicios' => $servicios, 'categorias' => $categorias,
+        return view('welcome', ['miEmpresa' => $miEmpresa, 'imagenes' => $imagenes, 'servicios' => $servicios, 'categorias' => $catergoriasLazy,
                                 'logoEmpresa' => $logoEmpresa]);
     }
 }

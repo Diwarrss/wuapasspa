@@ -16,4 +16,10 @@ class Categoria extends Model
         'url_video',
         'imagenes_imagenes_id'
     ];
+
+
+    public function servicios()
+    {
+        return $this->hasMany('App\Servicio','categorias_categorias_id');
+    }
 }
