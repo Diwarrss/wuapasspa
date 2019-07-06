@@ -15,6 +15,11 @@ class CreateCajasTable extends Migration
     {
         Schema::create('cajas', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('empleado_id');
+            $table->foreign('empleado_id')->references('id')->on('users');
+            $table->string('nombre_caja', 150);
+            $table->decimal('valor_inicial', 12,2);
+            $table->decimal('valor_producido', 12,2);
             $table->timestamps();
         });
     }

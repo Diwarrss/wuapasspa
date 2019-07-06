@@ -1,9 +1,9 @@
 <template>
-    <div class="container-fluid col-md-5 mx-auto py-5">
+    <div class="container-fluid col-md-5 mx-auto py-4">
         <div class="card">
             <div class="card-header">
                 <div class="col-md-12 text-center">
-                    <h3><i class="far fa-calendar-plus"></i> Solicitar Cita</h3>
+                    <h5><i class="far fa-calendar-plus"></i> Solicitar Cita</h5>
                 </div>
             </div>
             <div class="card-body">

@@ -52,6 +52,7 @@ import 'vue-datetime/dist/vue-datetime.css'
 
 //componente de las solicitudes hechas cliente
 Vue.component('solicitudes', require('./components/Cliente/Solicitudes.vue').default);
+Vue.component('totalsolicitudes', require('./components/Cliente/TotalSolicitudes.vue').default);
 Vue.component('registrarsolicitud', require('./components/Cliente/registrarSolicitud.vue').default);
 Vue.component('miperfil', require('./components/Cliente/miPerfil.vue').default);
 

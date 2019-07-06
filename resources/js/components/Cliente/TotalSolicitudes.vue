@@ -1,14 +1,14 @@
 <template>
-    <div class="container-fluid py-4">
+    <div class="py-3">
         <div class="card">
             <div class="card-header">
                 <div class="card-title text-center">
-                    <h5><i class="far fa-calendar-alt"></i> Citas Actuales</h5>
+                    <h5><i class="far fa-calendar-alt"></i> Historial de Citas</h5>
                     <button @click="actualizarCitas()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
                 </div>
             </div>
             <div class="card-body">
-                <table id="tablaSolicitudes" class="table table-bordered table-responsive" style="width:100%">
+                <table id="tablatotalsolicitudes" class="table table-bordered table-responsive" style="width:100%">
                     <thead>
                         <tr>
                             <th style="width:15%">Solicitado el</th>
@@ -24,7 +24,6 @@
                 </table>
             </div>
         </div>
-        <totalsolicitudes></totalsolicitudes>
     </div>
 </template>
 <script>
@@ -37,7 +36,7 @@
         methods: {
             listarSolicituesviejas(){
                 var data = this;
-                axios.get('/listarSolicitudesCliente').then(function (response) {
+                axios.get('/totalsolicitudes').then(function (response) {
                     data.solicitud=response.data;
 
                     //console.log(response.data);
@@ -50,7 +49,7 @@
             listarSolicitues(){
                 var data=this;//creamos esta variable para q nos reconozca los atributos de vuejs
                     jQuery(document).ready(function() {
-                        var tablaSolicitudes = jQuery('#tablaSolicitudes').DataTable({
+                        var tablatotalsolicitudes = jQuery('#tablatotalsolicitudes').DataTable({
                             "language": {
                                     "url": "/jsonDTIdioma.json"
                                 },
@@ -60,7 +59,7 @@
                             "order": [],
                             searching: false,
                             "serverSide": true, //Lado servidor activar o no mas de 20000 registros
-                            "ajax": "/listarSolicitudesCliente",
+                            "ajax": "/totalsolicitudes",
                             "columns": [
                                         {data:'created_at'},
                                         {data:'nombre_servicio'},
@@ -100,7 +99,7 @@
                                         }
                                     ]
                         });
-                        tablaSolicitudes.on('click', '.cancelarAgendada', function () {
+                        tablatotalsolicitudes.on('click', '.cancelarAgendada', function () {
 
                             jQuery.noConflict();// para evitar errores
                             var idRow = jQuery(this).closest('tr'); //fila que le dan click
@@ -120,7 +119,7 @@
                                     if (idRow.hasClass('child')) {//Check if the current row is a child row
                                         idRow = idRow.prev();//If it is, then point to the row before it (its 'parent')
                                     }
-                                    var data = tablaSolicitudes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+                                    var data = tablatotalsolicitudes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
                                     //console.log(data);
 
                                    ///cancelarCita
@@ -135,7 +134,7 @@
                                             showConfirmButton: false,
                                             timer: 1500
                                         });
-                                        tablaSolicitudes.ajax.reload();//refrescar todos los datos
+                                        tablatotalsolicitudes.ajax.reload();//refrescar todos los datos
                                     })
                                     .catch(function (error) {
                                         if (error.response.status == 422) {//preguntamos si el error es 422
@@ -152,7 +151,7 @@
                                 }
                             });
                         });
-                        tablaSolicitudes.on('click', '.cancelarSolicitud', function () {
+                        tablatotalsolicitudes.on('click', '.cancelarSolicitud', function () {
 
                             jQuery.noConflict();// para evitar errores
                             var idRow = jQuery(this).closest('tr'); //fila que le dan click
@@ -173,7 +172,7 @@
                                     if (idRow.hasClass('child')) {//Check if the current row is a child row
                                         idRow = idRow.prev();//If it is, then point to the row before it (its 'parent')
                                     }
-                                    var data = tablaSolicitudes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+                                    var data = tablatotalsolicitudes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
 
                                     //console.log(data);
 
@@ -188,7 +187,7 @@
                                                 showConfirmButton: false,
                                                 timer: 1500
                                             });
-                                        tablaSolicitudes.ajax.reload();//refrescar todos los datos
+                                        tablatotalsolicitudes.ajax.reload();//refrescar todos los datos
                                     })
                                     .catch(function (error) {
                                         if (error.response.status == 422) {//preguntamos si el error es 422
@@ -205,7 +204,7 @@
                                 }
                             });
                         });
-                        tablaSolicitudes.on('click', '.confirmar', function () {
+                        tablatotalsolicitudes.on('click', '.confirmar', function () {
 
                             jQuery.noConflict();// para evitar errores
                             var idRow = jQuery(this).closest('tr'); //fila que le dan click
@@ -225,7 +224,7 @@
                                     if (idRow.hasClass('child')) {//Check if the current row is a child row
                                         idRow = idRow.prev();//If it is, then point to the row before it (its 'parent')
                                     }
-                                    var data = tablaSolicitudes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+                                    var data = tablatotalsolicitudes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
                                     //console.log(data);
 
                                    ///cancelarCita
@@ -240,7 +239,7 @@
                                             showConfirmButton: false,
                                             timer: 1500
                                         });
-                                        tablaSolicitudes.ajax.reload();//refrescar todos los datos
+                                        tablatotalsolicitudes.ajax.reload();//refrescar todos los datos
                                     })
                                     .catch(function (error) {
                                         if (error.response.status == 422) {//preguntamos si el error es 422
@@ -257,14 +256,14 @@
                                 }
                             });
                         });
-                        tablaSolicitudes.on('click', '.verInformacion', function () {
+                        tablatotalsolicitudes.on('click', '.verInformacion', function () {
                             jQuery.noConflict();// para evitar errores
                             //para si es responsivo obtenemos la data
                             var current_row = jQuery(this).parents('tr');//Get the current row
                             if (current_row.hasClass('child')) {//Check if the current row is a child row
                                 current_row = current_row.prev();//If it is, then point to the row before it (its 'parent')
                             }
-                            var datos = tablaSolicitudes.row(current_row).data();
+                            var datos = tablatotalsolicitudes.row(current_row).data();
                             //console.log(datos);
                             //console.log(datos["id"]);
 
@@ -279,7 +278,7 @@
             },
             actualizarCitas()
             {
-                jQuery('#tablaSolicitudes').DataTable().ajax.reload();
+                jQuery('#tablatotalsolicitudes').DataTable().ajax.reload();
             },
         },
         mounted() {

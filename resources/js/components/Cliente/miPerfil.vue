@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid col-md-6 mx-auto py-5">
+    <div class="container-fluid col-md-6 mx-auto py-4">
         <section>
             <div class="card">
                 <div class="card-header">
