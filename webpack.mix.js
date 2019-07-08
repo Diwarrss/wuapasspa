@@ -31,7 +31,8 @@ mix.js(['resources/js/appCliente.js'
    'public/assets/parallax/jarallax.min.js',
    'public/assets/theme/js/script.js',//version 3.3.1
    'public/assets/slidervideo/script.js',
-   'public/assets/formoid/formoid.min.js'
+   'public/assets/formoid/formoid.min.js',
+   'public/resources/MisLibrerias/notificaciones/notificaciones.js'
 ], 'public/js/miWelcome.js')
 
 //Creamos el css modificado de boostrap 4 para cliente
@@ -56,7 +57,8 @@ mix.js(['resources/js/appCliente.js'
    'public/resources/MisLibrerias/sweetalert2/sweetalert2.all.min.js',
    'public/resources/MisLibrerias/datatablesB4/js/pdfmake.min.js',
    'public/resources/MisLibrerias/datatablesB4/js/vfs_fonts.js',
-   'public/resources/MisLibrerias/datatablesB4/js/datatables.min.js'
+   'public/resources/MisLibrerias/datatablesB4/js/datatables.min.js',
+   'public/resources/MisLibrerias/notificaciones/notificaciones.js'
 ], 'public/js/misLibrerias.js')
 
 //Creamos el css modificado de boostrap 4 para cliente
@@ -90,5 +92,6 @@ mix.js(['resources/js/appCliente.js'
     'public/resources/MisLibrerias/datatablesB3/js/pdfmake.min.js',
     'public/resources/MisLibrerias/datatablesB3/js/vfs_fonts.js',
     'public/resources/MisLibrerias/datatablesB3/js/datatables.min.js',
-    'public/resources/MisLibrerias/charjs/Chart.min.js'
+    'public/resources/MisLibrerias/charjs/Chart.min.js',
+    'public/resources/MisLibrerias/notificaciones/notificaciones.js'
  ], 'public/js/adminlte.js');

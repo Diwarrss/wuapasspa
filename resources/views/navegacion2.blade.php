@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background:black">
     <a class="navbar-brand font-weight-bold" href="{{asset('/')}}">
         @foreach ($logoEmpresa as $item)
-        <img src="/img/perfiles/{{$item->logo_empresa}}" width="50" height="50" class="d-inline-block align-top" alt="">
+        <img src="/img/perfiles/{{$item->logo_empresa}}" height="50" class="d-inline-block align-top" alt="">
         <span style="font-size:1.2rem;">{{$item->nombre_corto}}</span>
         @endforeach
     </a>
