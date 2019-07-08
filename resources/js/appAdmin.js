@@ -120,6 +120,9 @@ const MiPagina = require('./components/Admin/MiPagina.vue').default;
 //para el empleado
 const miAgenda = require('./components/Empleado/miAgenda.vue').default;
 const misAtenciones = require('./components/Empleado/misAtenciones.vue').default;
+//para el modulo de facturacion
+const CajaRegistradora = require('./components/Admin/CajaRegistradora.vue').default;
+const FacturarAtencion = require('./components/Admin/FacturarAtencion.vue').default;
 
 // 2. Define some routes
 // Each route should map to a component. The "component" can
@@ -146,6 +149,8 @@ const routes = [
     { path: '/mipagina', component: MiPagina},
     { path: '/miAgenda', component: miAgenda},
     { path: '/misAtenciones', component: misAtenciones},
+    { path: '/cajaRegistradora', component: CajaRegistradora},
+    { path: '/facturarAtencion', component: FacturarAtencion},
 ]
 
 // 3. Create the router instance and pass the `routes` option

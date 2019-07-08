@@ -19,10 +19,10 @@
                 <li role="separator" class="divider"></li>
                 <!-- sidebar menu: : style can be found in sidebar.less -->
                 <ul class="sidebar-menu" data-widget="tree">
-                    <li class="header text-center">Menú Principal</li>
+                    <li class="header text-center"><i class="fas fa-home"></i> Menú Principal</li>
                     <li>
                         <router-link to="/" data-toggle="push-menu">
-                            <i class="fas fa-list-ol text-white"></i> <span>Solicitudes</span>
+                            <i class="fas fa-calendar-alt text-white"></i> <span>Solicitudes</span>
                             <span class="pull-right-container">
                                 <small class="label pull-right bg-green">
                                     {{cantidad}}
@@ -48,37 +48,6 @@
                                     <i class="fas fa-hourglass-half text-green"></i> En Espera
                                 </router-link>
                             </li>
-                            <li>
-                                <router-link to="/agendaAtendidos" data-toggle="push-menu">
-                                    <i class="fas fa-calendar-check text-green"></i> Atendidos
-                                </router-link>
-                            </li>
-                            <li>
-                                <router-link to="/agendaNoAsistio" data-toggle="push-menu">
-                                    <i class="far fa-calendar-minus text-green"></i> No Asistió
-                                </router-link>
-                            </li>
-                            <li>
-                                <router-link to="/agendaCancelaron" data-toggle="push-menu">
-                                    <i class="far fa-calendar-times text-green"></i> Cancelaron
-                                </router-link>
-                            </li>
-
-                        </ul>
-                    </li>
-                    <li class="treeview">
-                        <a href="#">
-                            <i class="fas fa-cash-register text-white"></i> <span>Facturación</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li>
-                                <router-link to="/facturacion" data-toggle="push-menu">
-                                    <i class="fa fa-money-check text-green" aria-hidden="true"></i> <span>Facturar</span>
-                                </router-link>
-                            </li>
                         </ul>
                     </li>
                     <li class="treeview">
@@ -101,20 +70,25 @@
                             </li>
                         </ul>
                     </li>
-                    <li>
-                        <router-link to="/empleados" data-toggle="push-menu">
-                            <i class="fas fa-user-tie text-white"></i> <span>Empleados</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link to="/roles" data-toggle="push-menu" >
-                            <i class="fas fa-user-cog text-white"></i> <span>Roles</span>
-                        </router-link>
-                    </li>
-                    <li>
-                        <router-link to="/buzonSugerencias" data-toggle="push-menu">
-                            <i class="fas fa-mail-bulk"></i> <span>Buzón</span>
-                        </router-link>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fas fa-money-check-alt text-white"></i> <span>Facturación</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <router-link to="/cajaRegistradora" data-toggle="push-menu">
+                                    <i class="fas fa-cash-register text-green"></i> <span>Caja Registradora</span>
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link to="/facturarAtencion" data-toggle="push-menu">
+                                    <i class="fas fa-file-invoice-dollar text-green"></i> <span>Facturar Atención</span>
+                                </router-link>
+                            </li>
+                        </ul>
                     </li>
                     <li class="treeview">
                         <a href="#">
@@ -139,9 +113,40 @@
                                     <i class="far fa-chart-bar text-green"></i> Servicios Frecuentes
                                 </router-link>
                             </li>
+                            <li>
+                                <router-link to="/agendaAtendidos" data-toggle="push-menu">
+                                    <i class="fas fa-calendar-check text-green"></i> Atendidos
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link to="/agendaNoAsistio" data-toggle="push-menu">
+                                    <i class="far fa-calendar-minus text-green"></i> No Asistieron
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link to="/agendaCancelaron" data-toggle="push-menu">
+                                    <i class="far fa-calendar-times text-green"></i> Cancelaron
+                                </router-link>
+                            </li>
                         </ul>
                     </li>
-                    <li class="header text-center">Configuración</li>
+                    <li class="header text-center"><i class="fas fa-tools"></i> Administración</li>
+                    <li>
+                        <router-link to="/buzonSugerencias" data-toggle="push-menu">
+                            <i class="fas fa-mail-bulk"></i> <span>Buzón</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/empleados" data-toggle="push-menu">
+                            <i class="fas fa-user-tie text-white"></i> <span>Empleados</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/roles" data-toggle="push-menu" >
+                            <i class="fas fa-user-cog text-white"></i> <span>Roles</span>
+                        </router-link>
+                    </li>
+                    <li class="header text-center"><i class="fas fa-wrench"></i> Configuración</li>
                     <li>
                         <router-link to="/miperfil" data-toggle="push-menu">
                             <i class="fa fa-address-card text-white" aria-hidden="true"></i> <span>Mi Perfil</span>

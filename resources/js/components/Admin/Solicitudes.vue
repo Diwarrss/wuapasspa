@@ -32,11 +32,10 @@
                             <table id="tablaPendientes" class="table table-bordered table-hover" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Fecha Solicitud</th>
                                         <th>Cliente</th>
-                                        <th>Notas</th>
-                                        <th>Fecha Probable</th>
-                                        <th>Servicios</th>
+                                        <th>Notas: </th>
+                                        <th>Fecha Solicitada: </th>
+                                        <th>Servicios: </th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -320,7 +319,6 @@
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showSolicitudesPendientes",
                         "columns": [
-                                {data:'created_at'},
                                 {data:'nombre_completo'},
                                 {data:'comentario'},
                                 {data:'fechaprobable'},
