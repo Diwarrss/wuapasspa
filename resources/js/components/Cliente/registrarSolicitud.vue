@@ -1,9 +1,9 @@
 <template>
-    <div class="container-fluid col-md-5 mx-auto py-5">
+    <div class="container-fluid col-md-5 mx-auto py-4">
         <div class="card">
             <div class="card-header">
                 <div class="col-md-12 text-center">
-                    <h3><i class="far fa-calendar-plus"></i> Solicitar Cita</h3>
+                    <h5><i class="far fa-calendar-plus"></i> Solicitar Cita</h5>
                 </div>
             </div>
             <div class="card-body">
@@ -81,7 +81,7 @@
             guardar(){
                 var data = this;
                 axios.post('/crearSolicitudesCliente', {
-                    fecha_probable: moment(data.fecha_probable).format('YYYY-MM-DD hh:mm:ss'),//se usa para convertir la fecha antes de entregarla al servidor con formato especifico
+                    fecha_probable: moment(data.fecha_probable).format('YYYY-MM-DD HH:mm:ss'),//se usa para convertir la fecha antes de entregarla al servidor con formato especifico
                     comentario: data.comentario,
                     servicios: data.servicioSeleccionado
                 }).then(function (response) {

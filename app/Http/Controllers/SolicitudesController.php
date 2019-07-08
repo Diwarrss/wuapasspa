@@ -16,7 +16,51 @@ class SolicitudesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function listarSolicitudesCliente(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        //SET GLOBAL lc_time_names = 'es_ES' agregar esa linea en la base de datos para las fechas en español
+       DB::statement("SET lc_time_names = 'es_ES'");//transfort all sentense beloww to spanihs
+        $solicitudes =  DB::table('solicitudes')
+                        ->join('servicios_solicitudes', 'solicitudes.id', '=', 'servicios_solicitudes.solicitudes_solicitudes_id')
+                        ->join('servicios', 'servicios_solicitudes.servicios_servicios_id', '=', 'servicios.id')
+                        ->select('solicitudes.id','solicitudes.comentario','solicitudes.estado_solicitud',
+                        DB::raw("DATE_FORMAT(solicitudes.created_at, '%d/%m/%Y %h:%i %p') as created_at"),
+                        DB::raw("DATE_FORMAT(solicitudes.fechaprobable, '%d/%m/%Y %h:%i %p') as fechaprobable"),
+                        DB::raw("(CASE solicitudes.estado_solicitud
+                                       WHEN 1 THEN 'Pendiente'
+                                       WHEN 2 THEN 'Agendada'
+                                       WHEN 3 THEN 'Cancelada'
+                                       WHEN 4 THEN 'Aceptar Cita'
+                                       WHEN 5 THEN 'Atendida'
+                                       ELSE 'No Asistió' END) AS estado_solicitud_nombre,
+                        (GROUP_CONCAT(servicios.nombre_servicio SEPARATOR ', ')) as nombre_servicio"))
+                        ->where('solicitudes.users_users_id', Auth::user()->id)
+                        ->whereIn('solicitudes.estado_solicitud', [1,4])
+                        ->groupBy('solicitudes.id','solicitudes.comentario','solicitudes.estado_solicitud',
+                        'solicitudes.created_at','solicitudes.fechaprobable');
+
+        $reservacionSolicitud = DB::table('reservaciones')
+                                ->rightJoinSub($solicitudes, 'solicitudesQB', function ($join) {
+                                    $join->on('reservaciones.solicitudes_solicitudes_id', '=', 'solicitudesQB.id');
+                                })
+                                ->leftJoin('users', 'reservaciones.users_users_id', '=', 'users.id')
+                                ->select('solicitudesQB.id',DB::raw("MAX(reservaciones.id) as reservacionId"),'solicitudesQB.comentario',
+                              'solicitudesQB.estado_solicitud_nombre','reservaciones.estado_reservacion','solicitudesQB.nombre_servicio',
+                               DB::raw("CONCAT('Atendido Por: ',users.nombre_usuario,'  ',users.apellido_usuario) as Empleado"),
+                               DB::raw("CONCAT(DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%W %d de %M %Y, A las %h:%i %p'),' a ',
+                                                DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%h:%i %p')) as fecha_reserva"),
+                               'solicitudesQB.created_at', 'solicitudesQB.fechaprobable')
+                               ->groupBy('solicitudesQB.id')
+                               ->orderBy('solicitudesQB.id', 'desc')
+                               ->get();
+
+        return datatables($reservacionSolicitud)->toJson();
+        //->where([['solicitudes.users_users_id', Auth::user()->id]])
+        // return $reservacionSolicitud;
+    }
+
+    public function totalsolicitudes(Request $request)
     {
         if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
         //SET GLOBAL lc_time_names = 'es_ES' agregar esa linea en la base de datos para las fechas en español

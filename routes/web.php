@@ -147,7 +147,8 @@ Route::group(['middleware' => 'auth'], function () {
     //middleware que solo permite acceso a cliente
     Route::group(['middleware' => ['cliente']], function() {
         Route::get('/miSolicitud', 'SolicitudesController@componente')->name('componenteSolicitude');//para mostrar el componente
-        Route::get('/listarSolicitudesCliente', 'SolicitudesController@index')->name('listarSolicitudesCliente');
+        Route::get('/listarSolicitudesCliente', 'SolicitudesController@listarSolicitudesCliente')->name('listarSolicitudesCliente');
+        Route::get('/totalsolicitudes', 'SolicitudesController@totalsolicitudes')->name('totalsolicitudes');
         Route::post('/crearSolicitudesCliente', 'SolicitudesController@store')->name('crearSolicitudesCliente');
         Route::get('/nuevaCita', 'ServiciosController@componente')->name('componenteServicio');//para mostrar el componente der srvicoso cita
         Route::post('/cancelarAgendada', 'SolicitudesController@cancelarAgendada')->name('cancelarAgendada');//para cancelar solicitud agendada

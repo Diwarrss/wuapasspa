@@ -26,11 +26,11 @@
             </div>
         </main>
         <footer class="footer mt-auto py-3">
-            <div class="fixed-bottom">
+            <div class="">
                 <div class="card">
                     <div class="card-body">
                         <div class="align-center">
-                            © Copyright 2019 <a href="https://www.gridsoft.co/" target="_blank">GridSoft</a> All Rights Reserved
+                            © Copyright 2019 <a href="https://www.gridsoft.co/" target="_blank">www.gridsoft.co</a> All Rights Reserved
                         </div>
                     </div>            
                 </div>

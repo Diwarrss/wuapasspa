@@ -1791,6 +1791,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2054,6 +2055,316 @@ __webpack_require__.r(__webpack_exports__);
     },
     actualizarCitas: function actualizarCitas() {
       jQuery('#tablaSolicitudes').DataTable().ajax.reload();
+    }
+  },
+  mounted: function mounted() {
+    this.listarSolicitues();
+    this.listarSolicituesviejas();
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      solicitud: []
+    };
+  },
+  methods: {
+    listarSolicituesviejas: function listarSolicituesviejas() {
+      var data = this;
+      axios.get('/totalsolicitudes').then(function (response) {
+        data.solicitud = response.data; //console.log(response.data);
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      });
+    },
+    listarSolicitues: function listarSolicitues() {
+      var data = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+
+      jQuery(document).ready(function () {
+        var tablatotalsolicitudes = jQuery('#tablatotalsolicitudes').DataTable({
+          "language": {
+            "url": "/jsonDTIdioma.json"
+          },
+          "processing": true,
+          "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          "responsive": true,
+          "order": [],
+          searching: false,
+          "serverSide": true,
+          //Lado servidor activar o no mas de 20000 registros
+          "ajax": "/totalsolicitudes",
+          "columns": [{
+            data: 'created_at'
+          }, {
+            data: 'nombre_servicio'
+          }, {
+            data: 'fechaprobable'
+          }, {
+            data: 'comentario'
+          }, {
+            render: function render(data, type, row) {
+              if (row.estado_solicitud_nombre === 'Agendada') {
+                return '<span class="badge badge-success mb-1 mr-sm-1">' + row.estado_solicitud_nombre + '</span><button type="button" class="btn btn-sm btn-info mb-1 mr-sm-1 verInformacion" title="Ver Información"><i class="far fa-question-circle"></i><span class="d-lg-none"> Info</span></button>';
+              } else if (row.estado_solicitud_nombre === 'Cancelada') {
+                return '<span class="badge badge-danger">' + row.estado_solicitud_nombre + '</span>';
+              } else if (row.estado_solicitud_nombre === 'Aceptar Cita') {
+                return '<span class="badge badge-warning mb-1 mr-sm-1">' + row.estado_solicitud_nombre + '</span><button type="button" class="btn btn-sm btn-info mb-1 mr-sm-1 verInformacion" title="Ver Información"><i class="far fa-question-circle"></i><span class="d-lg-none"> Info</span></button>';
+              } else if (row.estado_solicitud_nombre === 'Atendida') {
+                return '<span class="badge badge-light mb-1 mr-sm-1">' + row.estado_solicitud_nombre + '</span>';
+              } else if (row.estado_solicitud_nombre === 'No Asistió') {
+                return '<span class="badge badge-dark mb-1 mr-sm-1">' + row.estado_solicitud_nombre + '</span>';
+              } else {
+                return '<span class="badge badge-info">' + row.estado_solicitud_nombre + '</span>';
+              }
+            }
+          }, {
+            render: function render(data, type, row) {
+              if (row.estado_solicitud_nombre === 'Agendada') {
+                return '<button type="button" class="btn btn-sm btn-danger mb-1 mr-sm-1 cancelarAgendada" title="Cancelar Cita"><i class="far fa-calendar-times"></i><span class="d-lg-none"> Cancelar</span></button>';
+              } else if (row.estado_solicitud_nombre === 'Cancelada') {
+                return '<a href="/nuevaCita" class="btn btn-sm btn-success mb-1 mr-sm-1" title="Crear Nueva Cita"><i class="far fa-calendar-plus"></i><span class="d-lg-none"> Nueva</span></a>';
+              } else if (row.estado_solicitud_nombre === 'Aceptar Cita') {
+                return '<button type="button" class="btn btn-sm btn-success mb-1 mr-sm-1 confirmar" title="Confirmar"><i class="far fa-calendar-check"></i><span class="d-lg-none"> Aceptar</span></button> <button type="button" class="btn btn-sm btn-danger mb-1 mr-sm-1 cancelarAgendada" title="Cancelar Cita"><i class="far fa-calendar-times"></i><span class="d-lg-none"> Cancelar</span></button>';
+              } else if (row.estado_solicitud_nombre === 'Atendida') {
+                return '<button type="button" class="btn btn-sm btn-info mb-1 mr-sm-1 verInformacion" title="Ver Información"><i class="far fa-question-circle"></i><span class="d-lg-none"> Info</span></button>';
+              } else if (row.estado_solicitud_nombre === 'No Asistió') {
+                return '<button type="button" class="btn btn-sm btn-info mb-1 mr-sm-1 verInformacion" title="Ver Información"><i class="far fa-question-circle"></i><span class="d-lg-none"> Info</span></button>';
+              } else {
+                return '<button type="button" class="btn btn-sm btn-danger mb-1 mr-sm-1 cancelarSolicitud" title="Cancelar Cita"><i class="far fa-calendar-times"></i><span class="d-lg-none"> Cancelar</span></button>';
+              }
+            }
+          }]
+        });
+        tablatotalsolicitudes.on('click', '.cancelarAgendada', function () {
+          jQuery.noConflict(); // para evitar errores
+
+          var idRow = jQuery(this).closest('tr'); //fila que le dan click
+
+          Swal.fire({
+            title: 'Esta Seguro de Cancelar la Cita?',
+            text: "Una vez Cancelada la Cita debera agendar una nueva.",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'green',
+            cancelButtonColor: 'red',
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(function (result) {
+            if (result.value) {
+              //para si es responsivo obtenemos la data
+              if (idRow.hasClass('child')) {
+                //Check if the current row is a child row
+                idRow = idRow.prev(); //If it is, then point to the row before it (its 'parent')
+              }
+
+              var data = tablatotalsolicitudes.row(idRow).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+              //console.log(data);
+              ///cancelarCita
+
+              axios.post('/cancelarAgendada', {
+                id: data.id,
+                reservacionId: data.reservacionId
+              }).then(function (response) {
+                Swal.fire({
+                  position: 'top-end',
+                  type: 'success',
+                  title: 'Cita Cancelada!',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                tablatotalsolicitudes.ajax.reload(); //refrescar todos los datos
+              })["catch"](function (error) {
+                if (error.response.status == 422) {
+                  //preguntamos si el error es 422
+                  Swal.fire({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Se produjo un Error, Reintentar',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
+
+                console.log(error.response.data.errors);
+              });
+            }
+          });
+        });
+        tablatotalsolicitudes.on('click', '.cancelarSolicitud', function () {
+          jQuery.noConflict(); // para evitar errores
+
+          var idRow = jQuery(this).closest('tr'); //fila que le dan click
+
+          Swal.fire({
+            title: 'Esta Seguro de Cancelar la Cita?',
+            text: "Una vez Cancelada la Cita debera agendar una nueva.",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'green',
+            cancelButtonColor: 'red',
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(function (result) {
+            if (result.value) {
+              //para si es responsivo obtenemos la data
+              if (idRow.hasClass('child')) {
+                //Check if the current row is a child row
+                idRow = idRow.prev(); //If it is, then point to the row before it (its 'parent')
+              }
+
+              var data = tablatotalsolicitudes.row(idRow).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+              //console.log(data);
+              // /cancelarCita
+
+              axios.post('/cancelarSolicitud', {
+                id: data.id
+              }).then(function (response) {
+                Swal.fire({
+                  position: 'top-end',
+                  type: 'success',
+                  title: 'Cita Cancelada!',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                tablatotalsolicitudes.ajax.reload(); //refrescar todos los datos
+              })["catch"](function (error) {
+                if (error.response.status == 422) {
+                  //preguntamos si el error es 422
+                  Swal.fire({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Se produjo un Error, Reintentar',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
+
+                console.log(error.response.data.errors);
+              });
+            }
+          });
+        });
+        tablatotalsolicitudes.on('click', '.confirmar', function () {
+          jQuery.noConflict(); // para evitar errores
+
+          var idRow = jQuery(this).closest('tr'); //fila que le dan click
+
+          Swal.fire({
+            title: 'Esta seguro de Aceptar el Día de la Cita?',
+            text: "Una vez confirmada, queda tu turno apartado!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'green',
+            cancelButtonColor: 'red',
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(function (result) {
+            if (result.value) {
+              //para si es responsivo obtenemos la data
+              if (idRow.hasClass('child')) {
+                //Check if the current row is a child row
+                idRow = idRow.prev(); //If it is, then point to the row before it (its 'parent')
+              }
+
+              var data = tablatotalsolicitudes.row(idRow).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+              //console.log(data);
+              ///cancelarCita
+
+              axios.post('/confirmarAgendada', {
+                id: data.id,
+                reservacionId: data.reservacionId
+              }).then(function (response) {
+                Swal.fire({
+                  position: 'top-end',
+                  type: 'success',
+                  title: 'Cita Apartada!',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                tablatotalsolicitudes.ajax.reload(); //refrescar todos los datos
+              })["catch"](function (error) {
+                if (error.response.status == 422) {
+                  //preguntamos si el error es 422
+                  Swal.fire({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Se produjo un Error, Reintentar',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
+
+                console.log(error.response.data.errors);
+              });
+            }
+          });
+        });
+        tablatotalsolicitudes.on('click', '.verInformacion', function () {
+          jQuery.noConflict(); // para evitar errores
+          //para si es responsivo obtenemos la data
+
+          var current_row = jQuery(this).parents('tr'); //Get the current row
+
+          if (current_row.hasClass('child')) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+
+          var datos = tablatotalsolicitudes.row(current_row).data(); //console.log(datos);
+          //console.log(datos["id"]);
+
+          Swal.fire({
+            type: 'info',
+            title: 'Información de tu Cita',
+            html: datos["fecha_reserva"] + '<br><b>' + datos["Empleado"] + '</b>',
+            confirmButtonText: '<i class="fas fa-check"></i> Ocultar'
+          });
+        });
+      });
+    },
+    actualizarCitas: function actualizarCitas() {
+      jQuery('#tablatotalsolicitudes').DataTable().ajax.reload();
     }
   },
   mounted: function mounted() {
@@ -2586,7 +2897,7 @@ __webpack_require__.r(__webpack_exports__);
     guardar: function guardar() {
       var data = this;
       axios.post('/crearSolicitudesCliente', {
-        fecha_probable: moment__WEBPACK_IMPORTED_MODULE_0___default()(data.fecha_probable).format('YYYY-MM-DD hh:mm:ss'),
+        fecha_probable: moment__WEBPACK_IMPORTED_MODULE_0___default()(data.fecha_probable).format('YYYY-MM-DD HH:mm:ss'),
         //se usa para convertir la fecha antes de entregarla al servidor con formato especifico
         comentario: data.comentario,
         servicios: data.servicioSeleccionado
@@ -30320,7 +30631,110 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container-fluid py-5" }, [
+  return _c(
+    "div",
+    { staticClass: "container-fluid py-4" },
+    [
+      _c("div", { staticClass: "card" }, [
+        _c("div", { staticClass: "card-header" }, [
+          _c("div", { staticClass: "card-title text-center" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-info btn-sm",
+                on: {
+                  click: function($event) {
+                    return _vm.actualizarCitas()
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "fas fa-sync-alt" }),
+                _vm._v(" Actualizar")
+              ]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _vm._m(1)
+      ]),
+      _vm._v(" "),
+      _c("totalsolicitudes")
+    ],
+    1
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h5", [
+      _c("i", { staticClass: "far fa-calendar-alt" }),
+      _vm._v(" Citas Actuales")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-body" }, [
+      _c(
+        "table",
+        {
+          staticClass: "table table-bordered table-responsive",
+          staticStyle: { width: "100%" },
+          attrs: { id: "tablaSolicitudes" }
+        },
+        [
+          _c("thead", [
+            _c("tr", [
+              _c("th", { staticStyle: { width: "15%" } }, [
+                _vm._v("Solicitado el")
+              ]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Servicios")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Fecha Probable")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Notas")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Estado")]),
+              _vm._v(" "),
+              _c("th", [_vm._v("Acciones")])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("tbody")
+        ]
+      )
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=template&id=3e12d5ee&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=template&id=3e12d5ee& ***!
+  \***************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "py-3" }, [
     _c("div", { staticClass: "card" }, [
       _c("div", { staticClass: "card-header" }, [
         _c("div", { staticClass: "card-title text-center" }, [
@@ -30350,9 +30764,9 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("h3", [
+    return _c("h5", [
       _c("i", { staticClass: "far fa-calendar-alt" }),
-      _vm._v(" Mis Citas")
+      _vm._v(" Historial de Citas")
     ])
   },
   function() {
@@ -30365,7 +30779,7 @@ var staticRenderFns = [
         {
           staticClass: "table table-bordered table-responsive",
           staticStyle: { width: "100%" },
-          attrs: { id: "tablaSolicitudes" }
+          attrs: { id: "tablatotalsolicitudes" }
         },
         [
           _c("thead", [
@@ -30413,7 +30827,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container-fluid col-md-6 mx-auto py-5" }, [
+  return _c("div", { staticClass: "container-fluid col-md-6 mx-auto py-4" }, [
     _c("section", [
       _c("div", { staticClass: "card" }, [
         _vm._m(0),
@@ -31380,7 +31794,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container-fluid col-md-5 mx-auto py-5" }, [
+  return _c("div", { staticClass: "container-fluid col-md-5 mx-auto py-4" }, [
     _c("div", { staticClass: "card" }, [
       _vm._m(0),
       _vm._v(" "),
@@ -31542,7 +31956,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header" }, [
       _c("div", { staticClass: "col-md-12 text-center" }, [
-        _c("h3", [
+        _c("h5", [
           _c("i", { staticClass: "far fa-calendar-plus" }),
           _vm._v(" Solicitar Cita")
         ])
@@ -44205,6 +44619,7 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_0___default.a); // You need a spec
 //componente de las solicitudes hechas cliente
 
 Vue.component('solicitudes', __webpack_require__(/*! ./components/Cliente/Solicitudes.vue */ "./resources/js/components/Cliente/Solicitudes.vue")["default"]);
+Vue.component('totalsolicitudes', __webpack_require__(/*! ./components/Cliente/TotalSolicitudes.vue */ "./resources/js/components/Cliente/TotalSolicitudes.vue")["default"]);
 Vue.component('registrarsolicitud', __webpack_require__(/*! ./components/Cliente/registrarSolicitud.vue */ "./resources/js/components/Cliente/registrarSolicitud.vue")["default"]);
 Vue.component('miperfil', __webpack_require__(/*! ./components/Cliente/miPerfil.vue */ "./resources/js/components/Cliente/miPerfil.vue")["default"]);
 /**
@@ -44284,6 +44699,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Solicitudes_vue_vue_type_template_id_af3145fc___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Solicitudes_vue_vue_type_template_id_af3145fc___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/Cliente/TotalSolicitudes.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/Cliente/TotalSolicitudes.vue ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _TotalSolicitudes_vue_vue_type_template_id_3e12d5ee___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TotalSolicitudes.vue?vue&type=template&id=3e12d5ee& */ "./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=template&id=3e12d5ee&");
+/* harmony import */ var _TotalSolicitudes_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TotalSolicitudes.vue?vue&type=script&lang=js& */ "./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _TotalSolicitudes_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _TotalSolicitudes_vue_vue_type_template_id_3e12d5ee___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _TotalSolicitudes_vue_vue_type_template_id_3e12d5ee___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Cliente/TotalSolicitudes.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TotalSolicitudes_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./TotalSolicitudes.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TotalSolicitudes_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=template&id=3e12d5ee&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=template&id=3e12d5ee& ***!
+  \*********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TotalSolicitudes_vue_vue_type_template_id_3e12d5ee___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./TotalSolicitudes.vue?vue&type=template&id=3e12d5ee& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Cliente/TotalSolicitudes.vue?vue&type=template&id=3e12d5ee&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TotalSolicitudes_vue_vue_type_template_id_3e12d5ee___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TotalSolicitudes_vue_vue_type_template_id_3e12d5ee___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
