@@ -2897,7 +2897,7 @@ __webpack_require__.r(__webpack_exports__);
     guardar: function guardar() {
       var data = this;
       axios.post('/crearSolicitudesCliente', {
-        fecha_probable: moment__WEBPACK_IMPORTED_MODULE_0___default()(data.fecha_probable).format('YYYY-MM-DD hh:mm:ss'),
+        fecha_probable: moment__WEBPACK_IMPORTED_MODULE_0___default()(data.fecha_probable).format('YYYY-MM-DD HH:mm:ss'),
         //se usa para convertir la fecha antes de entregarla al servidor con formato especifico
         comentario: data.comentario,
         servicios: data.servicioSeleccionado

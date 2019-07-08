@@ -81,7 +81,7 @@
             guardar(){
                 var data = this;
                 axios.post('/crearSolicitudesCliente', {
-                    fecha_probable: moment(data.fecha_probable).format('YYYY-MM-DD hh:mm:ss'),//se usa para convertir la fecha antes de entregarla al servidor con formato especifico
+                    fecha_probable: moment(data.fecha_probable).format('YYYY-MM-DD HH:mm:ss'),//se usa para convertir la fecha antes de entregarla al servidor con formato especifico
                     comentario: data.comentario,
                     servicios: data.servicioSeleccionado
                 }).then(function (response) {
