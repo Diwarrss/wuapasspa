@@ -15,6 +15,7 @@
     <link href="{{ asset('css/misLibrerias.css') }}" rel="stylesheet">
     <!-- Para que sea Full PWA -->
     @laravelPWA
+    <script src="{{ asset('js/enable-push.js') }}" defer></script>
 </head>
 <body style="background-image: linear-gradient(to bottom, #9937ae, #843eae, #6e43ad, #5846a9, #4148a4, #3e49a6, #3b49a8, #374aaa, #4b4ab4, #604abd, #7548c5, #8a44cb); background-repeat: no-repeat; background-attachment: fixed;">
     <div id="app">

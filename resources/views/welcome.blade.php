@@ -15,6 +15,7 @@
         <link type="text/css" rel="stylesheet" href="{{asset('css/miWelcome.css')}}"/>
         <!-- Para que sea Full PWA -->
         @laravelPWA
+        <script src="{{ asset('js/enable-push.js') }}" defer></script>
     </head>
     <body>
 

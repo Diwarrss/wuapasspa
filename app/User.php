@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use NotificationChannels\WebPush\HasPushSubscriptions; //import the trait
 
 /**
  * App\User
@@ -54,6 +55,8 @@ class User extends Authenticatable
     const DESACTIVADO = 2;
 
     use Notifiable;
+
+    use HasPushSubscriptions;
 
     /**
      * The attributes that are mass assignable.
