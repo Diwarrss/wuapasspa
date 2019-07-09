@@ -85,6 +85,7 @@
                     comentario: data.comentario,
                     servicios: data.servicioSeleccionado
                 }).then(function (response) {
+                    data.enviarNotificacion();
                     //mesaje exito y lo redirecciona a la pagina de la solicitudes hechas
                     Swal.fire({
                         position: 'top-end',
@@ -93,6 +94,7 @@
                         showConfirmButton: false,
                         timer: 1500
                     }).then(function(){
+                        //envio de notifiacion por get                        
                         window.location.href = "/miSolicitud";
                     });
                     console.log(response);
@@ -102,6 +104,13 @@
                         data.arrayErrors = error.response.data.errors;//guardamos la respuesta del server de errores en el array arrayErrors
                     }
                     console.log(error);
+                });
+                 
+            },
+            enviarNotificacion(){
+                axios({
+                    url: '/push',
+                    method: 'get'
                 });
             }
         },

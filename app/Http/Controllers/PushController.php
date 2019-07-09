@@ -18,6 +18,17 @@ class PushController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    
+
+    public function push(Request $request){
+        if (!$request->ajax()) return redirect('/');
+        //capturamos el id del Admin si es autenticado
+        $user = User::find(1);
+
+        Notification::send($user,new PushDemo);
+        return redirect()->back();
+    }
+    
     public function store(Request $request){
         $this->validate($request,[
             'endpoint'    => 'required',

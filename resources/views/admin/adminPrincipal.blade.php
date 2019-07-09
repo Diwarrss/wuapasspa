@@ -8,6 +8,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Para que sea Full PWA -->
     @laravelPWA
+    @if (Auth::check())
+        <script src="{{ asset('js/enable-push.js') }}" defer></script>           
+    @endif
 
     @if(Auth::user()->roles_roles_id == 1)<!-- si es administrador-->
         <title>Admin - {{ config('app.name')}}</title>

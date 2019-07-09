@@ -52,7 +52,7 @@ function subscribeUser() {
             const subscribeOptions = {
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(
-                    'BOQGV4T8fe79z7BXWlnIiO9BjF7qNOq36tM8zDtvnRMfVVL9fUMZfhvu9DRCgsOmS1xwLI4q+HnS+we/bkQiGLQ='
+                    'BKTMTUcKIhKvI4QGx0rJIBNPMLpSoXqZjLr61J1ggC3CUBi5aufPRwhle4XkN4rUtP0WYWjnryO03B0IZPNH9mk='
                 )
             };
 
@@ -82,7 +82,7 @@ function urlBase64ToUint8Array(base64String) {
 function storePushSubscription(pushSubscription) {
     const token = document.querySelector('meta[name=csrf-token]').getAttribute('content');
 
-    fetch('/push', {
+    fetch('/pushs', {
         method: 'POST',
         body: JSON.stringify(pushSubscription),
         headers: {

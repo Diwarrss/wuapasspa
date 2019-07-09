@@ -65,7 +65,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'id',
-        'users_id',
         'roles_roles_id',
         'empresas_empresas_id',
         'nombre_usuario',
@@ -79,9 +78,6 @@ class User extends Authenticatable
         'estado_usuario',
         'email_verified_at'
     ];
-
-    //nombrando la primary key
-    protected $primary_key = 'users_id';
 
     /**
      * The attributes that should be hidden for arrays.
