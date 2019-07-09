@@ -49,6 +49,17 @@ class UserController extends Controller
         return $empleados;
     }
 
+    //listar empleados para seleccionarlos en el componente de Caja registradora.
+    //los Agendadores tienen el rol 4 y estan activos 1
+    public function empleadosAgendadores(){
+        $empleados = User::select('id',DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"))
+                         ->where([
+                            ['estado_usuario', '1'],
+                            ['roles_roles_id', '4'],
+                        ])->get();
+        return $empleados;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
