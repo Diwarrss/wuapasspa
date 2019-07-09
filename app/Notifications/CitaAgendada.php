@@ -30,10 +30,10 @@ class PushDemo extends Notification
     {
         return (new WebPushMessage)
             ->title("Agenda Grid")
-            ->body('Te han solicitado una nueva Cita!')
-            ->icon('img/logo/Logo.jpg');
+            ->body('Te han Agendado la Cita! Confirmala')
+            ->icon('img/logo/Logo.jpg');            
             //->action('Aceptar', 'notification_action')
-            //->badge('/img/logo/Logo.png')
+            //->badge('/img/logo/Logo.png')            
             // ->data(['id' => $notification->id])
             // ->badge()
             // ->dir()

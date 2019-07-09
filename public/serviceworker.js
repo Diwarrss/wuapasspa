@@ -68,6 +68,7 @@ self.addEventListener("fetch", event => {
     )
 });
 
+//para mostrar la notificacion
 self.addEventListener('push', function (e) {
     if (!(self.Notification && self.Notification.permission === 'granted')) {
         //notifications aren't supported or permission not granted!
@@ -82,9 +83,21 @@ self.addEventListener('push', function (e) {
             body: msg.body,
             icon: msg.icon,
             //actions: msg.actions,
-            badge: msg.badge,
-            vibrate: [500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500],
-            sound: '/img/audio/definite.mp3'
+            badge: 'https://agendagrid.gridsoft.co/img/favicon.ico',
+            sound: 'https://agendagrid.gridsoft.co/img/audio/definite.mp3',
+            data: {
+                url: '/admin#/'//url raiz de la aplicacion dnd esta el SW
+            },
+            actions:[
+                {
+                    action: 'agendar-action',
+                    title: 'Agendar',
+                    icon: 'https://agendagrid.gridsoft.co/img/logo/agendar.ico'
+                }
+            ]
+
+            //badge: msg.badge,
+            //vibrate: [500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500],
             // ->data(['id' => $notification->id])
             // ->badge()
             // ->dir()
@@ -96,4 +109,36 @@ self.addEventListener('push', function (e) {
             // ->vibrate()
         }));
     }
+});
+//cuando se cierra la notificacion
+self.addEventListener('notificationclose', e=> {
+    console.log('Notificación cerrada', e);
+});
+//cuando el usuario toca la notificacion en accion especifica
+self.addEventListener('notificationclick', e=> {
+
+    const notificacion = e.notification;//capturamos la notificacion
+    const accion = e.action;//capturamos el nombre de la accion
+
+    console.log(notificacion);
+    console.log(accion);
+
+    //redirigir al tocar la notificacion capturamos del data y verificamos si esta o no ya abierta
+    const respuesta = clients.matchAll()
+    .then(clientes =>{
+        let cliente = clientes.find( c=>{
+            return c.visibilityState === 'visible';
+        });
+        if( cliente !== undefined){
+            //redirigimos a la url qcapturamos en data
+            cliente.navigate( notificacion.data.url);
+            cliente.focus();
+        }else{
+            clients.openWindow( notificacion.data.url);
+        }
+
+        return notificacion.close();
+    });
+    //esperamos hasta q el evento se ejecute
+    e.waitUntil(respuesta);
 });

@@ -17,10 +17,14 @@ use Illuminate\Support\Facades\Route;
 
     //link personalizacion Login
     Route::post('/login', 'Auth\LoginController@login')->name('login');
-    //para las notificaciones
+
+    //para guardar la subscripcion del q acepta las notificaciones
     Route::post('/pushs','PushController@store');
-    //make a push notification.
+    //Enviar notificacion al Admin cuando cliente pida cita
     Route::get('/push','PushController@push')->name('push');
+
+    //Enviar notificacion a los Clientes cuando el admin la agende
+    Route::get('/pushClientes','PushController@pushClientes')->name('pushClientes');
 
     Auth::routes();//ruta de sistema login laravel Ya tienen implementado los Middleware
 
