@@ -85,6 +85,15 @@ self.addEventListener('push', function (e) {
             badge: msg.badge,
             vibrate: [500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500],
             sound: '/img/audio/definite.mp3'
+            // ->data(['id' => $notification->id])
+            // ->badge()
+            // ->dir()
+            // ->image()
+            // ->lang()
+            // ->renotify()
+            // ->requireInteraction()
+            // ->tag()
+            // ->vibrate()
         }));
     }
 });

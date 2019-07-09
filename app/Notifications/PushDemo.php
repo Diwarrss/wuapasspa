@@ -33,5 +33,14 @@ class PushDemo extends Notification
             ->body('Te han solicitado una nueva Cita!')
             ->badge('/img/logo/Logo.png')
             ->action('Ver más...', 'notification_action');
+            // ->data(['id' => $notification->id])
+            // ->badge()
+            // ->dir()
+            // ->image()
+            // ->lang()
+            // ->renotify()
+            // ->requireInteraction()
+            // ->tag()
+            // ->vibrate()
     }
 }
