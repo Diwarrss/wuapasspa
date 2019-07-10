@@ -54,6 +54,26 @@ class CajaController extends Controller
 
     }
 
+
+    public function listarCajar(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+
+        //creamos la consulta de los usuarios que pertenecen al rol Empleados
+        $caja = Caja::join('users', 'cajas.empleado_id','=','users.id')
+                        ->select('cajas.id','cajas.nombre_caja','cajas.valor_inicial','cajas.valor_producido',
+                                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_usuario"))
+                        ->get();
+
+        //devolvemos el resultado en formato datatable
+        return datatables($caja)
+        //setrowid elejimos y mostramos el id del atributo
+        ->setRowId(function ($caja) {
+            return $caja->id;
+        })
+        ->toJson();
+    }
+
     /**
      * Store a newly created resource in storage.
      *

@@ -101,6 +101,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/storeReservacionesA', 'ReservacionesController@storeAnonimo')->name('storeReservacionesA');
         //todas las operaciones para caja Registradora
         Route::post('/crearCaja', 'CajaController@crearCaja')->name('crearCaja');
+        Route::get('/listarCajar', 'CajaController@listarCajar')->name('listarCajar');
         Route::get('/empleadosAgendadores', 'UserController@empleadosAgendadores')->name('showEmpleado');//ruta para usarlos en select de agendar
 
     });

@@ -26,16 +26,10 @@
                     <table id="tablaEmpleados" class="table table-bordered table-hover" style="width:100%">
                         <thead>
                             <tr>
-                                <th>Empleado</th>
-                                <th>Email</th>
-                                <th>WhatsApp</th>
-                                <th>Estado</th>
-                                <th>Rol</th>
-                                <th>Acciones</th>
-                                <!-- <th>Empleado Responsable</th>
+                                <th>Empleado Responsable</th>
                                 <th>Nombre Caja</th>
                                 <th>Valor Inicialr</th>
-                                <th>Valor Producido</th> -->
+                                <th>Valor Producido</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -84,11 +78,12 @@
                                     <label for="empleado" class="col-sm-4 control-label hidden-xs"><i class="fas fa-user-tie"></i> Asignar A:</label>
                                     <div class="col-sm-6">
                                         <select class="form-control" id="empleado" v-model="idEmpleadoElegido">
-                                            <option disabled value="999">Escoge tu Empleado</option>
+                                            <option disabled value="">Escoge tu Empleado</option>
                                             <option v-for="empleado in empleados" :key="empleado.id" v-bind:value="empleado.id">
                                                 {{ empleado.nombre}}
                                             </option>
                                         </select>
+                                        <p class="text-red" v-if="arrayErrors.empleado_id" v-text="arrayErrors.empleado_id[0]"></p>
                                     </div>
                                 </div>
                             <div class="form-group">
@@ -128,11 +123,11 @@
                 arrayCaja:[],
                 empresas_empresas_id: 1,
                 nombre_caja:'',
-                valor_inicial:'0.00',
-                idEmpleadoElegido: '999',
+                valor_inicial:'0',
+                idEmpleadoElegido: '',
                 empleados:[],
                 usuario:'',
-                valor_producido:'0.00',
+                valor_producido:'0',
                 password:'',
                 password2:'',
                 celular:'',
@@ -171,31 +166,12 @@
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
-                        "ajax": "/showEmpleadosDT",
+                        "ajax": "/listarCajar",
                         "columns": [
-                                {data:'nombre_completo'},
-                                {data:'email'},
-                                {render: function (data, type, row) {
-                                        return '<i class="fab fa-whatsapp text-green"></i> <a href="https://wa.me/57'+ row.celular +'?text=Hola, '+ row.nombre_usuario +' '+ row.apellido_usuario +' " target="_blank" title="Enviar Mensaje">' + row.celular + '</a>';
-                                    }
-                                },
-                                {render: function (data, type, row) {
-                                    if (row.estado_nombre === 'Activo'){
-                                            return '<span class="label label-success">' + row.estado_nombre + '</span>';
-                                        }else{
-                                            return '<span class="label label-danger">' + row.estado_nombre + '</span>';
-                                        }
-                                    }
-                                },
-                                {data:'nombre_rol'},
-                                {render: function (data, type, row) {
-                                    if (row.estado_nombre === 'Activo'){
-                                            return '<button class="btn btn-warning edit btn-sm" title="Editar Empleado"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Empleado"><i class="fas fa-close"></i> Desactivar</button>';
-                                        }else{
-                                            return '<button class="btn btn-warning edit btn-sm" title="Editar Empleado"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-success activar btn-sm" title="Activar Empleado"><i class="fas fa-check"></i> Activar</button>';
-                                        }
-                                    }
-                                }
+                                {data:'nombre_usuario'},
+                                {data:'nombre_caja'},
+                                {data:'valor_inicial'},
+                                {data:'valor_producido'}
                             ]
                     });
 
@@ -364,7 +340,7 @@
                          data.arrayErrors = error.response.data.errors;//guardamos la respuesta del server de errores en el array arrayErrors
                     };
                     console.log(error);
-                    //console.log(me.arrayErrors);
+                    console.log(data.arrayErrors);
                 });
             },
             actualizarEmpleado(){
