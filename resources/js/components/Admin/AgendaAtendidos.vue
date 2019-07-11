@@ -59,7 +59,7 @@
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showAtendidos",
                         "columns": [
-                                {data:'nombre_cliente'},
+                                {data:'fechaAgendada'},
                                 {data:'nombre_cliente'},
                                 {data:'fecha_reserva'},
                                 {data:'fechaAtendido'},

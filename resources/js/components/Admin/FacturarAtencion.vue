@@ -66,8 +66,20 @@
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/listarFacturacion",
                         "columns": [
-                                {data:'nombre_cliente'},
-                                {data:'nombre_servicio'},
+                                {render: function (data, type, row) {
+                                    if (row.nombre_cliente != null) {
+                                        return row.nombre_cliente;
+                                    }else{
+                                        return row.nombre_anonimo;
+                                    }
+                                }},
+                                {render: function (data, type, row) {
+                                    if (row.nombre_servicio != null) {
+                                        return row.nombre_servicio;
+                                    }else{
+                                        return '<span class="label label-warning">Agregar</span>';
+                                    }
+                                }},
                                 {data: 'valor_total', render: $.fn.dataTable.render.number( '.', ',', 2, '$ ' )},
                                 {render: function (data, type, row) {
                                     return `<button type="button" class="btn btn-success btn-sm facturar" title="Facturar Servicio">
