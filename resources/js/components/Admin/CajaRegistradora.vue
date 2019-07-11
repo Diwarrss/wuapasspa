@@ -55,7 +55,7 @@
                                     <tr>
                                         <th>Empleado Responsable</th>
                                         <th>Nombre Caja</th>
-                                        <th>Valor Inicialr</th>
+                                        <th>Valor Inicial</th>
                                         <th>Valor Producido</th>
                                     </tr>
                                 </thead>
@@ -83,7 +83,7 @@
                             <div class="form-group" v>
                                 <label for="nombre_usuario" class="col-sm-4 control-label hidden-xs">Nombre Caja</label>
                                 <div class="col-sm-8 col-xs-12">
-                                    <input type="text" class="form-control" id="nombre_usuario" v-model="nombre_caja" placeholder="Nombre  Caja">
+                                    <input type="text" class="form-control" id="nombre_usuario" v-model="nombre_caja" placeholder="Nombre Caja">
                                     <p class="text-red" v-if="arrayErrors.nombre_caja" v-text="arrayErrors.nombre_caja[0]"></p>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                                 <label for="valor_inicial" class="col-sm-4 control-label hidden-xs">Valor Inicial</label>
 
                                 <div class="col-sm-8 col-xs-12">
-                                    <input type="number" class="form-control" id="valor_inicial" v-model="valor_inicial" placeholder="Apellidos">
+                                    <input type="number" class="form-control" id="valor_inicial" v-model="valor_inicial" placeholder="Valor Inicial">
                                     <p class="text-red" v-if="arrayErrors.valor_inicial" v-text="arrayErrors.valor_inicial[0]"></p>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
                                 <label for="valor_producido" class="col-sm-4 control-label hidden-xs">Valor Producido</label>
 
                                 <div class="col-sm-8 col-xs-12">
-                                    <input type="number" class="form-control" id="valor_producido" v-model="valor_producido" placeholder="E-mail">
+                                    <input type="number" class="form-control" id="valor_producido" v-model="valor_producido" placeholder="Valor Producido">
                                     <p class="text-red" v-if="arrayErrors.valor_producido" v-text="arrayErrors.valor_producido[0]"></p>
                                 </div>
                             </div>
@@ -152,11 +152,11 @@
                 arrayCaja:[],
                 empresas_empresas_id: 1,
                 nombre_caja:'',
-                valor_inicial:'0',
+                valor_inicial:'',
                 idEmpleadoElegido: '',
                 empleados:[],
                 usuario:'',
-                valor_producido:'0',
+                valor_producido:'',
                 password:'',
                 password2:'',
                 celular:'',
@@ -199,8 +199,8 @@
                         "columns": [
                                 {data:'nombre_usuario'},
                                 {data:'nombre_caja'},
-                                {data:'valor_inicial'},
-                                {data:'valor_producido'}
+                                {data:'valor_inicial', render: $.fn.dataTable.render.number( '.', ',', 2, '$ ' )},
+                                {data:'valor_producido', render: $.fn.dataTable.render.number( '.', ',', 2, '$ ' )}
                             ]
                     });
 

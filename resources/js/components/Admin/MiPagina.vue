@@ -889,7 +889,7 @@
                                         }
                                     }
                                 },
-                                {data:'valor_servicio'},
+                                {data:'valor_servicio', render: $.fn.dataTable.render.number( '.', ',', 2, '$ ' )},
                                 {render: function (data, type, row) {
                                     if (row.url_video == '') {
                                             return '<span class="label label-info"> Sin video</span>';

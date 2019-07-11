@@ -68,7 +68,7 @@
                         "columns": [
                                 {data:'nombre_cliente'},
                                 {data:'nombre_servicio'},
-                                {data:'valor_total'},
+                                {data: 'valor_total', render: $.fn.dataTable.render.number( '.', ',', 2, '$ ' )},
                                 {render: function (data, type, row) {
                                     return `<button type="button" class="btn btn-success btn-sm facturar" title="Facturar Servicio">
                                             <i class="fas fa-donate"></i> Facturar
