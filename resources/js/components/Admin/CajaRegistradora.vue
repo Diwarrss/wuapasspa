@@ -13,28 +13,61 @@
             </ol>
         </section>
         <section class="content">
-            <div>
-                <button type="button" class="btn btn-primary" @click="abrirModal('empleado','crear')">
-                    <i class="fas fa-plus-circle"></i> Crear
-                </button>
-            </div>
-            <br>
-            <div class="box box-primary">
-                <div class="box-header">
+            <div class="row">
+                <div class="col-md-6">
+
                 </div>
-                <div class="table-responsive container-fluid">
-                    <table id="tablaEmpleados" class="table table-bordered table-hover" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Empleado Responsable</th>
-                                <th>Nombre Caja</th>
-                                <th>Valor Inicialr</th>
-                                <th>Valor Producido</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                <div class="col-md-6">
+                     <!-- elemeto cajita -->
+                            <div class="small-box bg-aqua">
+                                <div class="inner">
+                                    <h4 class="text-center">CAJA MAESTRA</h4>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <h4>Valor Inicial</h4>
+                                            <p>200.000</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h4>Valor Producido</h4>
+                                            <p>500</p>
+                                        </div>
+                                     </div>
+                                </div>
+                                <div class="icon">
+                                <i class="fas fa-cash-register"></i>
+                                </div>
+                                <a href="admin#/cajaRegistradora" @click="abrirModal('empleado','crear')" class="small-box-footer">Acciones
+                                <i class="fas fa-wrench"></i></a>
+                            </div>
+                    <!-- elemtno cajita -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div>
+                        <button type="button" class="btn btn-primary" @click="abrirModal('empleado','crear')">
+                            <i class="fas fa-plus-circle"></i> Crear
+                        </button>
+                    </div>
+                    <br>
+                    <div class="box box-primary">
+                        <div class="box-header">
+                        </div>
+                        <div class="table-responsive container-fluid">
+                            <table id="tablaEmpleados" class="table table-bordered table-hover" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Empleado Responsable</th>
+                                        <th>Nombre Caja</th>
+                                        <th>Valor Inicialr</th>
+                                        <th>Valor Producido</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -416,19 +449,14 @@
             cerrarModal(){
                 $("[data-dismiss=modal]").trigger({ type: "click" });//para cerrar la modal con boostrap 3
                 jQuery('#tablaEmpleados').DataTable().ajax.reload();//toca con jQuery para recargar la tabla si no genera conflicto
-                this.roles_roles_id= 2;
-                this.empresas_empresas_id= 1;
-                this.nombre_usuario='';
-                this.apellido_usuario='';
-                this.usuario='';
-                this.email='';
-                this.password='';
-                this.password2='';
-                this.celular='';
-                this.fecha_cumple='';
-                this.imagen='';
-                this.estado_usuario= 1;
+
                 this.arrayErrors = [];
+                this.nombre_caja= '',
+                this.valor_inicial= '0',
+                this.idEmpleadoElegido=  '',
+                this.valor_producido= '0',
+                this.arrayErrors= []
+
             }
         },
         mounted() {
