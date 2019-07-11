@@ -27,13 +27,12 @@
                         <thead>
                             <tr>
                                 <th>Cliente</th>
-                                <th>Fecha Atención</th>
                                 <th>Servicios</th>
                                 <th>Valor Total</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-weight: normal;">
                         </tbody>
                     </table>
                 </div>
@@ -67,7 +66,15 @@
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/listarFacturacion",
                         "columns": [
-                                {data:'nombre_usuario'}
+                                {data:'nombre_cliente'},
+                                {data:'nombre_servicio'},
+                                {data:'valor_total'},
+                                {render: function (data, type, row) {
+                                    return `<button type="button" class="btn btn-success btn-sm facturar" title="Facturar Servicio">
+                                            <i class="fas fa-donate"></i> Facturar
+                                        </button>`
+                                    }
+                                }
                             ]
                     });
                 } );

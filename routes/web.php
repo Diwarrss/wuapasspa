@@ -105,6 +105,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/listarCajar', 'CajaController@listarCajar')->name('listarCajar');
         Route::get('/empleadosAgendadores', 'UserController@empleadosAgendadores')->name('showEmpleado');//ruta para usarlos en select de agendar
 
+        //Controlador de Facturacion
+        Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');
     });
 
     //middleware que solo permite acceso a agendador

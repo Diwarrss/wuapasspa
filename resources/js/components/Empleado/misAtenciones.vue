@@ -26,7 +26,7 @@
                                 <th>Estado/Cita</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-weight: normal;">
                         </tbody>
                     </table>
                 </div>

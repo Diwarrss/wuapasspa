@@ -59,12 +59,12 @@
                                         <th>Valor Producido</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody style="font-weight: normal;">
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>                
+                </div>
             </div>
         </section>
         <!-- Modal crear NUEVO, ACTUALIZAR Caja Registradora -->

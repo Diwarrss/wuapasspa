@@ -27,7 +27,7 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-weight: normal;">
                         </tbody>
                     </table>
                 </div>
@@ -68,7 +68,7 @@
                                             return '<span class="label label-danger">' + row.estado_reservacion_nombre + '</span> <span class="label label-primary">' + row.tipo_agenda + '</span>';
                                         }else{
                                             return '<span class="label label-danger">' + row.estado_reservacion_nombre + '</span> <span class="label label-info">' + row.tipo_agenda + '</span>';
-                                        }                                       
+                                        }
                                     }
                                 },
                                 {render: function (data, type, row) {

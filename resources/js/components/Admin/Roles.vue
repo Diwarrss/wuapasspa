@@ -27,7 +27,7 @@
                                 <th>Creación</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-weight: normal;">
                             <tr v-for="rol in arrayRoles" :key="rol.id">
                                 <td v-text="rol.id"></td>
                                 <td v-text="rol.nombre_rol"></td>
@@ -48,7 +48,7 @@
                                 <th>Creación</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-weight: normal;">
                         </tbody>
                     </table>
                 </div>
