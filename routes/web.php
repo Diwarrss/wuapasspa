@@ -55,6 +55,7 @@ Route::group(['middleware' => 'auth'], function () {
         //controlador vista Solicitudes
         Route::get('/showSolicitudesPendientes', 'SolicitudesController@showSolicitudesPendientes')->name('showSolicitudesPendientes');
         Route::get('/contarSolicitudes', 'SolicitudesController@contarSolicitudes')->name('contarSolicitudes');
+        Route::put('/cancelarSolicitud', 'SolicitudesController@cancelarSolicitud')->name('cancelarSolicitud');//para cancelar solo solicitud sin agendar
         //solo para sheluder
         Route::get('/sheluder', 'AdminController@sheluder')->name('sheluder');
         //controlador para Reservaciones
@@ -123,6 +124,7 @@ Route::group(['middleware' => 'auth'], function () {
         //controlador vista Solicitudes
         Route::get('/showSolicitudesPendientes', 'SolicitudesController@showSolicitudesPendientes')->name('showSolicitudesPendientes');
         Route::get('/contarSolicitudes', 'SolicitudesController@contarSolicitudes')->name('contarSolicitudes');
+        Route::put('/cancelarSolicitud', 'SolicitudesController@cancelarSolicitud')->name('cancelarSolicitud');//para cancelar solo solicitud sin agendar
         //solo para sheluder
         Route::get('/sheluder', 'AdminController@sheluder')->name('sheluder');
         //controlador para Reservaciones

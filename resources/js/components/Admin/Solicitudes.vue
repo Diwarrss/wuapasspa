@@ -331,7 +331,12 @@
                                 },
                                 {render: function (data, type, row) {
                                     if (row.estado_solicitud_nombre === 'Pendiente'){
-                                        return '<button type="button" data-toggle="tab" href="#sheluder" class="btn btn-success btn-sm agendar" title="Agendar Cita"><i class="far fa-calendar-check"></i> Agendar</button>';
+                                        return `<button type="button" data-toggle="tab" href="#sheluder" class="btn btn-success btn-sm agendar" title="Agendar Cita" style="margin-top: 1px">
+                                                    <i class="far fa-calendar-check"></i> Agendar
+                                                </button>
+                                                <button type="button" data-toggle="tab" class="btn btn-danger btn-sm cancelarS" title="Cancelar Solicitud" style="margin-top: 1px">
+                                                    <i class="far fa-trash-alt"></i> Cancelar
+                                                </button>`
                                         }
                                     }
                                 }
@@ -339,19 +344,71 @@
                     });
                     //funcion de enviar los datos de la  lista de reservaciones pendientes.
                     tablaPendientes.on('click', '.agendar', function () {
+                        jQuery.noConflict();// para evitar errores
+                        var idRow = jQuery(this).closest('tr'); //fila que le dan click
 
-                            jQuery.noConflict();// para evitar errores
-                            var idRow = jQuery(this).closest('tr'); //fila que le dan click
+                        //para si es responsivo obtenemos la data
+                        if (idRow.hasClass('child')) {//Check if the current row is a child row
+                            idRow = idRow.prev();//If it is, then point to the row before it (its 'parent')
+                        }
+                        var filaDT = tablaPendientes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
 
-                            //para si es responsivo obtenemos la data
-                            if (idRow.hasClass('child')) {//Check if the current row is a child row
-                                idRow = idRow.prev();//If it is, then point to the row before it (its 'parent')
+                        //console.log(filaDT);
+                        data.reservacionDT=filaDT;
+                    });
+                    //para cancelar la Reservacion
+                    tablaPendientes.on('click', '.cancelarS', function () {
+                        jQuery.noConflict();// para evitar errores
+                        //para si es responsivo obtenemos la data
+                        var current_row = jQuery(this).parents('tr');//Get the current row
+                        if (current_row.hasClass('child')) {//Check if the current row is a child row
+                            current_row = current_row.prev();//If it is, then point to the row before it (its 'parent')
+                        }
+                        var datos = tablaPendientes.row(current_row).data();
+                        //console.log(datos);
+
+                        data.id = datos["id"];//capturamos el id para enviarlo por put en el metodo
+                        Swal.fire({
+                            title: 'Esta Seguro de Cancelar la Solicitud?',
+                            text: "Una vez Cancelada el cliente debera solicitar una nueva.",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: 'green',
+                            cancelButtonColor: 'red',
+                            confirmButtonText: '<i class="fas fa-check"></i> Si',
+                            cancelButtonText: '<i class="fas fa-times"></i> No'
+                        }).then((result) => {
+                            if (result.value) {
+                                // /cancelarReservacion
+                                axios.put('/cancelarSolicitud', {
+                                    id: data.id
+                                }).then(function (response) {
+                                    Swal.fire({
+                                        position: 'top-end',
+                                        type: 'success',
+                                        title: 'Solicitud Cancelada!',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                        data.cantidadSolicitudes();//refrescar datos de cantidad
+                                        //data.cantidadAgendadas();
+                                        jQuery('#tablaPendientes').DataTable().ajax.reload(null,false);//refrestcar la tabla de pendientes
+                                })
+                                .catch(function (error) {
+                                    if (error.response.status == 422) {//preguntamos si el error es 422
+                                        Swal.fire({
+                                            position: 'top-end',
+                                            type: 'error',
+                                            title: 'Se produjo un Error, Reintentar',
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        });
+                                    }
+                                    console.log(error.response.data.errors);
+                                });
                             }
-                            var filaDT = tablaPendientes.row(idRow).data();//At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
-
-                            //console.log(filaDT);
-                            data.reservacionDT=filaDT;
                         });
+                    });
                 });
             },
             listarAgendadas(){

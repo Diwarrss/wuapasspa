@@ -14,39 +14,35 @@
         </section>
         <section class="content">
             <div class="row">
-                <div class="col-md-6">
-
-                </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                      <!-- elemeto cajita -->
-                            <div class="small-box bg-aqua">
-                                <div class="inner">
-                                    <h4 class="text-center">CAJA MAESTRA</h4>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <h4>Valor Inicial</h4>
-                                            <p>200.000</p>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <h4>Valor Producido</h4>
-                                            <p>500</p>
-                                        </div>
-                                     </div>
+                    <div class="small-box bg-green">
+                        <div class="inner">
+                            <h4 class="text-center">CAJA PRINCIPAL</h4>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4>Valor Inicial</h4>
+                                    <p>200.000</p>
                                 </div>
-                                <div class="icon">
-                                <i class="fas fa-cash-register"></i>
+                                <div class="col-md-4">
+                                    <h4>Valor Producido</h4>
+                                    <p>500</p>
                                 </div>
-                                <a href="admin#/cajaRegistradora" @click="abrirModal('empleado','crear')" class="small-box-footer">Acciones
-                                <i class="fas fa-wrench"></i></a>
-                            </div>
+                                </div>
+                        </div>
+                        <div class="icon">
+                        <i class="fas fa-cash-register"></i>
+                        </div>
+                        <a href="admin#/cajaRegistradora" @click="abrirModal('empleado','crear')" class="small-box-footer">Acciones
+                            <i class="fas fa-wrench"></i>
+                        </a>
+                    </div>
                     <!-- elemtno cajita -->
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-8">
                     <div>
                         <button type="button" class="btn btn-primary" @click="abrirModal('empleado','crear')">
-                            <i class="fas fa-plus-circle"></i> Crear
+                            <i class="fas fa-plus-circle"></i> Nueva Caja
                         </button>
                     </div>
                     <br>
@@ -68,7 +64,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div>                
             </div>
         </section>
         <!-- Modal crear NUEVO, ACTUALIZAR Caja Registradora -->

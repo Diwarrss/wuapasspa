@@ -2983,6 +2983,30 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2994,11 +3018,11 @@ __webpack_require__.r(__webpack_exports__);
       arrayCaja: [],
       empresas_empresas_id: 1,
       nombre_caja: '',
-      valor_inicial: '0.00',
-      idEmpleadoElegido: '999',
+      valor_inicial: '0',
+      idEmpleadoElegido: '',
       empleados: [],
       usuario: '',
-      valor_producido: '0.00',
+      valor_producido: '0',
       password: '',
       password2: '',
       celular: '',
@@ -3039,33 +3063,15 @@ __webpack_require__.r(__webpack_exports__);
           //no colocar ordenamiento
           "serverSide": true,
           //Lado servidor activar o no mas de 20000 registros
-          "ajax": "/showEmpleadosDT",
+          "ajax": "/listarCajar",
           "columns": [{
-            data: 'nombre_completo'
+            data: 'nombre_usuario'
           }, {
-            data: 'email'
+            data: 'nombre_caja'
           }, {
-            render: function render(data, type, row) {
-              return '<i class="fab fa-whatsapp text-green"></i> <a href="https://wa.me/57' + row.celular + '?text=Hola, ' + row.nombre_usuario + ' ' + row.apellido_usuario + ' " target="_blank" title="Enviar Mensaje">' + row.celular + '</a>';
-            }
+            data: 'valor_inicial'
           }, {
-            render: function render(data, type, row) {
-              if (row.estado_nombre === 'Activo') {
-                return '<span class="label label-success">' + row.estado_nombre + '</span>';
-              } else {
-                return '<span class="label label-danger">' + row.estado_nombre + '</span>';
-              }
-            }
-          }, {
-            data: 'nombre_rol'
-          }, {
-            render: function render(data, type, row) {
-              if (row.estado_nombre === 'Activo') {
-                return '<button class="btn btn-warning edit btn-sm" title="Editar Empleado"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Empleado"><i class="fas fa-close"></i> Desactivar</button>';
-              } else {
-                return '<button class="btn btn-warning edit btn-sm" title="Editar Empleado"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-success activar btn-sm" title="Activar Empleado"><i class="fas fa-check"></i> Activar</button>';
-              }
-            }
+            data: 'valor_producido'
           }]
         }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
 
@@ -3245,7 +3251,8 @@ __webpack_require__.r(__webpack_exports__);
         }
 
         ;
-        console.log(error); //console.log(me.arrayErrors);
+        console.log(error);
+        console.log(data.arrayErrors);
       });
     },
     actualizarEmpleado: function actualizarEmpleado() {
@@ -3328,19 +3335,8 @@ __webpack_require__.r(__webpack_exports__);
 
       jQuery('#tablaEmpleados').DataTable().ajax.reload(); //toca con jQuery para recargar la tabla si no genera conflicto
 
-      this.roles_roles_id = 2;
-      this.empresas_empresas_id = 1;
-      this.nombre_usuario = '';
-      this.apellido_usuario = '';
-      this.usuario = '';
-      this.email = '';
-      this.password = '';
-      this.password2 = '';
-      this.celular = '';
-      this.fecha_cumple = '';
-      this.imagen = '';
-      this.estado_usuario = 1;
       this.arrayErrors = [];
+      this.nombre_caja = '', this.valor_inicial = '0', this.idEmpleadoElegido = '', this.valor_producido = '0', this.arrayErrors = [];
     }
   },
   mounted: function mounted() {
@@ -4293,13 +4289,63 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {};
   },
   watch: {},
-  methods: {},
-  mounted: function mounted() {}
+  methods: {
+    //aqui tenemos el script para datatables para los que se facturaran
+    listarFacturacion: function listarFacturacion() {
+      var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+
+      jQuery(document).ready(function () {
+        var tablaFacturacion = jQuery('#tablaFacturacion').DataTable({
+          "language": {
+            "url": "/jsonDTIdioma.json"
+          },
+          "processing": true,
+          "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          "responsive": true,
+          "order": [],
+          //no colocar ordenamiento
+          "serverSide": true,
+          //Lado servidor activar o no mas de 20000 registros
+          "ajax": "/listarFacturacion",
+          "columns": [{
+            data: 'nombre_usuario'
+          }]
+        });
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.listarFacturacion();
+  }
 });
 
 /***/ }),
@@ -6900,7 +6946,7 @@ __webpack_require__.r(__webpack_exports__);
           }, {
             render: function render(data, type, row) {
               if (row.estado_solicitud_nombre === 'Pendiente') {
-                return '<button type="button" data-toggle="tab" href="#sheluder" class="btn btn-success btn-sm agendar" title="Agendar Cita"><i class="far fa-calendar-check"></i> Agendar</button>';
+                return "<button type=\"button\" data-toggle=\"tab\" href=\"#sheluder\" class=\"btn btn-success btn-sm agendar\" title=\"Agendar Cita\" style=\"margin-top: 1px\">\n                                                <i class=\"far fa-calendar-check\"></i> Agendar\n                                            </button>\n                                            <button type=\"button\" data-toggle=\"tab\" class=\"btn btn-danger btn-sm cancelarS\" title=\"Cancelar Solicitud\" style=\"margin-top: 1px\">\n                                                <i class=\"far fa-trash-alt\"></i> Cancelar\n                                            </button>";
               }
             }
           }]
@@ -6921,6 +6967,65 @@ __webpack_require__.r(__webpack_exports__);
           //console.log(filaDT);
 
           data.reservacionDT = filaDT;
+        }); //para cancelar la Reservacion
+
+        tablaPendientes.on('click', '.cancelarS', function () {
+          jQuery.noConflict(); // para evitar errores
+          //para si es responsivo obtenemos la data
+
+          var current_row = jQuery(this).parents('tr'); //Get the current row
+
+          if (current_row.hasClass('child')) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+
+          var datos = tablaPendientes.row(current_row).data(); //console.log(datos);
+
+          data.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
+
+          Swal.fire({
+            title: 'Esta Seguro de Cancelar la Solicitud?',
+            text: "Una vez Cancelada el cliente debera solicitar una nueva.",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'green',
+            cancelButtonColor: 'red',
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(function (result) {
+            if (result.value) {
+              // /cancelarReservacion
+              axios.put('/cancelarSolicitud', {
+                id: data.id
+              }).then(function (response) {
+                Swal.fire({
+                  position: 'top-end',
+                  type: 'success',
+                  title: 'Solicitud Cancelada!',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                data.cantidadSolicitudes(); //refrescar datos de cantidad
+                //data.cantidadAgendadas();
+
+                jQuery('#tablaPendientes').DataTable().ajax.reload(null, false); //refrestcar la tabla de pendientes
+              })["catch"](function (error) {
+                if (error.response.status == 422) {
+                  //preguntamos si el error es 422
+                  Swal.fire({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Se produjo un Error, Reintentar',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
+
+                console.log(error.response.data.errors);
+              });
+            }
+          });
         });
       });
     },
@@ -39247,28 +39352,57 @@ var render = function() {
     _vm._m(0),
     _vm._v(" "),
     _c("section", { staticClass: "content" }, [
-      _c("div", [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.abrirModal("empleado", "crear")
-              }
-            }
-          },
-          [
-            _c("i", { staticClass: "fas fa-plus-circle" }),
-            _vm._v(" Crear\n            ")
-          ]
-        )
-      ]),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _vm._m(1)
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-4" }, [
+          _c("div", { staticClass: "small-box bg-green" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _vm._m(2),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "small-box-footer",
+                attrs: { href: "admin#/cajaRegistradora" },
+                on: {
+                  click: function($event) {
+                    return _vm.abrirModal("empleado", "crear")
+                  }
+                }
+              },
+              [
+                _vm._v("Acciones\n                        "),
+                _c("i", { staticClass: "fas fa-wrench" })
+              ]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-md-8" }, [
+          _c("div", [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.abrirModal("empleado", "crear")
+                  }
+                }
+              },
+              [
+                _c("i", { staticClass: "fas fa-plus-circle" }),
+                _vm._v(" Nueva Caja\n                    ")
+              ]
+            )
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _vm._m(3)
+        ])
+      ])
     ]),
     _vm._v(" "),
     _c(
@@ -39279,7 +39413,7 @@ var render = function() {
           _c("div", { staticClass: "modal-content" }, [
             _c("form", { staticClass: "form-horizontal" }, [
               _c("div", { staticClass: "modal-header" }, [
-                _vm._m(2),
+                _vm._m(4),
                 _vm._v(" "),
                 _vm.tipoAccionModal == 1
                   ? _c("h4", { staticClass: "modal-title" }, [
@@ -39449,7 +39583,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
-                    _vm._m(3),
+                    _vm._m(5),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-sm-6" }, [
                       _c(
@@ -39482,11 +39616,9 @@ var render = function() {
                           }
                         },
                         [
-                          _c(
-                            "option",
-                            { attrs: { disabled: "", value: "999" } },
-                            [_vm._v("Escoge tu Empleado")]
-                          ),
+                          _c("option", { attrs: { disabled: "", value: "" } }, [
+                            _vm._v("Escoge tu Empleado")
+                          ]),
                           _vm._v(" "),
                           _vm._l(_vm.empleados, function(empleado) {
                             return _c(
@@ -39506,7 +39638,18 @@ var render = function() {
                           })
                         ],
                         2
-                      )
+                      ),
+                      _vm._v(" "),
+                      _vm.arrayErrors.empleado_id
+                        ? _c("p", {
+                            staticClass: "text-red",
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.arrayErrors.empleado_id[0]
+                              )
+                            }
+                          })
+                        : _vm._e()
                     ])
                   ]),
                   _vm._v(" "),
@@ -39673,6 +39816,36 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "inner" }, [
+      _c("h4", { staticClass: "text-center" }, [_vm._v("CAJA PRINCIPAL")]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-3" }, [
+          _c("h4", [_vm._v("Valor Inicial")]),
+          _vm._v(" "),
+          _c("p", [_vm._v("200.000")])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-md-4" }, [
+          _c("h4", [_vm._v("Valor Producido")]),
+          _vm._v(" "),
+          _c("p", [_vm._v("500")])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "icon" }, [
+      _c("i", { staticClass: "fas fa-cash-register" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "box box-primary" }, [
       _c("div", { staticClass: "box-header" }),
       _vm._v(" "),
@@ -39687,17 +39860,13 @@ var staticRenderFns = [
           [
             _c("thead", [
               _c("tr", [
-                _c("th", [_vm._v("Empleado")]),
+                _c("th", [_vm._v("Empleado Responsable")]),
                 _vm._v(" "),
-                _c("th", [_vm._v("Email")]),
+                _c("th", [_vm._v("Nombre Caja")]),
                 _vm._v(" "),
-                _c("th", [_vm._v("WhatsApp")]),
+                _c("th", [_vm._v("Valor Inicialr")]),
                 _vm._v(" "),
-                _c("th", [_vm._v("Estado")]),
-                _vm._v(" "),
-                _c("th", [_vm._v("Rol")]),
-                _vm._v(" "),
-                _c("th", [_vm._v("Acciones")])
+                _c("th", [_vm._v("Valor Producido")])
               ])
             ]),
             _vm._v(" "),
@@ -41222,7 +41391,52 @@ var staticRenderFns = [
         ])
       ]),
       _vm._v(" "),
-      _c("section", { staticClass: "content" })
+      _c("section", { staticClass: "content" }, [
+        _c("div", [
+          _c(
+            "button",
+            { staticClass: "btn btn-primary", attrs: { type: "button" } },
+            [
+              _c("i", { staticClass: "fas fa-plus-circle" }),
+              _vm._v(" Nueva Factura\n            ")
+            ]
+          )
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("div", { staticClass: "box box-primary" }, [
+          _c("div", { staticClass: "box-header" }),
+          _vm._v(" "),
+          _c("div", { staticClass: "table-responsive container-fluid" }, [
+            _c(
+              "table",
+              {
+                staticClass: "table table-bordered table-hover",
+                staticStyle: { width: "100%" },
+                attrs: { id: "tablaFacturacion" }
+              },
+              [
+                _c("thead", [
+                  _c("tr", [
+                    _c("th", [_vm._v("Cliente")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Fecha Atención")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Servicios")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Valor Total")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Acciones")])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("tbody")
+              ]
+            )
+          ])
+        ])
+      ])
     ])
   }
 ]

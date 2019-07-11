@@ -208,10 +208,12 @@ class SolicitudesController extends Controller
     {
         if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
 
-        //CANCELO = 3;
+        return DB::transaction(function () use ($request) {
+        //CANCELO = 3 para cancelar la solicitud que hace el cliente
         $solicitudes = Solicitude::findOrFail($request->id);
         $solicitudes->estado_solicitud = '3';
         $solicitudes->save();
+        });
     }
 
     public function componente(){
