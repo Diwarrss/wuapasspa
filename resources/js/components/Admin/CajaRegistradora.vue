@@ -298,11 +298,11 @@ export default {
             { data: "nombre_caja" },
             {
               data: "valor_inicial",
-              render: $.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
             },
             {
               data: "valor_producido",
-              render: $.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
             }
           ]
         });
@@ -576,9 +576,10 @@ export default {
 
       this.arrayErrors = [];
       (this.nombre_caja = ""),
-        (this.valor_inicial = "0"),
+        (this.valor_inicial = ""),
         (this.idEmpleadoElegido = ""),
-        (this.valor_producido = "0"),
+        (this.valor_producido = ""),
+        (this.estado_caja = ""),
         (this.arrayErrors = []);
     }
   },

@@ -37,6 +37,7 @@ class CajaController extends Controller
                 'nombre_caja' => 'required|min:3|max:150',
                 'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                 'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                'estado_caja' => 'required'
             ]);
 
             $caja =  new Caja();
