@@ -27,13 +27,13 @@ class CajaController extends Controller
      */
     public function crearCaja(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
         try {
             //usaremos transacciones
             DB::beginTransaction();
             //para validar los formularios
             $request->validate([
-                'empleado_id' => 'required',
+                'empleado_id' => 'required|unique:cajas',
                 'nombre_caja' => 'required|min:3|max:150',
                 'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                 'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
@@ -44,34 +44,51 @@ class CajaController extends Controller
             $caja->nombre_caja = $request->nombre_caja;;
             $caja->valor_inicial = $request->valor_inicial;
             $caja->valor_producido = $request->valor_producido;
+            $caja->estado_caja = $request->estado_caja;
             $caja->save();
             DB::commit();
-
-
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
-
     }
 
 
     public function listarCajar(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //creamos la consulta de los usuarios que pertenecen al rol Empleados
-        $caja = Caja::join('users', 'cajas.empleado_id','=','users.id')
-                        ->select('cajas.id','cajas.nombre_caja','cajas.valor_inicial','cajas.valor_producido',
-                                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_usuario"))
-                        ->get();
+        $caja = Caja::join('users', 'cajas.empleado_id', '=', 'users.id')
+            ->select(
+                'cajas.id',
+                'cajas.nombre_caja',
+                'cajas.valor_inicial',
+                'cajas.valor_producido',
+                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_usuario")
+            )
+            ->get();
 
         //devolvemos el resultado en formato datatable
         return datatables($caja)
-        //setrowid elejimos y mostramos el id del atributo
-        ->setRowId(function ($caja) {
-            return $caja->id;
-        })
-        ->toJson();
+            //setrowid elejimos y mostramos el id del atributo
+            ->setRowId(function ($caja) {
+                return $caja->id;
+            })
+            ->toJson();
+    }
+
+
+    public function infoCajaDiv(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        //creamos la consulta de traer la caja para el empleado que este logueado y que la caja este activa too
+        $caja = Caja::where([
+            ['empleado_id', Auth::user()->id],
+            ['estado_caja', '1']
+        ])->get();
+
+        return $caja;
     }
 
     /**

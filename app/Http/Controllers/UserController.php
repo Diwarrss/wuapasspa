@@ -17,46 +17,59 @@ class UserController extends Controller
      */
     public function showEmpleadosDT(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //creamos la consulta de los usuarios que pertenecen al rol Empleados
-        $empleados = User::join('roles', 'users.roles_roles_id','=','roles.id')
-                        ->select('users.id', 'users.roles_roles_id', 'empresas_empresas_id', 'nombre_usuario', 'apellido_usuario',
-                                'usuario', 'email', 'password', 'celular', 'fecha_cumple', 'imagen', 'estado_usuario', 'roles.nombre_rol',
-                                DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre"),
-                                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo"))
-                        ->whereIn('roles_roles_id', [2,4])
-                        ->orderBy('users.id','asc')
-                        ->get();
+        $empleados = User::join('roles', 'users.roles_roles_id', '=', 'roles.id')
+            ->select(
+                'users.id',
+                'users.roles_roles_id',
+                'empresas_empresas_id',
+                'nombre_usuario',
+                'apellido_usuario',
+                'usuario',
+                'email',
+                'password',
+                'celular',
+                'fecha_cumple',
+                'imagen',
+                'estado_usuario',
+                'roles.nombre_rol',
+                DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre"),
+                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo")
+            )
+            ->whereIn('roles_roles_id', [2, 4])
+            ->orderBy('users.id', 'asc')
+            ->get();
 
         //devolvemos el resultado en formato datatable
         return datatables($empleados)
-        //setrowid elejimos y mostramos el id del atributo
-        ->setRowId(function ($empleados) {
-            return $empleados->id;
-        })
-        ->toJson();
+            //setrowid elejimos y mostramos el id del atributo
+            ->setRowId(function ($empleados) {
+                return $empleados->id;
+            })
+            ->toJson();
     }
 
     //listar empleados para seleccionarlos en el componente de agenda.
     //los peluqueos tienen el rol 2 y estan activos 1
-    public function showEmpleado(){
-        $empleados = User::select('id',DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"))
-                         ->where([
-                            ['estado_usuario', '1'],
-                            ['roles_roles_id', '2'],
-                        ])->get();
+    public function showEmpleado()
+    {
+        $empleados = User::select('id', DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"))
+            ->where([
+                ['estado_usuario', '1'],
+                ['roles_roles_id', '2'],
+            ])->get();
         return $empleados;
     }
 
     //listar empleados para seleccionarlos en el componente de Caja registradora.
     //los Agendadores tienen el rol 4 y estan activos 1
-    public function empleadosAgendadores(){
-        $empleados = User::select('id',DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"))
-                         ->where([
-                            ['estado_usuario', '1'],
-                            ['roles_roles_id', '4'],
-                        ])->get();
+    public function empleadosAgendadores()
+    {
+        $empleados = User::select('id', DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"))
+            ->where('estado_usuario', '1')
+            ->whereIn('roles_roles_id', ['1', '4'])->get();
         return $empleados;
     }
 
@@ -67,7 +80,7 @@ class UserController extends Controller
      */
     public function createEmpleado(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //para validar los formularios
         $request->validate([
@@ -98,7 +111,7 @@ class UserController extends Controller
 
     public function actualizarEmpleado(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         try {
             //usaremos transacciones
@@ -110,7 +123,7 @@ class UserController extends Controller
             $request->validate([
                 'nombre_usuario' => 'required|min:3|max:255',
                 'apellido_usuario' => ['required', 'string', 'max:255'],
-                'email' => 'required|min:5|max:255|string|email|unique:users,email,'.$empleado->id,
+                'email' => 'required|min:5|max:255|string|email|unique:users,email,' . $empleado->id,
                 //'password' => ['required', 'string', 'min:6'],
                 'celular' => ['required', 'string', 'max:100'],
                 'fecha_cumple' => ['required', 'string', 'max:100'],
@@ -129,17 +142,17 @@ class UserController extends Controller
             $empleado->fecha_cumple = $request->fecha_cumple;
             $empleado->imagen = $request->imagen;
             $empleado->estado_usuario = $request->estado_usuario;
-            $empleado->save();//guardamos en la tabla users con el metodo save en la BD
+            $empleado->save(); //guardamos en la tabla users con el metodo save en la BD
 
-            DB::commit();//
+            DB::commit(); //
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
 
     public function updateEstadoEmple(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         try {
             //usaremos transacciones
@@ -148,40 +161,52 @@ class UserController extends Controller
             $empleado = User::findOrFail($request->id);
 
             $empleado->estado_usuario = $request->estado_usuario;
-            $empleado->save();//guardamos en la tabla users con el metodo save en la BD
+            $empleado->save(); //guardamos en la tabla users con el metodo save en la BD
 
-            DB::commit();//
+            DB::commit(); //
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
 
     public function showClientesDT(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //creamos la consulta de los usuarios que pertenecen al rol Clientes
-        $clientes = User::join('roles', 'users.roles_roles_id','=','roles.id')
-                        ->select('users.id', 'users.roles_roles_id', 'empresas_empresas_id', 'nombre_usuario', 'apellido_usuario',
-                                'usuario', 'email', 'password', 'celular', 'fecha_cumple', 'imagen', 'estado_usuario',
-                                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo"),
-                                DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre"))
-                        ->where('roles_roles_id', 3)
-                        ->orderBy('users.id','asc')
-                        ->get();
+        $clientes = User::join('roles', 'users.roles_roles_id', '=', 'roles.id')
+            ->select(
+                'users.id',
+                'users.roles_roles_id',
+                'empresas_empresas_id',
+                'nombre_usuario',
+                'apellido_usuario',
+                'usuario',
+                'email',
+                'password',
+                'celular',
+                'fecha_cumple',
+                'imagen',
+                'estado_usuario',
+                DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo"),
+                DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre")
+            )
+            ->where('roles_roles_id', 3)
+            ->orderBy('users.id', 'asc')
+            ->get();
 
         //devolvemos el resultado en formato datatable
         return datatables($clientes)
-        //setrowid elejimos y mostramos el id del atributo
-        ->setRowId(function ($clientes) {
-            return $clientes->id;
-        })
-        ->toJson();
+            //setrowid elejimos y mostramos el id del atributo
+            ->setRowId(function ($clientes) {
+                return $clientes->id;
+            })
+            ->toJson();
     }
 
     public function createCliente(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //para validar los formularios
         $request->validate([
@@ -211,7 +236,7 @@ class UserController extends Controller
 
     public function actualizarCliente(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         try {
             //usaremos transacciones
@@ -223,7 +248,7 @@ class UserController extends Controller
             $request->validate([
                 'nombre_usuario' => 'required|min:3|max:255',
                 'apellido_usuario' => ['required', 'string', 'max:255'],
-                'email' => 'required|min:5|max:255|string|email|unique:users,email,'.$cliente->id,
+                'email' => 'required|min:5|max:255|string|email|unique:users,email,' . $cliente->id,
                 'password' => ['required', 'string', 'min:6'],
                 'celular' => ['required', 'string', 'max:100'],
                 'fecha_cumple' => ['required', 'string', 'max:100'],
@@ -241,27 +266,36 @@ class UserController extends Controller
             $cliente->fecha_cumple = $request->fecha_cumple;
             $cliente->imagen = $request->imagen;
             $cliente->estado_usuario = $request->estado_usuario;
-            $cliente->save();//guardamos en la tabla users con el metodo save en la BD
+            $cliente->save(); //guardamos en la tabla users con el metodo save en la BD
 
-            DB::commit();//
+            DB::commit(); //
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
 
     public function showCumpleClientes(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //consulta para cumpleaños del mes
-        $cumpleCliente = User::select('id', 'roles_roles_id', 'empresas_empresas_id',
-            'usuario', 'celular', 'fecha_cumple', 'imagen', 'estado_usuario', DB::raw('DAY(fecha_cumple) as cumpleDia'),
-            DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo"))
+        $cumpleCliente = User::select(
+            'id',
+            'roles_roles_id',
+            'empresas_empresas_id',
+            'usuario',
+            'celular',
+            'fecha_cumple',
+            'imagen',
+            'estado_usuario',
+            DB::raw('DAY(fecha_cumple) as cumpleDia'),
+            DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_completo")
+        )
             ->where([
                 ['roles_roles_id', 3],
                 ['empresas_empresas_id', 1],
                 [DB::raw('MONTH(fecha_cumple)'), '=', DB::raw('MONTH(NOW())')],
-            ] )
+            ])
             ->get();
 
 
@@ -281,29 +315,43 @@ class UserController extends Controller
 
         //devolvemos el resultado en formato datatable
         return datatables($cumpleCliente)
-        //setrowid elejimos y mostramos el id del atributo
-        ->setRowId(function ($cumpleCliente) {
-            return $cumpleCliente->id;
-        })
-        ->toJson();
+            //setrowid elejimos y mostramos el id del atributo
+            ->setRowId(function ($cumpleCliente) {
+                return $cumpleCliente->id;
+            })
+            ->toJson();
     }
 
     public function showPerfil(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
-        $miperfil = User::select('id', 'roles_roles_id', 'empresas_empresas_id', 'nombre_usuario', 'apellido_usuario',
-                                'usuario', 'email', 'password', 'celular', 'fecha_cumple', 'imagen', 'estado_usuario','created_at',
-                                'updated_at', DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre"))
-                    ->where('id', Auth::user()->id)
-                    ->get();
+        $miperfil = User::select(
+            'id',
+            'roles_roles_id',
+            'empresas_empresas_id',
+            'nombre_usuario',
+            'apellido_usuario',
+            'usuario',
+            'email',
+            'password',
+            'celular',
+            'fecha_cumple',
+            'imagen',
+            'estado_usuario',
+            'created_at',
+            'updated_at',
+            DB::raw("IF(estado_usuario=1, 'Activo', 'Desactivado') as estado_nombre")
+        )
+            ->where('id', Auth::user()->id)
+            ->get();
 
         return $miperfil;
     }
 
     public function actualizarPerfil(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //'imagen' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:4084',
         try {
@@ -316,7 +364,7 @@ class UserController extends Controller
             $request->validate([
                 'nombre_usuario' => 'required|min:3|max:255',
                 'apellido_usuario' => ['required', 'string', 'max:255'],
-                'email' => 'required|min:5|max:255|string|email|unique:users,email,'.$miperfil->id,
+                'email' => 'required|min:5|max:255|string|email|unique:users,email,' . $miperfil->id,
                 'celular' => ['required', 'string', 'max:100'],
                 'fecha_cumple' => ['required', 'string', 'max:100'],
                 'estado_usuario' => ['required'],
@@ -331,11 +379,11 @@ class UserController extends Controller
             $miperfil->celular = $request->celular;
             $miperfil->fecha_cumple = $request->fecha_cumple;
             $miperfil->estado_usuario = $request->estado_usuario;
-            $miperfil->save();//guardamos en la tabla users con el metodo save en la BD
+            $miperfil->save(); //guardamos en la tabla users con el metodo save en la BD
 
-            DB::commit();//
+            DB::commit(); //
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
 
@@ -347,15 +395,15 @@ class UserController extends Controller
             'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $user = User::findOrFail(auth()->user()->id);//actualizamos para el user logueado
+        $user = User::findOrFail(auth()->user()->id); //actualizamos para el user logueado
 
-        $imagenFile = $request->imagen;//capturamos la imagen
-        $nombreImagen = $request->imagen->getClientOriginalName();//obtenemos el nombre de la imagen
+        $imagenFile = $request->imagen; //capturamos la imagen
+        $nombreImagen = $request->imagen->getClientOriginalName(); //obtenemos el nombre de la imagen
 
-        if ($imagenFile) {//validamos que alla una imagen
+        if ($imagenFile) { //validamos que alla una imagen
 
             //Subimos la nueva imagen
-            $imagenFile->move(public_path('/img/perfiles/'), $nombreImagen);//guardamos la imagen en este directorio
+            $imagenFile->move(public_path('/img/perfiles/'), $nombreImagen); //guardamos la imagen en este directorio
 
             $user->imagen = $nombreImagen;
             $user->save();
@@ -366,7 +414,7 @@ class UserController extends Controller
 
     public function actualizarPassword(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //'imagen' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:4084',
         try {
@@ -382,11 +430,11 @@ class UserController extends Controller
                 'password2' => ['required', 'string', 'min:6'],
             ]);
             $miperfil->password = Hash::make($request->password);
-            $miperfil->save();//guardamos en la tabla users con el metodo save en la BD
+            $miperfil->save(); //guardamos en la tabla users con el metodo save en la BD
 
-            DB::commit();//
+            DB::commit(); //
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
 }
