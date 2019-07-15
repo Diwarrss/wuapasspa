@@ -24,6 +24,9 @@
 
                                 <ul class="list-group list-group-unbordered">
                                     <li class="list-group-item">
+                                    <b>Nombre Corto: </b> <span class="pull-right" v-text="empresa.nombre_corto"></span>
+                                    </li>
+                                    <li class="list-group-item">
                                     <b>Nit: </b> <span class="pull-right" v-text="empresa.nit_empresa"></span>
                                     </li>
                                     <li class="list-group-item">

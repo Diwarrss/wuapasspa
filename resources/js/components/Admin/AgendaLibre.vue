@@ -199,7 +199,15 @@ export default {
                             },
                             {render: function (data, type, row) {
                                 if (row.estado_reservacion_nombre === 'En Espera'){
-                                    return '<button type="button" style="margin: 1px" class="btn btn-success btn-sm atendido" title="Atendido"><i class="fas fa-calendar-check"></i> Atentido</button> <button type="button" style="margin: 1px" class="btn btn-warning btn-sm noasistio" title="No Asistió"><i class="far fa-calendar-times"></i> No Asistió</button>';
+                                    return `<button type="button" style="margin: 1px" class="btn btn-success btn-sm atendido" title="Atendido">
+                                                <i class="fas fa-calendar-check"></i> Atentido
+                                            </button> 
+                                            <button type="button" style="margin: 1px" class="btn btn-warning btn-sm noasistio" title="No Asistió">
+                                                <i class="far fa-calendar-times"></i> No Asistió
+                                            </button>
+                                            <button type="button" style="margin: 1px" class="btn btn-danger btn-sm cancelarR" title="Cancelar Solicitud" style="margin-top: 1px">
+                                                <i class="far fa-trash-alt"></i> Cancelar
+                                            </button>`;
                                     }else{
                                         return '<span class="label label-info">Ninguna</span>'
                                     }
@@ -286,7 +294,6 @@ export default {
                         cancelButtonText: '<i class="fas fa-times"></i> No'
                     }).then((result) => {
                         if (result.value) {
-                            // /cancelarReservacion
                             axios.put('/clienteNoAsistio', {
                                 id: me.idReserva,
 
@@ -300,6 +307,59 @@ export default {
                                 });
                                 jQuery('#tablaAgendasL').DataTable().ajax.reload(null,false);
                                 data.listarReservaciones(data.idEmpleadoElegido);
+                            })
+                            .catch(function (error) {
+                                if (error.response.status == 422) {//preguntamos si el error es 422
+                                    Swal.fire({
+                                        position: 'top-end',
+                                        type: 'error',
+                                        title: 'Se produjo un Error, Reintentar',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                }
+                                console.log(error.response.data.errors);
+                            });
+                        }
+                    });
+                });
+                //para cancelar la Reservacion
+                tablaAgendasL.on('click', '.cancelarR', function () {
+                    jQuery.noConflict();// para evitar errores
+                    //para si es responsivo obtenemos la data
+                    var current_row = jQuery(this).parents('tr');//Get the current row
+                    if (current_row.hasClass('child')) {//Check if the current row is a child row
+                        current_row = current_row.prev();//If it is, then point to the row before it (its 'parent')
+                    }
+                    var datos = tablaAgendasL.row(current_row).data();
+                    //console.log(datos);
+
+                    me.id = datos["id"];//capturamos el id para enviarlo por put en el metodo
+                    Swal.fire({
+                        title: 'Esta Seguro de Cancelar la Reservación?',
+                        text: "Una vez Cancelada la Reservación debera agendar una nueva.",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: 'green',
+                        cancelButtonColor: 'red',
+                        confirmButtonText: '<i class="fas fa-check"></i> Si',
+                        cancelButtonText: '<i class="fas fa-times"></i> No'
+                    }).then((result) => {
+                        if (result.value) {
+                            // /cancelarReservacion
+                            axios.put('/cancelarReservaciones', {
+                                id: me.id
+                            }).then(function (response) {
+                                Swal.fire({
+                                    position: 'top-end',
+                                    type: 'success',
+                                    title: 'Cita Cancelada!',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                    //data.cantidadAgendadas();
+                                    jQuery('#tablaAgendasL').DataTable().ajax.reload(null,false);
+                                    data.listarReservaciones(data.idEmpleadoElegido);
                             })
                             .catch(function (error) {
                                 if (error.response.status == 422) {//preguntamos si el error es 422

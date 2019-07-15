@@ -43,15 +43,317 @@
     </section>
     <section v-else-if="mostrarDiv == 2" class="content">
       <div>
-        <button type="button" class="btn btn-info" @click="regresar()">
+        <button type="button" class="btn btn-success" @click="regresar()">
           <i class="fas fa-reply"></i> Regresar
         </button>
       </div>
       <br />
       <div class="box box-primary">
-        <div class="box-header">
-          <h1>PARA LA FACTURACION</h1>
+        <div class="box-header with-border bg-aqua-active">
+          <div class="col-md-12 text-center">
+            <h3>
+              <i class="fas fa-file-invoice-dollar"></i> Detalles de Facturación
+            </h3>
+          </div>
+          <div class="col-md-4 col-sm-4">
+            <span>
+              <strong>Nombre Cliente:</strong>
+              <span v-if="nombre_cliente != ''" v-text="nombre_cliente"></span>
+              <span else v-text="nombre_anonimo"></span>
+            </span>
+          </div>
+          <div class="col-md-4 col-sm-4 text-center">
+            <span>
+              <strong>Nombre Empresa:</strong>
+              {{nombre_empresa}}
+            </span>
+          </div>
+          <div class="col-md-4 col-sm-4 text-right">
+            <span>
+              <strong>Fecha Factura:</strong>
+              {{fecha_actual}}
+            </span>
+            <br />
+            <span>
+              <strong>Facturado Por:</strong>
+              {{nombre_facturador}}
+            </span>
+          </div>
         </div>
+        <div class="box-body table-responsive">
+          <div class="col-md-6">
+            <button
+              type="button"
+              class="btn btn-default"
+              style="margin-bottom: 5px"
+              @click="nota();"
+            >
+              <i class="fas fa-pencil-alt"></i> Nota
+            </button>
+          </div>
+          <div class="col-md-6 text-right">
+            <button
+              type="button"
+              class="btn btn-success"
+              style="margin-bottom: 5px"
+              @click="agregarDetalles();"
+            >
+              <i class="fas fa-plus-circle"></i> Añadir Servicio
+            </button>
+          </div>
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>Servicios</th>
+                <th>Realizado Por</th>
+                <th>Cantidad</th>
+                <th>Valor</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody style="font-weight: normal;">
+              <tr v-if="informacionFacturar.length == 0">
+                <td colspan="5">
+                  <div
+                    class="alert alert-danger text-center"
+                    role="alert"
+                  >Agregue información a Facturar</div>
+                </td>
+              </tr>
+              <tr v-for="(detalle, index) in informacionFacturar" :key="detalle.id">
+                <td>
+                  <span>{{detalle.nombre_servicio}} ($ {{formatearValor(detalle.valor_servicio)}})</span>
+                </td>
+                <td>
+                  <select class="form-control" id="empleado" v-model="detalle.id_atendido_por">
+                    <option
+                      v-for="empleado in lista_empleados"
+                      :key="empleado.id"
+                      v-bind:value="empleado.id"
+                    >{{ empleado.nombre}}</option>
+                  </select>
+                </td>
+                <td>
+                  <input v-model="detalle.cantidad" type="number" max:3 class="form-control" />
+                </td>
+                <td>
+                  <span>$ {{formatearValor(detalle.cantidad*detalle.valor_servicio)}}</span>
+                </td>
+                <td>
+                  <button
+                    @click="eliminarDetalle(index)"
+                    type="button"
+                    class="btn btn-danger"
+                    title="Quitar"
+                  >
+                    <i class="fas fa-close"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="informacionFacturar.length > 0">
+                <td colspan="3" align="right">
+                  <strong>Subtotal:</strong>
+                </td>
+                <td>$ {{formatearValor(subtotal = calcularSubtotal)}}</td>
+              </tr>
+              <tr v-if="informacionFacturar.length > 0">
+                <td colspan="3" align="right">
+                  <strong>Descuento:</strong>
+                </td>
+                <td>
+                  <input type="number" v-model="descuento" class="form-control" />
+                </td>
+              </tr>
+              <tr v-if="informacionFacturar.length > 0">
+                <td colspan="3" align="right">
+                  <strong>Total Neto:</strong>
+                </td>
+                <td>$ {{formatearValor(valorNeto = calcularNeto)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="box-footer clearfix">
+          <div class="text-left">
+            <div v-if="informacionFacturar.length > 0">
+              <button
+                type="button"
+                class="btn btn-success"
+                style="margin-bottom: 5px"
+                @click="abrirPagos()"
+              >
+                <i class="fas fa-money"></i> Pago
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                style="margin-bottom: 5px"
+                @click="regresar()"
+              >
+                <i class="fas fa-close"></i> Cancelar
+              </button>
+            </div>
+            <div v-else></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!--Modal mostrar Servicios-->
+    <section>
+      <div class="modal fade in" id="modalServicios">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <form class="form-horizontal" content-type="multipart/form-data">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-list"></i> Lista de Servicios
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box-body">
+                  <div class="table-responsive container-fluid">
+                    <table
+                      id="tablaServicios"
+                      class="table table-bordered table-hover"
+                      style="width:100%"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Valor</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody style="font-weight: normal;"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
+    <!--Modal Para realizar Pago Factura-->
+    <section>
+      <div class="modal fade in" id="modalPagos">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <form class="form-horizontal" content-type="multipart/form-data">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-money"></i> Pagar Factura
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box-body">
+                  <div class>
+                    <ul class="nav nav-tabs">
+                      <li class="active">
+                        <a data-toggle="tab" href="#pagoEfectivo">
+                          <i class="fas fa-money-bill-wave-alt"></i> Pago Efectivo
+                        </a>
+                      </li>
+                      <li>
+                        <a data-toggle="tab" href="#pagoTarjeta">
+                          <i class="far fa-credit-card"></i> Pago Tarjeta
+                        </a>
+                      </li>
+                    </ul>
+                    <div class="tab-content row">
+                      <div id="pagoEfectivo" class="tab-pane fade in active">
+                        <div class="box-body">
+                          <div class="col-md-6">
+                            <div class="box box-primary">
+                              <div class="box-body">
+                                <table class="table table-bordered table-hover">
+                                  <tbody style="font-weight: normal; font-size: 18px;">
+                                    <tr v-if="informacionFacturar.length > 0">
+                                      <td align="right">
+                                        <strong>Subtotal:</strong>
+                                      </td>
+                                      <td>$ {{formatearValor(subtotal = calcularSubtotal)}}</td>
+                                    </tr>
+                                    <tr v-if="informacionFacturar.length > 0">
+                                      <td align="right">
+                                        <strong>Descuento:</strong>
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          v-model="descuento"
+                                          class="form-control"
+                                        />
+                                      </td>
+                                    </tr>
+                                    <tr v-if="informacionFacturar.length > 0">
+                                      <td align="right">
+                                        <strong>Total Neto:</strong>
+                                      </td>
+                                      <td>$ {{formatearValor(valorNeto = calcularNeto)}}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="box box-primary">
+                              <div class="box-body">
+                                <div class="text-center">
+                                  <h3>Valor Recibido</h3>
+                                  <input type="number" class="form-control" v-model="valorRecibido" />
+                                </div>
+                                <div class="text-center">
+                                  <h3>Valor Cambio</h3>
+                                  <h3>$ {{formatearValor(valorRecibido - valorNeto)}}</h3>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div id="pagoTarjeta" class="tab-pane fade">
+                        <div class="box-header"></div>
+                        <div class="box-body"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" @click="cerrarModalPago()">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-default" @click="limpiarPago()">
+                  <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  :disabled="valorRecibido < valorNeto || descuento > subtotal"
+                >
+                  <i class="fas fa-shopping-cart"></i> Facturar
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
       </div>
     </section>
   </div>
@@ -62,11 +364,101 @@ export default {
     return {
       mostrarDiv: 1,
       id_reserva: "",
-      informacionFacturar: []
+      informacionFacturar: [],
+      fecha_actual: "",
+      nombre_cliente: "",
+      nombre_anonimo: "",
+      nombre_facturador: "",
+      nombre_empresa: "",
+      lista_empleados: [],
+      subtotal: "",
+      descuento: 0,
+      valorNeto: "",
+      valorRecibido: 0,
+      valorCambio: ""
     };
   },
   watch: {},
+  computed: {
+    //calcular el subtotal de la factura
+    calcularSubtotal: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.informacionFacturar.length; i++) {
+        resultado =
+          resultado +
+          this.informacionFacturar[i].valor_servicio *
+            this.informacionFacturar[i].cantidad;
+      }
+      return resultado;
+    },
+    /* calcular el totalNeto */
+    calcularNeto: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.informacionFacturar.length; i++) {
+        resultado =
+          resultado +
+          this.informacionFacturar[i].valor_servicio *
+            this.informacionFacturar[i].cantidad;
+      }
+      return resultado - this.descuento;
+    }
+  },
   methods: {
+    //mostrar todos los empleados con Rol Empleado Activos
+    listaEmpleados() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/showEmpleado")
+        .then(function(response) {
+          me.lista_empleados = response.data;
+          //console.log(me.lista_empleados);
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
+    //obtener la informacion de la empresa
+    infoEmpresa() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/mostrar")
+        .then(function(response) {
+          me.nombre_empresa = response.data[0].nombre_empresa;
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
+    //obtener la informacion del empleado logueado actualmente
+    infoFacturador() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/showPerfil")
+        .then(function(response) {
+          me.nombre_facturador =
+            response.data[0].nombre_usuario +
+            " " +
+            response.data[0].apellido_usuario;
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
     //aqui tenemos el script para datatables para los que se facturaran
     listarFacturacion() {
       let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
@@ -106,7 +498,7 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return `<button type="button" class="btn btn-success btn-sm facturar" title="Facturar Servicio">
+                return `<button type="button" class="btn btn-success facturar" title="Facturar Servicio">
                             <i class="fas fa-donate"></i> Facturar
                         </button>`;
               }
@@ -115,16 +507,15 @@ export default {
         });
         //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
         tablaFacturacion.on("click", ".facturar", function() {
-          me.mostrarDiv = 2;
           //para si es responsivo obtenemos la data
           var current_row = $(this).parents("tr"); //Get the current row
           if (current_row.hasClass("child")) {
             //Check if the current row is a child row
             current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
           }
-          var data = tablaFacturacion.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+          var datos = tablaFacturacion.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
 
-          me.id_reserva = data["id_reserva"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
+          me.id_reserva = datos["id_reserva"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
 
           //creamos axios que nos trae la informacion para facturar por id
           axios
@@ -133,9 +524,21 @@ export default {
             })
             .then(function(response) {
               //si todo sale ok capturamos la data de la respuesta de la consulta
-              me.informacionFacturar = data;
-              console.log(response);
-              console.log(me.informacionFacturar);
+              me.informacionFacturar = response.data;
+              //aqui mandamos los datos del array a varibles especificas
+              me.fecha_actual = response.data[0].fecha_actual;
+              me.nombre_cliente = response.data[0].nombre_cliente;
+              me.nombre_anonimo = response.data[0].nombre_anonimo;
+
+              //console.log(response);
+              //console.log(me.informacionFacturar);
+              //para mostrar el div despues de dar en el boton y consultar
+              me.mostrarDiv = 2;
+              //para borrar el registro del array cuando es anonimo
+              if (me.informacionFacturar[0].id_solicitud === null) {
+                me.eliminarDetalleAnonimo(0);
+                //console.log("borrado");
+              }
             })
             .catch(function(error) {
               // handle error
@@ -147,14 +550,124 @@ export default {
         });
       });
     },
+    //aqui likstamos los servicios en una tabla
+    listarServicios() {
+      let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+      jQuery(document).ready(function() {
+        var tablaServicios = jQuery("#tablaServicios").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [], //no colocar ordenamiento
+          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ajax: "/serviciosFaturables",
+          columns: [
+            {
+              data: "nombre_servicio"
+            },
+            {
+              data: "valor_servicio",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+            },
+            {
+              render: function(data, type, row) {
+                return `<button type="button" class="btn btn-success agregar btn-sm" title="Agregar">
+                          <i class="fas fa-plus-circle"></i> Agregar
+                        </button>`;
+              }
+            }
+          ]
+        });
+        //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
+        tablaServicios.on("click", ".agregar", function() {
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaServicios.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+
+          //let id_servicio = datos["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
+          me.informacionFacturar.push({
+            //llenamos el array con push
+            cantidad: "1",
+            fecha_actual: me.fecha_actual,
+            id_atendido_por: me.lista_empleados[0].id,
+            id_reserva: me.id_reserva,
+            id_servicio: datos.id,
+            id_solicitud: "",
+            nombre_anonimo: me.nombre_anonimo,
+            nombre_cliente: me.nombre_cliente,
+            nombre_servicio: datos.nombre_servicio,
+            valor_servicio: datos.valor_servicio
+          });
+          Swal.fire({
+            position: "top-end",
+            title: "Agregado con éxito!",
+            type: "success",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
+      });
+    },
     regresar() {
       let me = this;
       me.mostrarDiv = 1;
       me.listarFacturacion();
+    },
+    formatearValor(value) {
+      let val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    eliminarDetalle(index) {
+      let me = this;
+      me.informacionFacturar.splice(index, 1); //se usa el metodo splice para borrar el index
+      /*Swal.fire({
+        position: "top-end",
+        title: "Eliminado con éxito!",
+        type: "success",
+        showConfirmButton: false,
+        timer: 1500
+      });*/
+    },
+    eliminarDetalleAnonimo(index) {
+      let me = this;
+      me.informacionFacturar.splice(index, 1); //se usa el metodo splice para borrar el index
+    },
+    agregarDetalles() {
+      let me = this;
+
+      jQuery.noConflict();
+      $("#modalServicios").modal("show");
+    },
+    //abrimos la modal de pagos
+    abrirPagos() {
+      let me = this;
+
+      jQuery.noConflict();
+      $("#modalPagos").modal("show");
+    },
+    cerrarModalPago() {
+      $("[data-dismiss=modal]").trigger({ type: "click" });
+      this.limpiarPago();
+    },
+    limpiarPago() {
+      let me = this;
+      me.descuento = 0;
+      me.valorRecibido = 0;
     }
   },
   mounted() {
     this.listarFacturacion();
+    this.infoFacturador();
+    this.infoEmpresa();
+    this.listaEmpleados();
+    this.listarServicios();
   }
 };
 </script>

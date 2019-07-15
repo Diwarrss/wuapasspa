@@ -4,23 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // para obtener el id del cliente que hace la solicitud
-use Illuminate\Support\Facades\DB;// para hacer transacciones seguras a la db
-use App\Empresa;//se importa el modelo de las solicitudes
+use Illuminate\Support\Facades\DB; // para hacer transacciones seguras a la db
+use App\Empresa; //se importa el modelo de las solicitudes
 
 class EmpresaController extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $miEmpresa = DB::table('empresas')
-                    ->join('users', 'empresas.id', '=', 'users.empresas_empresas_id')
-                    ->select('empresas.id','empresas.nombre_empresa','empresas.nombre_corto','empresas.estado_empresa','empresas.nit_empresa','empresas.direccion_empresa',
-                    'empresas.correo_empresa','empresas.urlweb_empresa',
-                    'empresas.facebook_empresa','empresas.instagram_empresa',
-                    'empresas.celular_empresa','empresas.telefono_empresa','logo_empresa')
-                    ->where('users.id', Auth::user()->id)
-                    ->get();
+            ->join('users', 'empresas.id', '=', 'users.empresas_empresas_id')
+            ->select(
+                'empresas.id',
+                'empresas.nombre_empresa',
+                'empresas.nombre_corto',
+                'empresas.estado_empresa',
+                'empresas.nit_empresa',
+                'empresas.direccion_empresa',
+                'empresas.correo_empresa',
+                'empresas.urlweb_empresa',
+                'empresas.facebook_empresa',
+                'empresas.instagram_empresa',
+                'empresas.celular_empresa',
+                'empresas.telefono_empresa',
+                'logo_empresa'
+            )
+            ->where('users.id', Auth::user()->id)
+            ->get();
 
         return $miEmpresa;
     }
@@ -33,7 +44,7 @@ class EmpresaController extends Controller
      */
     public function actualizarEmpresa(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //'imagen' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:4084',
         try {
@@ -45,9 +56,10 @@ class EmpresaController extends Controller
             //para validar los formularios
             $request->validate([
                 'empresa.nombre_empresa' => 'required|min:3|max:200',
+                'empresa.nombre_corto' => 'required|min:3|max:12',
                 'empresa.nit_empresa' => 'required|min:3|max:12',
                 'empresa.direccion_empresa' => 'required|min:3|max:255',
-                'empresa.correo_empresa' => 'required|min:5|max:100|string|email|unique:empresas,correo_empresa,'.$Empresa->id,
+                'empresa.correo_empresa' => 'required|min:5|max:100|string|email|unique:empresas,correo_empresa,' . $Empresa->id,
                 'empresa.urlweb_empresa' => ['required', 'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/', 'max:200'],
                 'empresa.facebook_empresa' => ['required', 'string', 'max:500'],
                 'empresa.instagram_empresa' => ['required', 'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/', 'max:500'],
@@ -65,11 +77,11 @@ class EmpresaController extends Controller
             $Empresa->celular_empresa = $request->empresa['celular_empresa'];
             $Empresa->telefono_empresa = $request->empresa['telefono_empresa'];
             $Empresa->logo_empresa = $request->empresa['logo_empresa'];
-            $Empresa->save();//guardamos en la tabla users con el metodo save en la BD
+            $Empresa->save(); //guardamos en la tabla users con el metodo save en la BD
 
-            DB::commit();//
+            DB::commit(); //
         } catch (Exception $e) {
-            DB::rollBack();//si hay error no ejecute la transaccion
+            DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
 
@@ -81,15 +93,15 @@ class EmpresaController extends Controller
             'logo_empresa' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $empresa = Empresa::findOrFail(1);//actualizamos para el user logueado
+        $empresa = Empresa::findOrFail(1); //actualizamos para el user logueado
 
-        $imagenFile = $request->logo_empresa;//capturamos la imagen
-        $nombreImagen = time().'.'. $request->logo_empresa->getClientOriginalExtension();//obtenemos el nombre de la imagen
+        $imagenFile = $request->logo_empresa; //capturamos la imagen
+        $nombreImagen = time() . '.' . $request->logo_empresa->getClientOriginalExtension(); //obtenemos el nombre de la imagen
 
-        if ($imagenFile) {//validamos que alla una imagen
+        if ($imagenFile) { //validamos que alla una imagen
 
             //Subimos la nueva imagen
-            $imagenFile->move(public_path('/img/perfiles/'), $nombreImagen);//guardamos la imagen en este directorio
+            $imagenFile->move(public_path('/img/perfiles/'), $nombreImagen); //guardamos la imagen en este directorio
 
             $empresa->logo_empresa = $nombreImagen;
             $empresa->save();

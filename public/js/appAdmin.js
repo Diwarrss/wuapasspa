@@ -1823,7 +1823,7 @@ __webpack_require__.r(__webpack_exports__);
           //Lado servidor activar o no mas de 20000 registros
           "ajax": "/showAtendidos",
           "columns": [{
-            data: 'nombre_cliente'
+            data: 'fechaAgendada'
           }, {
             data: 'nombre_cliente'
           }, {
@@ -2458,7 +2458,7 @@ __webpack_require__.r(__webpack_exports__);
           }, {
             render: function render(data, type, row) {
               if (row.estado_reservacion_nombre === 'En Espera') {
-                return '<button type="button" style="margin: 1px" class="btn btn-success btn-sm atendido" title="Atendido"><i class="fas fa-calendar-check"></i> Atentido</button> <button type="button" style="margin: 1px" class="btn btn-warning btn-sm noasistio" title="No Asistió"><i class="far fa-calendar-times"></i> No Asistió</button>';
+                return "<button type=\"button\" style=\"margin: 1px\" class=\"btn btn-success btn-sm atendido\" title=\"Atendido\">\n                                                <i class=\"fas fa-calendar-check\"></i> Atentido\n                                            </button> \n                                            <button type=\"button\" style=\"margin: 1px\" class=\"btn btn-warning btn-sm noasistio\" title=\"No Asisti\xF3\">\n                                                <i class=\"far fa-calendar-times\"></i> No Asisti\xF3\n                                            </button>\n                                            <button type=\"button\" style=\"margin: 1px\" class=\"btn btn-danger btn-sm cancelarR\" title=\"Cancelar Solicitud\" style=\"margin-top: 1px\">\n                                                <i class=\"far fa-trash-alt\"></i> Cancelar\n                                            </button>";
               } else {
                 return '<span class="label label-info">Ninguna</span>';
               }
@@ -2550,7 +2550,6 @@ __webpack_require__.r(__webpack_exports__);
             cancelButtonText: '<i class="fas fa-times"></i> No'
           }).then(function (result) {
             if (result.value) {
-              // /cancelarReservacion
               axios.put('/clienteNoAsistio', {
                 id: me.idReserva
               }).then(function (response) {
@@ -2561,6 +2560,64 @@ __webpack_require__.r(__webpack_exports__);
                   showConfirmButton: false,
                   timer: 1500
                 });
+                jQuery('#tablaAgendasL').DataTable().ajax.reload(null, false);
+                data.listarReservaciones(data.idEmpleadoElegido);
+              })["catch"](function (error) {
+                if (error.response.status == 422) {
+                  //preguntamos si el error es 422
+                  Swal.fire({
+                    position: 'top-end',
+                    type: 'error',
+                    title: 'Se produjo un Error, Reintentar',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
+
+                console.log(error.response.data.errors);
+              });
+            }
+          });
+        }); //para cancelar la Reservacion
+
+        tablaAgendasL.on('click', '.cancelarR', function () {
+          jQuery.noConflict(); // para evitar errores
+          //para si es responsivo obtenemos la data
+
+          var current_row = jQuery(this).parents('tr'); //Get the current row
+
+          if (current_row.hasClass('child')) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+
+          var datos = tablaAgendasL.row(current_row).data(); //console.log(datos);
+
+          me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
+
+          Swal.fire({
+            title: 'Esta Seguro de Cancelar la Reservación?',
+            text: "Una vez Cancelada la Reservación debera agendar una nueva.",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'green',
+            cancelButtonColor: 'red',
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(function (result) {
+            if (result.value) {
+              // /cancelarReservacion
+              axios.put('/cancelarReservaciones', {
+                id: me.id
+              }).then(function (response) {
+                Swal.fire({
+                  position: 'top-end',
+                  type: 'success',
+                  title: 'Cita Cancelada!',
+                  showConfirmButton: false,
+                  timer: 1500
+                }); //data.cantidadAgendadas();
+
                 jQuery('#tablaAgendasL').DataTable().ajax.reload(null, false);
                 data.listarReservaciones(data.idEmpleadoElegido);
               })["catch"](function (error) {
@@ -3007,27 +3064,107 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       id: 0,
       //id del empleado
-      rol_user: '',
+      rol_user: "",
       //empleado Rol
       arrayCaja: [],
       empresas_empresas_id: 1,
-      nombre_caja: '',
-      valor_inicial: '0',
-      idEmpleadoElegido: '',
+      nombre_caja: "",
+      estado_caja: "",
+      valor_inicial: "",
+      dataCajaDiv: [],
+      idEmpleadoElegido: "",
       empleados: [],
-      usuario: '',
-      valor_producido: '0',
-      password: '',
-      password2: '',
-      celular: '',
-      fecha_cumple: '',
-      imagen: '',
+      usuario: "",
+      valor_producido: "",
+      password: "",
+      password2: "",
+      celular: "",
+      fecha_cumple: "",
+      imagen: "",
       estado_usuario: 1,
       arrayErrors: [],
       tipoAccionModal: 0,
@@ -3037,11 +3174,23 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     EmpleadoListaCrear: function EmpleadoListaCrear() {
       var data = this;
-      axios.get('/empleadosAgendadores').then(function (response) {
+      axios.get("/empleadosAgendadores").then(function (response) {
         // data.fechaprobable=response.data[0].fechaprobable;
         // data.comentario=response.data[0].comentario;
         //console.log(response.data);
         data.empleados = response.data;
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      });
+    },
+    infoCajaDiv: function infoCajaDiv() {
+      var data = this;
+      axios.get("/infoCajaDiv").then(function (response) {
+        // data.fechaprobable=response.data[0].fechaprobable;
+        // data.comentario=response.data[0].comentario;
+        //console.log(response.data[0].nombre_caja);
+        data.dataCajaDiv = response.data;
       })["catch"](function (error) {
         // handle error
         console.log(error);
@@ -3052,42 +3201,44 @@ __webpack_require__.r(__webpack_exports__);
       var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
 
       jQuery(document).ready(function () {
-        var tablaEmpleados = jQuery('#tablaEmpleados').DataTable({
-          "language": {
-            "url": "/jsonDTIdioma.json"
+        var tablaEmpleados = jQuery("#tablaEmpleados").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
           },
-          "processing": true,
-          "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
-          "responsive": true,
-          "order": [],
+          processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [],
           //no colocar ordenamiento
-          "serverSide": true,
+          serverSide: true,
           //Lado servidor activar o no mas de 20000 registros
-          "ajax": "/listarCajar",
-          "columns": [{
-            data: 'nombre_usuario'
+          ajax: "/listarCajar",
+          columns: [{
+            data: "nombre_usuario"
           }, {
-            data: 'nombre_caja'
+            data: "nombre_caja"
           }, {
-            data: 'valor_inicial'
+            data: "valor_inicial",
+            render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
           }, {
-            data: 'valor_producido'
+            data: "valor_producido",
+            render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
           }]
         }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
 
-        tablaEmpleados.on('click', '.edit', function () {
+        tablaEmpleados.on("click", ".edit", function () {
           jQuery.noConflict(); // para evitar errores
 
-          $('#modalEmpleado').modal('show'); //mostramos la modal
+          $("#modalEmpleado").modal("show"); //mostramos la modal
 
           me.tipoAccionModal = 2; //para actualizar colocamos 2 en esta variable de vuejs
           //aplica para si no es responsiva la tabla
           //var data= tablaEmpleados.row($(this).parents('tr')).data();//optenemos los datos de esa fila seleccionada variable data
           //para si es responsivo obtenemos la data
 
-          var current_row = $(this).parents('tr'); //Get the current row
+          var current_row = $(this).parents("tr"); //Get the current row
 
-          if (current_row.hasClass('child')) {
+          if (current_row.hasClass("child")) {
             //Check if the current row is a child row
             current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
           }
@@ -3112,13 +3263,13 @@ __webpack_require__.r(__webpack_exports__);
           me.estado_usuario = data["estado_usuario"];
         }); //para desactivar el empleado
 
-        tablaEmpleados.on('click', '.desactivar', function () {
+        tablaEmpleados.on("click", ".desactivar", function () {
           jQuery.noConflict(); // para evitar errores
           //para si es responsivo obtenemos la data
 
-          var current_row = jQuery(this).parents('tr'); //Get the current row
+          var current_row = jQuery(this).parents("tr"); //Get the current row
 
-          if (current_row.hasClass('child')) {
+          if (current_row.hasClass("child")) {
             //Check if the current row is a child row
             current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
           }
@@ -3128,35 +3279,35 @@ __webpack_require__.r(__webpack_exports__);
           me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
 
           Swal.fire({
-            title: '¿Desactivar el empleado?',
-            type: 'warning',
+            title: "¿Desactivar el empleado?",
+            type: "warning",
             showCancelButton: true,
-            confirmButtonColor: 'green',
-            cancelButtonColor: 'red',
+            confirmButtonColor: "green",
+            cancelButtonColor: "red",
             confirmButtonText: '<i class="fas fa-check"></i> Si',
             cancelButtonText: '<i class="fas fa-times"></i> No'
           }).then(function (result) {
             if (result.value) {
               // /cancelarReservacion
-              axios.put('/updateEstadoEmple', {
+              axios.put("/updateEstadoEmple", {
                 id: me.id,
                 estado_usuario: 2
               }).then(function (response) {
                 Swal.fire({
-                  position: 'top-end',
-                  type: 'success',
-                  title: 'Empleado Desactivado!',
+                  position: "top-end",
+                  type: "success",
+                  title: "Empleado Desactivado!",
                   showConfirmButton: false,
                   timer: 1500
                 });
-                jQuery('#tablaEmpleados').DataTable().ajax.reload(null, false);
+                jQuery("#tablaEmpleados").DataTable().ajax.reload(null, false);
               })["catch"](function (error) {
                 if (error.response.status == 422) {
                   //preguntamos si el error es 422
                   Swal.fire({
-                    position: 'top-end',
-                    type: 'error',
-                    title: 'Se produjo un Error, Reintentar',
+                    position: "top-end",
+                    type: "error",
+                    title: "Se produjo un Error, Reintentar",
                     showConfirmButton: false,
                     timer: 1500
                   });
@@ -3168,13 +3319,13 @@ __webpack_require__.r(__webpack_exports__);
           });
         }); //para Activar el empleado
 
-        tablaEmpleados.on('click', '.activar', function () {
+        tablaEmpleados.on("click", ".activar", function () {
           jQuery.noConflict(); // para evitar errores
           //para si es responsivo obtenemos la data
 
-          var current_row = jQuery(this).parents('tr'); //Get the current row
+          var current_row = jQuery(this).parents("tr"); //Get the current row
 
-          if (current_row.hasClass('child')) {
+          if (current_row.hasClass("child")) {
             //Check if the current row is a child row
             current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
           }
@@ -3184,35 +3335,35 @@ __webpack_require__.r(__webpack_exports__);
           me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
 
           Swal.fire({
-            title: 'Activar el empleado?',
-            type: 'warning',
+            title: "Activar el empleado?",
+            type: "warning",
             showCancelButton: true,
-            confirmButtonColor: 'green',
-            cancelButtonColor: 'red',
+            confirmButtonColor: "green",
+            cancelButtonColor: "red",
             confirmButtonText: '<i class="fas fa-check"></i> Si',
             cancelButtonText: '<i class="fas fa-times"></i> No'
           }).then(function (result) {
             if (result.value) {
               // /cancelarReservacion
-              axios.put('/updateEstadoEmple', {
+              axios.put("/updateEstadoEmple", {
                 id: me.id,
                 estado_usuario: 1
               }).then(function (response) {
                 Swal.fire({
-                  position: 'top-end',
-                  type: 'success',
-                  title: 'Empleado Activado!',
+                  position: "top-end",
+                  type: "success",
+                  title: "Empleado Activado!",
                   showConfirmButton: false,
                   timer: 1500
                 });
-                jQuery('#tablaEmpleados').DataTable().ajax.reload(null, false);
+                jQuery("#tablaEmpleados").DataTable().ajax.reload(null, false);
               })["catch"](function (error) {
                 if (error.response.status == 422) {
                   //preguntamos si el error es 422
                   Swal.fire({
-                    position: 'top-end',
-                    type: 'error',
-                    title: 'Se produjo un Error, Reintentar',
+                    position: "top-end",
+                    type: "error",
+                    title: "Se produjo un Error, Reintentar",
                     showConfirmButton: false,
                     timer: 1500
                   });
@@ -3228,19 +3379,21 @@ __webpack_require__.r(__webpack_exports__);
     crearCaja: function crearCaja() {
       //creamos variable q corresponde a this de mis variables de data()
       var data = this;
-      axios.post('/crearCaja', {
-        'empleado_id': data.idEmpleadoElegido,
-        'nombre_caja': data.nombre_caja,
-        'valor_inicial': data.valor_inicial,
-        'valor_producido': data.valor_producido
+      axios.post("/crearCaja", {
+        empleado_id: data.idEmpleadoElegido,
+        nombre_caja: data.nombre_caja,
+        valor_inicial: data.valor_inicial,
+        valor_producido: data.valor_producido,
+        estado_caja: data.estado_caja
       }).then(function (response) {
         //para actualizar la tabla de datatables
-        jQuery('#tablaEmpleados').DataTable().ajax.reload();
+        jQuery("#tablaEmpleados").DataTable().ajax.reload();
         data.cerrarModal();
+        data.infoCajaDiv();
         Swal.fire({
-          position: 'top-end',
-          type: 'success',
-          title: 'Empleado creado con éxito',
+          position: "top-end",
+          type: "success",
+          title: "Empleado creado con éxito",
           showConfirmButton: false,
           timer: 1500
         }); //console.log(response);
@@ -3250,7 +3403,6 @@ __webpack_require__.r(__webpack_exports__);
           data.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
         }
 
-        ;
         console.log(error);
         console.log(data.arrayErrors);
       });
@@ -3260,28 +3412,28 @@ __webpack_require__.r(__webpack_exports__);
       var me = this; //reseteamos los errores
 
       this.arrayErrors = [];
-      axios.put('/actualizarEmpleado', {
+      axios.put("/actualizarEmpleado", {
         //enviamos los tados que hay en nuestros parametros
-        'id': this.id,
-        'roles_roles_id': this.rol_user,
-        'empresas_empresas_id': this.empresas_empresas_id,
-        'nombre_usuario': this.nombre_usuario,
-        'apellido_usuario': this.apellido_usuario,
-        'usuario': this.usuario,
-        'email': this.email,
-        'password': this.password,
-        'celular': this.celular,
-        'fecha_cumple': moment__WEBPACK_IMPORTED_MODULE_0___default()(this.fecha_cumple).format('YYYY-MM-DD'),
-        'imagen': this.imagen,
-        'estado_usuario': this.estado_usuario
+        id: this.id,
+        roles_roles_id: this.rol_user,
+        empresas_empresas_id: this.empresas_empresas_id,
+        nombre_usuario: this.nombre_usuario,
+        apellido_usuario: this.apellido_usuario,
+        usuario: this.usuario,
+        email: this.email,
+        password: this.password,
+        celular: this.celular,
+        fecha_cumple: moment__WEBPACK_IMPORTED_MODULE_0___default()(this.fecha_cumple).format("YYYY-MM-DD"),
+        imagen: this.imagen,
+        estado_usuario: this.estado_usuario
       }).then(function (response) {
         //para actualizar la tabla de datatables
-        jQuery('#tablaEmpleados').DataTable().ajax.reload(null, false);
+        jQuery("#tablaEmpleados").DataTable().ajax.reload(null, false);
         me.cerrarModal();
         Swal.fire({
-          position: 'top-end',
-          type: 'success',
-          title: 'Empleado actualizado',
+          position: "top-end",
+          type: "success",
+          title: "Empleado actualizado",
           showConfirmButton: false,
           timer: 1500
         });
@@ -3292,7 +3444,6 @@ __webpack_require__.r(__webpack_exports__);
           me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
         }
 
-        ;
         console.log(error); //console.log(me.arrayErrors);
       });
     },
@@ -3305,21 +3456,21 @@ __webpack_require__.r(__webpack_exports__);
                 {
                   jQuery.noConflict(); // para evitar errores al mostrar la modal
 
-                  $('#modalEmpleado').modal('show');
+                  $("#modalEmpleado").modal("show");
                   this.tipoAccionModal = 1; //para registrar
                   //reseteamos variables
 
                   this.roles_roles_id = 2;
                   this.empresas_empresas_id = 1;
-                  this.nombre_usuario = '';
-                  this.apellido_usuario = '';
-                  this.usuario = '';
-                  this.email = '';
-                  this.password = '';
-                  this.password2 = '';
-                  this.celular = '';
-                  this.fecha_cumple = '';
-                  this.imagen = '';
+                  this.nombre_usuario = "";
+                  this.apellido_usuario = "";
+                  this.usuario = "";
+                  this.email = "";
+                  this.password = "";
+                  this.password2 = "";
+                  this.celular = "";
+                  this.fecha_cumple = "";
+                  this.imagen = "";
                   this.estado_usuario = 1;
                   this.arrayErrors = [];
                   break;
@@ -3333,14 +3484,15 @@ __webpack_require__.r(__webpack_exports__);
         type: "click"
       }); //para cerrar la modal con boostrap 3
 
-      jQuery('#tablaEmpleados').DataTable().ajax.reload(); //toca con jQuery para recargar la tabla si no genera conflicto
+      jQuery("#tablaEmpleados").DataTable().ajax.reload(); //toca con jQuery para recargar la tabla si no genera conflicto
 
       this.arrayErrors = [];
-      this.nombre_caja = '', this.valor_inicial = '0', this.idEmpleadoElegido = '', this.valor_producido = '0', this.arrayErrors = [];
+      this.nombre_caja = "", this.valor_inicial = "", this.idEmpleadoElegido = "", this.valor_producido = "", this.estado_caja = "", this.arrayErrors = [];
     }
   },
   mounted: function mounted() {
     this.listarEmpleados();
+    this.infoCajaDiv();
     this.EmpleadoListaCrear();
   }
 });
@@ -4313,38 +4465,605 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
-    return {};
+    return {
+      mostrarDiv: 1,
+      id_reserva: "",
+      informacionFacturar: [],
+      fecha_actual: "",
+      nombre_cliente: "",
+      nombre_anonimo: "",
+      nombre_facturador: "",
+      nombre_empresa: "",
+      lista_empleados: [],
+      subtotal: "",
+      descuento: 0,
+      valorNeto: "",
+      valorRecibido: 0,
+      valorCambio: ""
+    };
   },
   watch: {},
+  computed: {
+    //calcular el subtotal de la factura
+    calcularSubtotal: function calcularSubtotal() {
+      var resultado = 0.0;
+
+      for (var i = 0; i < this.informacionFacturar.length; i++) {
+        resultado = resultado + this.informacionFacturar[i].valor_servicio * this.informacionFacturar[i].cantidad;
+      }
+
+      return resultado;
+    },
+
+    /* calcular el totalNeto */
+    calcularNeto: function calcularNeto() {
+      var resultado = 0.0;
+
+      for (var i = 0; i < this.informacionFacturar.length; i++) {
+        resultado = resultado + this.informacionFacturar[i].valor_servicio * this.informacionFacturar[i].cantidad;
+      }
+
+      return resultado - this.descuento;
+    }
+  },
   methods: {
+    //mostrar todos los empleados con Rol Empleado Activos
+    listaEmpleados: function listaEmpleados() {
+      var me = this; // Make a request for a user with a given ID
+
+      axios.get("/showEmpleado").then(function (response) {
+        me.lista_empleados = response.data; //console.log(me.lista_empleados);
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      })["finally"](function () {// always executed
+      });
+    },
+    //obtener la informacion de la empresa
+    infoEmpresa: function infoEmpresa() {
+      var me = this; // Make a request for a user with a given ID
+
+      axios.get("/mostrar").then(function (response) {
+        me.nombre_empresa = response.data[0].nombre_empresa;
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      })["finally"](function () {// always executed
+      });
+    },
+    //obtener la informacion del empleado logueado actualmente
+    infoFacturador: function infoFacturador() {
+      var me = this; // Make a request for a user with a given ID
+
+      axios.get("/showPerfil").then(function (response) {
+        me.nombre_facturador = response.data[0].nombre_usuario + " " + response.data[0].apellido_usuario;
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      })["finally"](function () {// always executed
+      });
+    },
     //aqui tenemos el script para datatables para los que se facturaran
     listarFacturacion: function listarFacturacion() {
       var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
 
       jQuery(document).ready(function () {
-        var tablaFacturacion = jQuery('#tablaFacturacion').DataTable({
-          "language": {
-            "url": "/jsonDTIdioma.json"
+        var tablaFacturacion = jQuery("#tablaFacturacion").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
           },
-          "processing": true,
-          "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
-          "responsive": true,
-          "order": [],
+          processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [],
           //no colocar ordenamiento
-          "serverSide": true,
+          serverSide: true,
           //Lado servidor activar o no mas de 20000 registros
-          "ajax": "/listarFacturacion",
-          "columns": [{
-            data: 'nombre_usuario'
+          ajax: "/listarFacturacion",
+          columns: [{
+            render: function render(data, type, row) {
+              if (row.nombre_cliente != null) {
+                return row.nombre_cliente;
+              } else {
+                return row.nombre_anonimo;
+              }
+            }
+          }, {
+            render: function render(data, type, row) {
+              if (row.nombre_servicio != null) {
+                return row.nombre_servicio;
+              } else {
+                return '<span class="label label-warning">Agregar</span>';
+              }
+            }
+          }, {
+            data: "valor_total",
+            render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+          }, {
+            render: function render(data, type, row) {
+              return "<button type=\"button\" class=\"btn btn-success facturar\" title=\"Facturar Servicio\">\n                            <i class=\"fas fa-donate\"></i> Facturar\n                        </button>";
+            }
           }]
+        }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
+
+        tablaFacturacion.on("click", ".facturar", function () {
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+
+          var datos = tablaFacturacion.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+
+          me.id_reserva = datos["id_reserva"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
+          //creamos axios que nos trae la informacion para facturar por id
+
+          axios.get("/mostrarInfoFacturar", {
+            params: {
+              id_reserva: me.id_reserva
+            }
+          }).then(function (response) {
+            //si todo sale ok capturamos la data de la respuesta de la consulta
+            me.informacionFacturar = response.data; //aqui mandamos los datos del array a varibles especificas
+
+            me.fecha_actual = response.data[0].fecha_actual;
+            me.nombre_cliente = response.data[0].nombre_cliente;
+            me.nombre_anonimo = response.data[0].nombre_anonimo; //console.log(response);
+            //console.log(me.informacionFacturar);
+            //para mostrar el div despues de dar en el boton y consultar
+
+            me.mostrarDiv = 2; //para borrar el registro del array cuando es anonimo
+
+            if (me.informacionFacturar[0].id_solicitud === null) {
+              me.eliminarDetalleAnonimo(0); //console.log("borrado");
+            }
+          })["catch"](function (error) {
+            // handle error
+            console.log(error);
+          })["finally"](function () {// always executed
+          });
         });
       });
+    },
+    //aqui likstamos los servicios en una tabla
+    listarServicios: function listarServicios() {
+      var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+
+      jQuery(document).ready(function () {
+        var tablaServicios = jQuery("#tablaServicios").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [],
+          //no colocar ordenamiento
+          serverSide: true,
+          //Lado servidor activar o no mas de 20000 registros
+          ajax: "/serviciosFaturables",
+          columns: [{
+            data: "nombre_servicio"
+          }, {
+            data: "valor_servicio",
+            render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+          }, {
+            render: function render(data, type, row) {
+              return "<button type=\"button\" class=\"btn btn-success agregar btn-sm\" title=\"Agregar\">\n                          <i class=\"fas fa-plus-circle\"></i> Agregar\n                        </button>";
+            }
+          }]
+        }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
+
+        tablaServicios.on("click", ".agregar", function () {
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+
+          var datos = tablaServicios.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+          //let id_servicio = datos["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
+
+          me.informacionFacturar.push({
+            //llenamos el array con push
+            cantidad: "1",
+            fecha_actual: me.fecha_actual,
+            id_atendido_por: me.lista_empleados[0].id,
+            id_reserva: me.id_reserva,
+            id_servicio: datos.id,
+            id_solicitud: "",
+            nombre_anonimo: me.nombre_anonimo,
+            nombre_cliente: me.nombre_cliente,
+            nombre_servicio: datos.nombre_servicio,
+            valor_servicio: datos.valor_servicio
+          });
+          Swal.fire({
+            position: "top-end",
+            title: "Agregado con éxito!",
+            type: "success",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
+      });
+    },
+    regresar: function regresar() {
+      var me = this;
+      me.mostrarDiv = 1;
+      me.listarFacturacion();
+    },
+    formatearValor: function formatearValor(value) {
+      var val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    eliminarDetalle: function eliminarDetalle(index) {
+      var me = this;
+      me.informacionFacturar.splice(index, 1); //se usa el metodo splice para borrar el index
+
+      /*Swal.fire({
+        position: "top-end",
+        title: "Eliminado con éxito!",
+        type: "success",
+        showConfirmButton: false,
+        timer: 1500
+      });*/
+    },
+    eliminarDetalleAnonimo: function eliminarDetalleAnonimo(index) {
+      var me = this;
+      me.informacionFacturar.splice(index, 1); //se usa el metodo splice para borrar el index
+    },
+    agregarDetalles: function agregarDetalles() {
+      var me = this;
+      jQuery.noConflict();
+      $("#modalServicios").modal("show");
+    },
+    //abrimos la modal de pagos
+    abrirPagos: function abrirPagos() {
+      var me = this;
+      jQuery.noConflict();
+      $("#modalPagos").modal("show");
+    },
+    cerrarModalPago: function cerrarModalPago() {
+      $("[data-dismiss=modal]").trigger({
+        type: "click"
+      });
+      this.limpiarPago();
+    },
+    limpiarPago: function limpiarPago() {
+      var me = this;
+      me.descuento = 0;
+      me.valorRecibido = 0;
     }
   },
   mounted: function mounted() {
     this.listarFacturacion();
+    this.infoFacturador();
+    this.infoEmpresa();
+    this.listaEmpleados();
+    this.listarServicios();
   }
 });
 
@@ -4457,6 +5176,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
 //
 //
 //
@@ -5356,7 +6078,8 @@ __webpack_require__.r(__webpack_exports__);
               }
             }
           }, {
-            data: 'valor_servicio'
+            data: 'valor_servicio',
+            render: $.fn.dataTable.render.number('.', ',', 2, '$ ')
           }, {
             render: function render(data, type, row) {
               if (row.url_video == '') {
@@ -6094,13 +6817,41 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       cantidad: 0,
-      email: '',
-      imagen: '',
-      nombres: '',
+      email: "",
+      imagen: "",
+      nombres: "",
       estado_usuario: 1
     };
   },
@@ -6108,7 +6859,7 @@ __webpack_require__.r(__webpack_exports__);
     //metodo para saber la cantidad de solicitudes nuevas
     cantidadSolicitudes: function cantidadSolicitudes() {
       var me = this;
-      axios.get('/contarSolicitudes').then(function (response) {
+      axios.get("/contarSolicitudes").then(function (response) {
         //guardo en mi variable el valor y ya
         me.cantidad = response.data.cantidad; //console.log(response.data.cantidad);
       })["catch"](function (error) {
@@ -6119,8 +6870,8 @@ __webpack_require__.r(__webpack_exports__);
     verPerfil: function verPerfil() {
       //creamos variable q corresponde a this de mis variables de data()
       var me = this;
-      axios.get('/showPerfil').then(function (response) {
-        me.imagen = '/img/perfiles/' + response.data[0].imagen;
+      axios.get("/showPerfil").then(function (response) {
+        me.imagen = "/img/perfiles/" + response.data[0].imagen;
         me.email = response.data[0].email;
         me.nombres = response.data[0].nombre_usuario;
         me.estado_usuario = response.data[0].estado_usuario;
@@ -38663,7 +39414,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -38750,7 +39501,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -38835,7 +39586,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -38922,7 +39673,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -39151,7 +39902,7 @@ var staticRenderFns = [
                 ])
               ]),
               _vm._v(" "),
-              _c("tbody")
+              _c("tbody", { staticStyle: { "font-weight": "normal" } })
             ]
           )
         ])
@@ -39235,7 +39986,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -39318,7 +40069,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -39353,30 +40104,63 @@ var render = function() {
     _vm._v(" "),
     _c("section", { staticClass: "content" }, [
       _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-md-4" }, [
-          _c("div", { staticClass: "small-box bg-green" }, [
-            _vm._m(1),
-            _vm._v(" "),
-            _vm._m(2),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "small-box-footer",
-                attrs: { href: "admin#/cajaRegistradora" },
-                on: {
-                  click: function($event) {
-                    return _vm.abrirModal("empleado", "crear")
-                  }
-                }
-              },
-              [
-                _vm._v("Acciones\n                        "),
-                _c("i", { staticClass: "fas fa-wrench" })
-              ]
-            )
-          ])
-        ]),
+        _vm.dataCajaDiv.length > 0
+          ? _c("div", { staticClass: "col-md-4" }, [
+              _c("div", { staticClass: "small-box bg-green" }, [
+                _c("div", { staticClass: "inner" }, [
+                  _c("h4", {
+                    staticClass: "text-center",
+                    domProps: {
+                      textContent: _vm._s(_vm.dataCajaDiv[0].nombre_caja)
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-3" }, [
+                      _c("h4", [_vm._v("Valor Inicial")]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: {
+                          textContent: _vm._s(_vm.dataCajaDiv[0].valor_inicial)
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-4" }, [
+                      _c("h4", [_vm._v("Valor Producido")]),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: {
+                          textContent: _vm._s(
+                            _vm.dataCajaDiv[0].valor_producido
+                          )
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(1),
+                _vm._v(" "),
+                _c(
+                  "a",
+                  {
+                    staticClass: "small-box-footer",
+                    attrs: { href: "admin#/cajaRegistradora" },
+                    on: {
+                      click: function($event) {
+                        return _vm.abrirModal("empleado", "crear")
+                      }
+                    }
+                  },
+                  [
+                    _vm._v("\n            Acciones\n            "),
+                    _c("i", { staticClass: "fas fa-wrench" })
+                  ]
+                )
+              ])
+            ])
+          : _vm._e(),
         _vm._v(" "),
         _c("div", { staticClass: "col-md-8" }, [
           _c("div", [
@@ -39393,14 +40177,14 @@ var render = function() {
               },
               [
                 _c("i", { staticClass: "fas fa-plus-circle" }),
-                _vm._v(" Nueva Caja\n                    ")
+                _vm._v(" Nueva Caja\n          ")
               ]
             )
           ]),
           _vm._v(" "),
           _c("br"),
           _vm._v(" "),
-          _vm._m(3)
+          _vm._m(2)
         ])
       ])
     ]),
@@ -39413,19 +40197,19 @@ var render = function() {
           _c("div", { staticClass: "modal-content" }, [
             _c("form", { staticClass: "form-horizontal" }, [
               _c("div", { staticClass: "modal-header" }, [
-                _vm._m(4),
+                _vm._m(3),
                 _vm._v(" "),
                 _vm.tipoAccionModal == 1
                   ? _c("h4", { staticClass: "modal-title" }, [
                       _c("i", { staticClass: "fas fa-plus-circle" }),
-                      _vm._v(" Crear Caja")
+                      _vm._v(" Crear Caja\n            ")
                     ])
                   : _vm._e(),
                 _vm._v(" "),
                 _vm.tipoAccionModal == 2
                   ? _c("h4", { staticClass: "modal-title" }, [
                       _c("i", { staticClass: "fas fa-edit" }),
-                      _vm._v(" Actualizar Caja")
+                      _vm._v(" Actualizar Caja\n            ")
                     ])
                   : _vm._e()
               ]),
@@ -39456,7 +40240,7 @@ var render = function() {
                         attrs: {
                           type: "text",
                           id: "nombre_usuario",
-                          placeholder: "Nombre  Caja"
+                          placeholder: "Nombre Caja"
                         },
                         domProps: { value: _vm.nombre_caja },
                         on: {
@@ -39506,7 +40290,7 @@ var render = function() {
                         attrs: {
                           type: "number",
                           id: "valor_inicial",
-                          placeholder: "Apellidos"
+                          placeholder: "Valor Inicial"
                         },
                         domProps: { value: _vm.valor_inicial },
                         on: {
@@ -39556,7 +40340,7 @@ var render = function() {
                         attrs: {
                           type: "number",
                           id: "valor_producido",
-                          placeholder: "E-mail"
+                          placeholder: "Valor Producido"
                         },
                         domProps: { value: _vm.valor_producido },
                         on: {
@@ -39583,7 +40367,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
-                    _vm._m(5),
+                    _vm._m(4),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-sm-6" }, [
                       _c(
@@ -39627,13 +40411,7 @@ var render = function() {
                                 key: empleado.id,
                                 domProps: { value: empleado.id }
                               },
-                              [
-                                _vm._v(
-                                  "\n                                            " +
-                                    _vm._s(empleado.nombre) +
-                                    "\n                                        "
-                                )
-                              ]
+                              [_vm._v(_vm._s(empleado.nombre))]
                             )
                           })
                         ],
@@ -39671,8 +40449,8 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.estado_usuario,
-                              expression: "estado_usuario"
+                              value: _vm.estado_caja,
+                              expression: "estado_caja"
                             }
                           ],
                           staticClass: "form-control",
@@ -39686,7 +40464,7 @@ var render = function() {
                                   var val = "_value" in o ? o._value : o.value
                                   return val
                                 })
-                              _vm.estado_usuario = $event.target.multiple
+                              _vm.estado_caja = $event.target.multiple
                                 ? $$selectedVal
                                 : $$selectedVal[0]
                             }
@@ -39707,12 +40485,12 @@ var render = function() {
                         ]
                       ),
                       _vm._v(" "),
-                      _vm.arrayErrors.estado_usuario
+                      _vm.arrayErrors.estado_caja
                         ? _c("p", {
                             staticClass: "text-red",
                             domProps: {
                               textContent: _vm._s(
-                                _vm.arrayErrors.estado_usuario[0]
+                                _vm.arrayErrors.estado_caja[0]
                               )
                             }
                           })
@@ -39736,7 +40514,7 @@ var render = function() {
                   },
                   [
                     _c("i", { staticClass: "fas fa-times" }),
-                    _vm._v(" Cancelar")
+                    _vm._v(" Cancelar\n            ")
                   ]
                 ),
                 _vm._v(" "),
@@ -39754,7 +40532,7 @@ var render = function() {
                       },
                       [
                         _c("i", { staticClass: "fas fa-check" }),
-                        _vm._v(" Guardar")
+                        _vm._v(" Guardar\n            ")
                       ]
                     )
                   : _vm._e(),
@@ -39773,7 +40551,7 @@ var render = function() {
                       },
                       [
                         _c("i", { staticClass: "fas fa-edit" }),
-                        _vm._v(" Actualizar")
+                        _vm._v(" Actualizar\n            ")
                       ]
                     )
                   : _vm._e()
@@ -39793,7 +40571,7 @@ var staticRenderFns = [
     return _c("section", { staticClass: "content-header" }, [
       _c("h1", [
         _c("i", { staticClass: "fas fa-cash-register" }),
-        _vm._v(" Cajas Registradoras "),
+        _vm._v(" Cajas Registradoras\n      "),
         _c("small", [_vm._v("Cajas")])
       ]),
       _vm._v(" "),
@@ -39801,35 +40579,13 @@ var staticRenderFns = [
         _c("li", [
           _c("a", { attrs: { href: "/admin" } }, [
             _c("i", { staticClass: "fas fa-tachometer-alt" }),
-            _vm._v(" Inicio")
+            _vm._v(" Inicio\n        ")
           ])
         ]),
         _vm._v(" "),
         _c("li", { staticClass: "active" }, [
           _c("i", { staticClass: "fas fa-cash-register" }),
-          _vm._v(" Cajas Registradoras")
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "inner" }, [
-      _c("h4", { staticClass: "text-center" }, [_vm._v("CAJA PRINCIPAL")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-md-3" }, [
-          _c("h4", [_vm._v("Valor Inicial")]),
-          _vm._v(" "),
-          _c("p", [_vm._v("200.000")])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-md-4" }, [
-          _c("h4", [_vm._v("Valor Producido")]),
-          _vm._v(" "),
-          _c("p", [_vm._v("500")])
+          _vm._v(" Cajas Registradoras\n      ")
         ])
       ])
     ])
@@ -39864,13 +40620,13 @@ var staticRenderFns = [
                 _vm._v(" "),
                 _c("th", [_vm._v("Nombre Caja")]),
                 _vm._v(" "),
-                _c("th", [_vm._v("Valor Inicialr")]),
+                _c("th", [_vm._v("Valor Inicial")]),
                 _vm._v(" "),
                 _c("th", [_vm._v("Valor Producido")])
               ])
             ]),
             _vm._v(" "),
-            _c("tbody")
+            _c("tbody", { staticStyle: { "font-weight": "normal" } })
           ]
         )
       ])
@@ -39903,7 +40659,10 @@ var staticRenderFns = [
         staticClass: "col-sm-4 control-label hidden-xs",
         attrs: { for: "empleado" }
       },
-      [_c("i", { staticClass: "fas fa-user-tie" }), _vm._v(" Asignar A:")]
+      [
+        _c("i", { staticClass: "fas fa-user-tie" }),
+        _vm._v(" Asignar A:\n                ")
+      ]
     )
   }
 ]
@@ -40516,7 +41275,7 @@ var staticRenderFns = [
               ])
             ]),
             _vm._v(" "),
-            _c("tbody")
+            _c("tbody", { staticStyle: { "font-weight": "normal" } })
           ]
         )
       ])
@@ -41225,7 +41984,7 @@ var staticRenderFns = [
               ])
             ]),
             _vm._v(" "),
-            _c("tbody")
+            _c("tbody", { staticStyle: { "font-weight": "normal" } })
           ]
         )
       ])
@@ -41361,83 +42120,961 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "content-wrapper" }, [
-      _c("section", { staticClass: "content-header" }, [
-        _c("h1", [
-          _c("i", { staticClass: "fas fa-file-invoice-dollar" }),
-          _vm._v(" Facturar Atención "),
-          _c("small", [_vm._v("Facturación")])
-        ]),
-        _vm._v(" "),
-        _c("ol", { staticClass: "breadcrumb" }, [
-          _c("li", [
-            _c("a", { attrs: { href: "/admin" } }, [
-              _c("i", { staticClass: "fas fa-tachometer-alt" }),
-              _vm._v(" Inicio")
-            ])
-          ]),
+  return _c("div", { staticClass: "content-wrapper" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _vm.mostrarDiv == 1
+      ? _c("section", { staticClass: "content" }, [
+          _vm._m(1),
           _vm._v(" "),
-          _c("li", { staticClass: "active" }, [
-            _c("i", { staticClass: "fas fa-file-invoice-dollar" }),
-            _vm._v(" Facturar Atención")
-          ])
+          _c("br"),
+          _vm._v(" "),
+          _vm._m(2)
         ])
-      ]),
-      _vm._v(" "),
-      _c("section", { staticClass: "content" }, [
-        _c("div", [
-          _c(
-            "button",
-            { staticClass: "btn btn-primary", attrs: { type: "button" } },
-            [
-              _c("i", { staticClass: "fas fa-plus-circle" }),
-              _vm._v(" Nueva Factura\n            ")
-            ]
-          )
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("div", { staticClass: "box box-primary" }, [
-          _c("div", { staticClass: "box-header" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "table-responsive container-fluid" }, [
+      : _vm.mostrarDiv == 2
+      ? _c("section", { staticClass: "content" }, [
+          _c("div", [
             _c(
-              "table",
+              "button",
               {
-                staticClass: "table table-bordered table-hover",
-                staticStyle: { width: "100%" },
-                attrs: { id: "tablaFacturacion" }
+                staticClass: "btn btn-success",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.regresar()
+                  }
+                }
               },
               [
-                _c("thead", [
-                  _c("tr", [
-                    _c("th", [_vm._v("Cliente")]),
+                _c("i", { staticClass: "fas fa-reply" }),
+                _vm._v(" Regresar\n      ")
+              ]
+            )
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("div", { staticClass: "box box-primary" }, [
+            _c(
+              "div",
+              { staticClass: "box-header with-border bg-aqua-active" },
+              [
+                _vm._m(3),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-4 col-sm-4" }, [
+                  _c("span", [
+                    _c("strong", [_vm._v("Nombre Cliente:")]),
                     _vm._v(" "),
-                    _c("th", [_vm._v("Fecha Atención")]),
+                    _vm.nombre_cliente != ""
+                      ? _c("span", {
+                          domProps: { textContent: _vm._s(_vm.nombre_cliente) }
+                        })
+                      : _vm._e(),
                     _vm._v(" "),
-                    _c("th", [_vm._v("Servicios")]),
-                    _vm._v(" "),
-                    _c("th", [_vm._v("Valor Total")]),
-                    _vm._v(" "),
-                    _c("th", [_vm._v("Acciones")])
+                    _c("span", {
+                      attrs: { else: "" },
+                      domProps: { textContent: _vm._s(_vm.nombre_anonimo) }
+                    })
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("div", { staticClass: "col-md-4 col-sm-4 text-center" }, [
+                  _c("span", [
+                    _c("strong", [_vm._v("Nombre Empresa:")]),
+                    _vm._v(
+                      "\n            " +
+                        _vm._s(_vm.nombre_empresa) +
+                        "\n          "
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-4 col-sm-4 text-right" }, [
+                  _c("span", [
+                    _c("strong", [_vm._v("Fecha Factura:")]),
+                    _vm._v(
+                      "\n            " +
+                        _vm._s(_vm.fecha_actual) +
+                        "\n          "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c("span", [
+                    _c("strong", [_vm._v("Facturado Por:")]),
+                    _vm._v(
+                      "\n            " +
+                        _vm._s(_vm.nombre_facturador) +
+                        "\n          "
+                    )
+                  ])
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "box-body table-responsive" }, [
+              _c("div", { staticClass: "col-md-6" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-default",
+                    staticStyle: { "margin-bottom": "5px" },
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.nota()
+                      }
+                    }
+                  },
+                  [
+                    _c("i", { staticClass: "fas fa-pencil-alt" }),
+                    _vm._v(" Nota\n          ")
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-6 text-right" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-success",
+                    staticStyle: { "margin-bottom": "5px" },
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.agregarDetalles()
+                      }
+                    }
+                  },
+                  [
+                    _c("i", { staticClass: "fas fa-plus-circle" }),
+                    _vm._v(" Añadir Servicio\n          ")
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("table", { staticClass: "table table-bordered table-hover" }, [
+                _vm._m(4),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  { staticStyle: { "font-weight": "normal" } },
+                  [
+                    _vm.informacionFacturar.length == 0
+                      ? _c("tr", [_vm._m(5)])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm._l(_vm.informacionFacturar, function(detalle, index) {
+                      return _c("tr", { key: detalle.id }, [
+                        _c("td", [
+                          _c("span", [
+                            _vm._v(
+                              _vm._s(detalle.nombre_servicio) +
+                                " ($ " +
+                                _vm._s(
+                                  _vm.formatearValor(detalle.valor_servicio)
+                                ) +
+                                ")"
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: detalle.id_atendido_por,
+                                  expression: "detalle.id_atendido_por"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: { id: "empleado" },
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    detalle,
+                                    "id_atendido_por",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                }
+                              }
+                            },
+                            _vm._l(_vm.lista_empleados, function(empleado) {
+                              return _c(
+                                "option",
+                                {
+                                  key: empleado.id,
+                                  domProps: { value: empleado.id }
+                                },
+                                [_vm._v(_vm._s(empleado.nombre))]
+                              )
+                            }),
+                            0
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: detalle.cantidad,
+                                expression: "detalle.cantidad"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "number", "max:3": "" },
+                            domProps: { value: detalle.cantidad },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  detalle,
+                                  "cantidad",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c("span", [
+                            _vm._v(
+                              "$ " +
+                                _vm._s(
+                                  _vm.formatearValor(
+                                    detalle.cantidad * detalle.valor_servicio
+                                  )
+                                )
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-danger",
+                              attrs: { type: "button", title: "Quitar" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.eliminarDetalle(index)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "fas fa-close" })]
+                          )
+                        ])
+                      ])
+                    }),
+                    _vm._v(" "),
+                    _vm.informacionFacturar.length > 0
+                      ? _c("tr", [
+                          _vm._m(6),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              "$ " +
+                                _vm._s(
+                                  _vm.formatearValor(
+                                    (_vm.subtotal = _vm.calcularSubtotal)
+                                  )
+                                )
+                            )
+                          ])
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.informacionFacturar.length > 0
+                      ? _c("tr", [
+                          _vm._m(7),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.descuento,
+                                  expression: "descuento"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: { type: "number" },
+                              domProps: { value: _vm.descuento },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.descuento = $event.target.value
+                                }
+                              }
+                            })
+                          ])
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.informacionFacturar.length > 0
+                      ? _c("tr", [
+                          _vm._m(8),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              "$ " +
+                                _vm._s(
+                                  _vm.formatearValor(
+                                    (_vm.valorNeto = _vm.calcularNeto)
+                                  )
+                                )
+                            )
+                          ])
+                        ])
+                      : _vm._e()
+                  ],
+                  2
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "box-footer clearfix" }, [
+              _c("div", { staticClass: "text-left" }, [
+                _vm.informacionFacturar.length > 0
+                  ? _c("div", [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-success",
+                          staticStyle: { "margin-bottom": "5px" },
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.abrirPagos()
+                            }
+                          }
+                        },
+                        [
+                          _c("i", { staticClass: "fas fa-money" }),
+                          _vm._v(" Pago\n            ")
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          staticStyle: { "margin-bottom": "5px" },
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.regresar()
+                            }
+                          }
+                        },
+                        [
+                          _c("i", { staticClass: "fas fa-close" }),
+                          _vm._v(" Cancelar\n            ")
+                        ]
+                      )
+                    ])
+                  : _c("div")
+              ])
+            ])
+          ])
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm._m(9),
+    _vm._v(" "),
+    _c("section", [
+      _c("div", { staticClass: "modal fade in", attrs: { id: "modalPagos" } }, [
+        _c("div", { staticClass: "modal-dialog modal-lg" }, [
+          _c("div", { staticClass: "modal-content" }, [
+            _c(
+              "form",
+              {
+                staticClass: "form-horizontal",
+                attrs: { "content-type": "multipart/form-data" }
+              },
+              [
+                _vm._m(10),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c("div", { staticClass: "box-body" }, [
+                    _c("div", {}, [
+                      _vm._m(11),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "tab-content row" }, [
+                        _c(
+                          "div",
+                          {
+                            staticClass: "tab-pane fade in active",
+                            attrs: { id: "pagoEfectivo" }
+                          },
+                          [
+                            _c("div", { staticClass: "box-body" }, [
+                              _c("div", { staticClass: "col-md-6" }, [
+                                _c("div", { staticClass: "box box-primary" }, [
+                                  _c("div", { staticClass: "box-body" }, [
+                                    _c(
+                                      "table",
+                                      {
+                                        staticClass:
+                                          "table table-bordered table-hover"
+                                      },
+                                      [
+                                        _c(
+                                          "tbody",
+                                          {
+                                            staticStyle: {
+                                              "font-weight": "normal",
+                                              "font-size": "18px"
+                                            }
+                                          },
+                                          [
+                                            _vm.informacionFacturar.length > 0
+                                              ? _c("tr", [
+                                                  _vm._m(12),
+                                                  _vm._v(" "),
+                                                  _c("td", [
+                                                    _vm._v(
+                                                      "$ " +
+                                                        _vm._s(
+                                                          _vm.formatearValor(
+                                                            (_vm.subtotal =
+                                                              _vm.calcularSubtotal)
+                                                          )
+                                                        )
+                                                    )
+                                                  ])
+                                                ])
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            _vm.informacionFacturar.length > 0
+                                              ? _c("tr", [
+                                                  _vm._m(13),
+                                                  _vm._v(" "),
+                                                  _c("td", [
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value: _vm.descuento,
+                                                          expression:
+                                                            "descuento"
+                                                        }
+                                                      ],
+                                                      staticClass:
+                                                        "form-control",
+                                                      attrs: { type: "number" },
+                                                      domProps: {
+                                                        value: _vm.descuento
+                                                      },
+                                                      on: {
+                                                        input: function(
+                                                          $event
+                                                        ) {
+                                                          if (
+                                                            $event.target
+                                                              .composing
+                                                          ) {
+                                                            return
+                                                          }
+                                                          _vm.descuento =
+                                                            $event.target.value
+                                                        }
+                                                      }
+                                                    })
+                                                  ])
+                                                ])
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            _vm.informacionFacturar.length > 0
+                                              ? _c("tr", [
+                                                  _vm._m(14),
+                                                  _vm._v(" "),
+                                                  _c("td", [
+                                                    _vm._v(
+                                                      "$ " +
+                                                        _vm._s(
+                                                          _vm.formatearValor(
+                                                            (_vm.valorNeto =
+                                                              _vm.calcularNeto)
+                                                          )
+                                                        )
+                                                    )
+                                                  ])
+                                                ])
+                                              : _vm._e()
+                                          ]
+                                        )
+                                      ]
+                                    )
+                                  ])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "col-md-6" }, [
+                                _c("div", { staticClass: "box box-primary" }, [
+                                  _c("div", { staticClass: "box-body" }, [
+                                    _c("div", { staticClass: "text-center" }, [
+                                      _c("h3", [_vm._v("Valor Recibido")]),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.valorRecibido,
+                                            expression: "valorRecibido"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: { type: "number" },
+                                        domProps: { value: _vm.valorRecibido },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.valorRecibido =
+                                              $event.target.value
+                                          }
+                                        }
+                                      })
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("div", { staticClass: "text-center" }, [
+                                      _c("h3", [_vm._v("Valor Cambio")]),
+                                      _vm._v(" "),
+                                      _c("h3", [
+                                        _vm._v(
+                                          "$ " +
+                                            _vm._s(
+                                              _vm.formatearValor(
+                                                _vm.valorRecibido -
+                                                  _vm.valorNeto
+                                              )
+                                            )
+                                        )
+                                      ])
+                                    ])
+                                  ])
+                                ])
+                              ])
+                            ])
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _vm._m(15)
+                      ])
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.cerrarModalPago()
+                        }
+                      }
+                    },
+                    [
+                      _c("i", { staticClass: "fas fa-times" }),
+                      _vm._v(" Cancelar\n              ")
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-default",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.limpiarPago()
+                        }
+                      }
+                    },
+                    [
+                      _c("i", { staticClass: "fas fa-eraser" }),
+                      _vm._v(" Limpiar\n              ")
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-success",
+                      attrs: {
+                        type: "button",
+                        disabled:
+                          _vm.valorRecibido < _vm.valorNeto ||
+                          _vm.descuento > _vm.subtotal
+                      }
+                    },
+                    [
+                      _c("i", { staticClass: "fas fa-shopping-cart" }),
+                      _vm._v(" Facturar\n              ")
+                    ]
+                  )
+                ])
               ]
             )
           ])
         ])
       ])
     ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { staticClass: "content-header" }, [
+      _c("h1", [
+        _c("i", { staticClass: "fas fa-file-invoice-dollar" }),
+        _vm._v(" Facturar Atención\n      "),
+        _c("small", [_vm._v("Facturación")])
+      ]),
+      _vm._v(" "),
+      _c("ol", { staticClass: "breadcrumb" }, [
+        _c("li", [
+          _c("a", { attrs: { href: "/admin" } }, [
+            _c("i", { staticClass: "fas fa-tachometer-alt" }),
+            _vm._v(" Inicio\n        ")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("li", { staticClass: "active" }, [
+          _c("i", { staticClass: "fas fa-file-invoice-dollar" }),
+          _vm._v(" Facturar Atención\n      ")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c(
+        "button",
+        { staticClass: "btn btn-primary", attrs: { type: "button" } },
+        [
+          _c("i", { staticClass: "fas fa-plus-circle" }),
+          _vm._v(" Nueva Factura\n      ")
+        ]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "box box-primary" }, [
+      _c("div", { staticClass: "box-header" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "table-responsive container-fluid" }, [
+        _c(
+          "table",
+          {
+            staticClass: "table table-bordered table-hover",
+            staticStyle: { width: "100%" },
+            attrs: { id: "tablaFacturacion" }
+          },
+          [
+            _c("thead", [
+              _c("tr", [
+                _c("th", [_vm._v("Cliente")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Servicios")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Valor Total")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Acciones")])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("tbody", { staticStyle: { "font-weight": "normal" } })
+          ]
+        )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12 text-center" }, [
+      _c("h3", [
+        _c("i", { staticClass: "fas fa-file-invoice-dollar" }),
+        _vm._v(" Detalles de Facturación\n          ")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Servicios")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Realizado Por")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Cantidad")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Valor")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Acciones")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "5" } }, [
+      _c(
+        "div",
+        {
+          staticClass: "alert alert-danger text-center",
+          attrs: { role: "alert" }
+        },
+        [_vm._v("Agregue información a Facturar")]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "3", align: "right" } }, [
+      _c("strong", [_vm._v("Subtotal:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "3", align: "right" } }, [
+      _c("strong", [_vm._v("Descuento:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "3", align: "right" } }, [
+      _c("strong", [_vm._v("Total Neto:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", [
+      _c(
+        "div",
+        { staticClass: "modal fade in", attrs: { id: "modalServicios" } },
+        [
+          _c("div", { staticClass: "modal-dialog modal-lg" }, [
+            _c("div", { staticClass: "modal-content" }, [
+              _c(
+                "form",
+                {
+                  staticClass: "form-horizontal",
+                  attrs: { "content-type": "multipart/form-data" }
+                },
+                [
+                  _c("div", { staticClass: "modal-header" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "close",
+                        attrs: {
+                          type: "button",
+                          "data-dismiss": "modal",
+                          "aria-label": "Close"
+                        }
+                      },
+                      [
+                        _c("span", { attrs: { "aria-hidden": "true" } }, [
+                          _vm._v("×")
+                        ])
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("h4", { staticClass: "modal-title" }, [
+                      _c("i", { staticClass: "fas fa-list" }),
+                      _vm._v(" Lista de Servicios\n              ")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "box-body" }, [
+                      _c(
+                        "div",
+                        { staticClass: "table-responsive container-fluid" },
+                        [
+                          _c(
+                            "table",
+                            {
+                              staticClass: "table table-bordered table-hover",
+                              staticStyle: { width: "100%" },
+                              attrs: { id: "tablaServicios" }
+                            },
+                            [
+                              _c("thead", [
+                                _c("tr", [
+                                  _c("th", [_vm._v("Nombre")]),
+                                  _vm._v(" "),
+                                  _c("th", [_vm._v("Valor")]),
+                                  _vm._v(" "),
+                                  _c("th", [_vm._v("Acción")])
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("tbody", {
+                                staticStyle: { "font-weight": "normal" }
+                              })
+                            ]
+                          )
+                        ]
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger pull-left",
+                        attrs: { type: "button", "data-dismiss": "modal" }
+                      },
+                      [
+                        _c("i", { staticClass: "fas fa-times" }),
+                        _vm._v(" Cancelar\n              ")
+                      ]
+                    )
+                  ])
+                ]
+              )
+            ])
+          ])
+        ]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      ),
+      _vm._v(" "),
+      _c("h4", { staticClass: "modal-title" }, [
+        _c("i", { staticClass: "fas fa-money" }),
+        _vm._v(" Pagar Factura\n              ")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("ul", { staticClass: "nav nav-tabs" }, [
+      _c("li", { staticClass: "active" }, [
+        _c("a", { attrs: { "data-toggle": "tab", href: "#pagoEfectivo" } }, [
+          _c("i", { staticClass: "fas fa-money-bill-wave-alt" }),
+          _vm._v(" Pago Efectivo\n                      ")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("li", [
+        _c("a", { attrs: { "data-toggle": "tab", href: "#pagoTarjeta" } }, [
+          _c("i", { staticClass: "far fa-credit-card" }),
+          _vm._v(" Pago Tarjeta\n                      ")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { align: "right" } }, [
+      _c("strong", [_vm._v("Subtotal:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { align: "right" } }, [
+      _c("strong", [_vm._v("Descuento:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { align: "right" } }, [
+      _c("strong", [_vm._v("Total Neto:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "tab-pane fade", attrs: { id: "pagoTarjeta" } },
+      [
+        _c("div", { staticClass: "box-header" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "box-body" })
+      ]
+    )
   }
 ]
 render._withStripped = true
@@ -41581,6 +43218,17 @@ var render = function() {
                     "ul",
                     { staticClass: "list-group list-group-unbordered" },
                     [
+                      _c("li", { staticClass: "list-group-item" }, [
+                        _c("b", [_vm._v("Nombre Corto: ")]),
+                        _vm._v(" "),
+                        _c("span", {
+                          staticClass: "pull-right",
+                          domProps: {
+                            textContent: _vm._s(empresa.nombre_corto)
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
                       _c("li", { staticClass: "list-group-item" }, [
                         _c("b", [_vm._v("Nit: ")]),
                         _vm._v(" "),
@@ -43483,7 +45131,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("tbody")
+          _c("tbody", { staticStyle: { "font-weight": "normal" } })
         ]
       )
     ])
@@ -43524,7 +45172,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("tbody")
+          _c("tbody", { staticStyle: { "font-weight": "normal" } })
         ]
       )
     ])
@@ -43571,7 +45219,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("tbody")
+          _c("tbody", { staticStyle: { "font-weight": "normal" } })
         ]
       )
     ])
@@ -44473,19 +46121,20 @@ var render = function() {
             _c("p", [_vm._v("Administrador")]),
             _vm._v(" "),
             _c("small", { domProps: { textContent: _vm._s(_vm.nombres) } }),
+            _vm._v(" "),
             _c("br"),
             _vm._v(" "),
             _vm.estado_usuario == 1
               ? _c("a", { attrs: { href: "" } }, [
                   _c("i", { staticClass: "fa fa-circle text-success" }),
-                  _vm._v(" En línea")
+                  _vm._v(" En línea\n          ")
                 ])
               : _vm._e(),
             _vm._v(" "),
             _vm.estado_usuario == 2
               ? _c("a", { attrs: { href: "" } }, [
                   _c("i", { staticClass: "fa fa-circle text-success" }),
-                  _vm._v(" Desactivado")
+                  _vm._v(" Desactivado\n          ")
                 ])
               : _vm._e()
           ])
@@ -44514,13 +46163,7 @@ var render = function() {
                       _c(
                         "small",
                         { staticClass: "label pull-right bg-green" },
-                        [
-                          _vm._v(
-                            "\n                                " +
-                              _vm._s(_vm.cantidad) +
-                              "\n                            "
-                          )
-                        ]
+                        [_vm._v(_vm._s(_vm.cantidad))]
                       )
                     ])
                   ]
@@ -44546,9 +46189,9 @@ var render = function() {
                       },
                       [
                         _c("i", {
-                          staticClass: "far fa-calendar-plus  text-green"
+                          staticClass: "far fa-calendar-plus text-green"
                         }),
-                        _vm._v(" Agendar Libre\n                            ")
+                        _vm._v(" Agendar Libre\n              ")
                       ]
                     )
                   ],
@@ -44570,7 +46213,7 @@ var render = function() {
                         _c("i", {
                           staticClass: "fas fa-hourglass-half text-green"
                         }),
-                        _vm._v(" En Espera\n                            ")
+                        _vm._v(" En Espera\n              ")
                       ]
                     )
                   ],
@@ -44677,6 +46320,24 @@ var render = function() {
                     )
                   ],
                   1
+                ),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  [
+                    _c(
+                      "router-link",
+                      { attrs: { to: "/nomina", "data-toggle": "push-menu" } },
+                      [
+                        _c("i", {
+                          staticClass: "fas fa-university text-green"
+                        }),
+                        _vm._v(" "),
+                        _c("span", [_vm._v("Nómina")])
+                      ]
+                    )
+                  ],
+                  1
                 )
               ])
             ]),
@@ -44700,7 +46361,7 @@ var render = function() {
                         _c("i", {
                           staticClass: "fas fa-chart-line text-green"
                         }),
-                        _vm._v(" Citas por Mes\n                            ")
+                        _vm._v(" Citas por Mes\n              ")
                       ]
                     )
                   ],
@@ -44722,9 +46383,7 @@ var render = function() {
                         _c("i", {
                           staticClass: "fas fa-chart-area text-green"
                         }),
-                        _vm._v(
-                          " Citas por Empleados\n                            "
-                        )
+                        _vm._v(" Citas por Empleados\n              ")
                       ]
                     )
                   ],
@@ -44744,9 +46403,7 @@ var render = function() {
                       },
                       [
                         _c("i", { staticClass: "far fa-chart-bar text-green" }),
-                        _vm._v(
-                          " Servicios Frecuentes\n                            "
-                        )
+                        _vm._v(" Servicios Frecuentes\n              ")
                       ]
                     )
                   ],
@@ -44768,7 +46425,7 @@ var render = function() {
                         _c("i", {
                           staticClass: "fas fa-calendar-check text-green"
                         }),
-                        _vm._v(" Atendidos\n                            ")
+                        _vm._v(" Atendidos\n              ")
                       ]
                     )
                   ],
@@ -44790,7 +46447,7 @@ var render = function() {
                         _c("i", {
                           staticClass: "far fa-calendar-minus text-green"
                         }),
-                        _vm._v(" No Asistieron\n                            ")
+                        _vm._v(" No Asistieron\n              ")
                       ]
                     )
                   ],
@@ -44812,7 +46469,7 @@ var render = function() {
                         _c("i", {
                           staticClass: "far fa-calendar-times text-green"
                         }),
-                        _vm._v(" Cancelaron\n                            ")
+                        _vm._v(" Cancelaron\n              ")
                       ]
                     )
                   ],
@@ -44925,7 +46582,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("li", { staticClass: "header text-center" }, [
       _c("i", { staticClass: "fas fa-home" }),
-      _vm._v(" Menú Principal")
+      _vm._v(" Menú Principal\n        ")
     ])
   },
   function() {
@@ -44990,7 +46647,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("li", { staticClass: "header text-center" }, [
       _c("i", { staticClass: "fas fa-tools" }),
-      _vm._v(" Administración")
+      _vm._v(" Administración\n        ")
     ])
   },
   function() {
@@ -44999,7 +46656,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("li", { staticClass: "header text-center" }, [
       _c("i", { staticClass: "fas fa-wrench" }),
-      _vm._v(" Configuración")
+      _vm._v(" Configuración\n        ")
     ])
   }
 ]
@@ -45229,7 +46886,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -45547,7 +47204,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("tbody")
+          _c("tbody", { staticStyle: { "font-weight": "normal" } })
         ]
       )
     ])
@@ -45594,7 +47251,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("tbody")
+          _c("tbody", { staticStyle: { "font-weight": "normal" } })
         ]
       )
     ])
@@ -46303,7 +47960,7 @@ var staticRenderFns = [
                   ])
                 ]),
                 _vm._v(" "),
-                _c("tbody")
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
               ]
             )
           ])
@@ -61588,7 +63245,7 @@ __webpack_require__.r(__webpack_exports__);
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
@@ -61598,9 +63255,9 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 var token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {
-  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+  window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
 } else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+  console.error("CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token");
 } //importacion dela libreria de Vuejs
 
 
@@ -61655,11 +63312,11 @@ Vue.component('clientes', require('./components/Admin/Clientes.vue').default);
  */
 //componente de navegacion del Admin
 
-Vue.component('navegacionadmin', __webpack_require__(/*! ./components/Admin/NavegacionAdmin.vue */ "./resources/js/components/Admin/NavegacionAdmin.vue")["default"]);
-Vue.component('navegacionempleado', __webpack_require__(/*! ./components/Empleado/NavegacionEmpleado.vue */ "./resources/js/components/Empleado/NavegacionEmpleado.vue")["default"]);
-Vue.component('navegacionagendador', __webpack_require__(/*! ./components/Agendador/NavegacionAgendador.vue */ "./resources/js/components/Agendador/NavegacionAgendador.vue")["default"]); //componentes para optimizar todo
+Vue.component("navegacionadmin", __webpack_require__(/*! ./components/Admin/NavegacionAdmin.vue */ "./resources/js/components/Admin/NavegacionAdmin.vue")["default"]);
+Vue.component("navegacionempleado", __webpack_require__(/*! ./components/Empleado/NavegacionEmpleado.vue */ "./resources/js/components/Empleado/NavegacionEmpleado.vue")["default"]);
+Vue.component("navegacionagendador", __webpack_require__(/*! ./components/Agendador/NavegacionAgendador.vue */ "./resources/js/components/Agendador/NavegacionAgendador.vue")["default"]); //componentes para optimizar todo
 
-Vue.component('imagenperfil', __webpack_require__(/*! ./components/Admin/ImagenPerfil.vue */ "./resources/js/components/Admin/ImagenPerfil.vue")["default"]); //----*********** Aqui agregaremos todo configurado con Vue-Router*********
+Vue.component("imagenperfil", __webpack_require__(/*! ./components/Admin/ImagenPerfil.vue */ "./resources/js/components/Admin/ImagenPerfil.vue")["default"]); //----*********** Aqui agregaremos todo configurado con Vue-Router*********
 // 0. If using a module system (e.g. via vue-cli), import Vue and VueRouter
 // and then call `Vue.use(VueRouter)`.
 // 1. Define route components.
@@ -61708,7 +63365,9 @@ var misAtenciones = __webpack_require__(/*! ./components/Empleado/misAtenciones.
 
 var CajaRegistradora = __webpack_require__(/*! ./components/Admin/CajaRegistradora.vue */ "./resources/js/components/Admin/CajaRegistradora.vue")["default"];
 
-var FacturarAtencion = __webpack_require__(/*! ./components/Admin/FacturarAtencion.vue */ "./resources/js/components/Admin/FacturarAtencion.vue")["default"]; // 2. Define some routes
+var FacturarAtencion = __webpack_require__(/*! ./components/Admin/FacturarAtencion.vue */ "./resources/js/components/Admin/FacturarAtencion.vue")["default"];
+
+var Nomina = __webpack_require__(/*! ./components/Admin/Nomina.vue */ "./resources/js/components/Admin/Nomina.vue")["default"]; // 2. Define some routes
 // Each route should map to a component. The "component" can
 // either be an actual component constructor created via
 // `Vue.extend()`, or just a component options object.
@@ -61716,68 +63375,71 @@ var FacturarAtencion = __webpack_require__(/*! ./components/Admin/FacturarAtenci
 
 
 var routes = [{
-  path: '*',
+  path: "*",
   component: Error404
 }, {
-  path: '/',
+  path: "/",
   component: Solicitudes
 }, {
-  path: '/agendaLibre',
+  path: "/agendaLibre",
   component: AgendaLibre
 }, {
-  path: '/agendaEnEspera',
+  path: "/agendaEnEspera",
   component: AgendaEnEspera
 }, {
-  path: '/agendaAtendidos',
+  path: "/agendaAtendidos",
   component: AgendaAtendidos
 }, {
-  path: '/agendaNoAsistio',
+  path: "/agendaNoAsistio",
   component: AgendaNoAsistio
 }, {
-  path: '/agendaCancelaron',
+  path: "/agendaCancelaron",
   component: AgendaCancelaron
 }, {
-  path: '/buzonSugerencias',
+  path: "/buzonSugerencias",
   component: BuzonSugerencias
 }, {
-  path: '/agendaCumple',
+  path: "/agendaCumple",
   component: AgendaCumple
 }, {
-  path: '/clientes',
+  path: "/clientes",
   component: Clientes
 }, {
-  path: '/empleados',
+  path: "/empleados",
   component: Empleados
 }, {
-  path: '/roles',
+  path: "/roles",
   component: Roles
 }, {
-  path: '/reportCitas',
+  path: "/reportCitas",
   component: ReportCitas
 }, {
-  path: '/reportEmpleados',
+  path: "/reportEmpleados",
   component: ReportEmpleados
 }, {
-  path: '/reportServicios',
+  path: "/reportServicios",
   component: ReportServicios
 }, {
-  path: '/miperfil',
+  path: "/miperfil",
   component: MiPerfil
 }, {
-  path: '/mipagina',
+  path: "/mipagina",
   component: MiPagina
 }, {
-  path: '/miAgenda',
+  path: "/miAgenda",
   component: miAgenda
 }, {
-  path: '/misAtenciones',
+  path: "/misAtenciones",
   component: misAtenciones
 }, {
-  path: '/cajaRegistradora',
+  path: "/cajaRegistradora",
   component: CajaRegistradora
 }, {
-  path: '/facturarAtencion',
+  path: "/facturarAtencion",
   component: FacturarAtencion
+}, {
+  path: "/nomina",
+  component: Nomina
 }]; // 3. Create the router instance and pass the `routes` option
 // You can pass in additional options here, but let's
 // keep it simple for now.
@@ -61786,11 +63448,11 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
   //mode: 'history',//quitando el hash # que viene por defecto con vue-router
   routes: routes,
   // short for `routes: routes`
-  base: '/admin'
+  base: "/admin"
 }); //el menu numero 3 es para mostrar el componente de listar las citas.
 
 var app = new Vue({
-  el: '#app',
+  el: "#app",
   router: router
 });
 
@@ -62881,6 +64543,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_NavegacionAdmin_vue_vue_type_template_id_4c5631d3___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
+
+/***/ }),
+
+/***/ "./resources/js/components/Admin/Nomina.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/Admin/Nomina.vue ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+var render, staticRenderFns
+var script = {}
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_0__["default"])(
+  script,
+  render,
+  staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+component.options.__file = "resources/js/components/Admin/Nomina.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 

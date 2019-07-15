@@ -22,6 +22,7 @@ class CreateServiciosSolicitudesTable extends Migration
             $table->foreign('facturas_id')->references('id')->on('facturas');
             $table->unsignedInteger('empleado_id')->nullable();
             $table->foreign('empleado_id')->references('id')->on('users');
+            $table->integer('cantidad_facturada', 3)->nullable();
         });
     }
 

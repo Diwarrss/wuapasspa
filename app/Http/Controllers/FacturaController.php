@@ -43,7 +43,24 @@ class FacturaController extends Controller
 
         $id_reserva = $request->id_reserva;
 
-        $listarDetFacturar = Reservacione::where('id', '=', $id_reserva)
+        $listarDetFacturar = Reservacione::leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
+            ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
+            ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
+            ->leftJoin('servicios_solicitudes', 'solicitudes.id', '=', 'servicios_solicitudes.solicitudes_solicitudes_id')
+            ->leftJoin('servicios', 'servicios.id', '=', 'servicios_solicitudes.servicios_servicios_id')
+            ->select(
+                DB::raw("DATE_FORMAT(NOW(), '%d/%m/%Y') as fecha_actual"),
+                'solicitudes.id as id_solicitud',
+                'reservaciones.id as id_reserva',
+                'reservaciones.users_users_id as id_atendido_por',
+                'anonimos.nombre_anonimo',
+                'servicios.id as id_servicio',
+                'servicios.nombre_servicio',
+                'servicios.valor_servicio',
+                DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
+                DB::raw("'1' as cantidad")
+            )
+            ->where('reservaciones.id', '=', $id_reserva)
             ->get();
         //devuelvo un json que se llamara lista
         return $listarDetFacturar;

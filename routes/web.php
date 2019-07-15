@@ -110,6 +110,7 @@ Route::group(['middleware' => 'auth'], function () {
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');
         Route::get('/mostrarInfoFacturar', 'FacturaController@mostrarInfoFacturar')->name('mostrarInfoFacturar');
+        Route::get('/serviciosFaturables', 'ServiciosController@serviciosFaturables')->name('serviciosFaturables');
     });
 
     //middleware que solo permite acceso a agendador

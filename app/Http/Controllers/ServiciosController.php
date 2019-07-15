@@ -16,35 +16,57 @@ class ServiciosController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $servicios = DB::table('servicios')
-                    ->select('id','empresas_empresas_id','nombre_servicio','descripcion_servicio','estado_servicio')
-                    ->where('estado_servicio', 1)
-                    ->orderBy('nombre_servicio', 'asc')
-                    ->get();
+            ->select('id', 'empresas_empresas_id', 'nombre_servicio', 'valor_servicio', 'descripcion_servicio', 'estado_servicio')
+            ->where('estado_servicio', 1)
+            ->orderBy('nombre_servicio', 'asc')
+            ->get();
         return $servicios;
+    }
+
+    //añadir servicios de facturar
+    public function serviciosFaturables(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        $servicios = DB::table('servicios')
+            ->select('id', 'empresas_empresas_id', 'nombre_servicio', 'valor_servicio', 'descripcion_servicio', 'estado_servicio')
+            ->where('estado_servicio', 1)
+            ->orderBy('nombre_servicio', 'asc')
+            ->get();
+        return datatables($servicios)->toJson();
     }
 
     public function showServicios(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $servicios = DB::table('servicios')
-                    ->leftJoin('imagenes', 'servicios.imagenes_imagenes_id', '=', 'imagenes.id')
-                    ->leftJoin('categorias', 'servicios.categorias_categorias_id', '=', 'categorias.id')
-                    ->select('servicios.id','servicios.nombre_servicio','servicios.descripcion_servicio','servicios.estado_servicio',
-                            'servicios.url_video','servicios.valor_servicio','imagenes.empresas_empresas_id','imagenes.url_imagen', 'categorias.nombre_categoria',
-                            'servicios.categorias_categorias_id')
-                    ->get();
+            ->leftJoin('imagenes', 'servicios.imagenes_imagenes_id', '=', 'imagenes.id')
+            ->leftJoin('categorias', 'servicios.categorias_categorias_id', '=', 'categorias.id')
+            ->select(
+                'servicios.id',
+                'servicios.nombre_servicio',
+                'servicios.descripcion_servicio',
+                'servicios.estado_servicio',
+                'servicios.url_video',
+                'servicios.valor_servicio',
+                'imagenes.empresas_empresas_id',
+                'imagenes.url_imagen',
+                'categorias.nombre_categoria',
+                'servicios.categorias_categorias_id'
+            )
+            ->get();
 
         return datatables($servicios)
-        ->toJson();
+            ->toJson();
     }
 
     public function crearServicio(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //para validar
         $request->validate([
@@ -73,13 +95,13 @@ class ServiciosController extends Controller
             parse_str($parts['query'], $query);
 
             $url_Final = $query['v']; // Z29MkJdMKqs
-        }else {
-            $url_Final ='';
+        } else {
+            $url_Final = '';
         }
 
         //insertar la Imagen
         if ($imagenFile) {
-            $nombreImagen = time().'.'. $request->imagenServicio->getClientOriginalExtension();
+            $nombreImagen = time() . '.' . $request->imagenServicio->getClientOriginalExtension();
             //creamos la ruta dnd se va a guardar la imagen
             //$path = Storage::disk('public')->put('img/carousel', $request->file('file'));//UN METODO DE SUBIR LA IMAGEN PERO SE REPITEN
             $imagenFile->move(public_path('/img/servicios/'), $nombreImagen);
@@ -99,8 +121,7 @@ class ServiciosController extends Controller
             $servicio->imagenes_imagenes_id = $imagen->id;
             $servicio->categorias_categorias_id = $request->categoriaServicio;
             $servicio->save();
-
-        }else{
+        } else {
             $servicio = new Servicio();
             $servicio->nombre_servicio = $request->nombreServicio;
             $servicio->descripcion_servicio = $request->descripcion;
@@ -115,12 +136,12 @@ class ServiciosController extends Controller
 
     public function actualizarServicio(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');//seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //para validar
         $request->validate([
             'categoriaServicio' => 'required',
-            'nombreServicio' => 'required|max:150|string|',//unique:servicios,nombre_servicio,'.$request->idServicio
+            'nombreServicio' => 'required|max:150|string|', //unique:servicios,nombre_servicio,'.$request->idServicio
             'descripcion' => 'required|max:255',
             'estadoServicio' => 'required',
             'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
@@ -128,8 +149,8 @@ class ServiciosController extends Controller
             'valorServicio' => 'required|max:12'
         ]);
 
-        $servicio = Servicio::findOrFail($request->idServicio);//actualizamos para el user logueado
-        $imagenFile = $request->imagenServicio;//capturamos la imagen
+        $servicio = Servicio::findOrFail($request->idServicio); //actualizamos para el user logueado
+        $imagenFile = $request->imagenServicio; //capturamos la imagen
 
         $url = $request->urlVideoServicio;
 
@@ -144,19 +165,19 @@ class ServiciosController extends Controller
             parse_str($parts['query'], $query);
 
             $url_Final = $query['v']; // Z29MkJdMKqs
-        }else {
-            $url_Final ='';
+        } else {
+            $url_Final = '';
         }
 
-        if ($imagenFile) {//validamos que alla una imagen
+        if ($imagenFile) { //validamos que alla una imagen
 
             $idImagen = Imagene::find($servicio->imagenes_imagenes_id);
 
             if ($idImagen == null) {
-                $nombreImagen = time().'.'. $request->imagenServicio->getClientOriginalExtension();//obtenemos el nombre de la imagen
+                $nombreImagen = time() . '.' . $request->imagenServicio->getClientOriginalExtension(); //obtenemos el nombre de la imagen
 
                 //Subimos la nueva imagen
-                $imagenFile->move(public_path('/img/servicios/'), $nombreImagen);//guardamos la imagen en este directorio
+                $imagenFile->move(public_path('/img/servicios/'), $nombreImagen); //guardamos la imagen en este directorio
 
                 $imagen = new Imagene();
                 $imagen->empresas_empresas_id = 1;
@@ -172,10 +193,10 @@ class ServiciosController extends Controller
                 $servicio->categorias_categorias_id = $request->categoriaServicio;
                 $servicio->imagenes_imagenes_id = $imagen->id;
                 $servicio->save();
-            }else{
+            } else {
                 $nombreImagen = $request->imagenServicio->getClientOriginalName();
                 //Subimos la nueva imagen
-                $imagenFile->move(public_path('/img/categorias/'), $nombreImagen);//guardamos la imagen en este directorio
+                $imagenFile->move(public_path('/img/categorias/'), $nombreImagen); //guardamos la imagen en este directorio
 
                 $imagen = new Imagene();
                 $imagen->empresas_empresas_id = 1;
@@ -194,7 +215,7 @@ class ServiciosController extends Controller
 
                 $idImagen->delete();
             }
-        }else{
+        } else {
             $servicio->nombre_servicio = $request->nombreServicio;
             $servicio->descripcion_servicio = $request->descripcion;
             $servicio->estado_servicio = $request->estadoServicio;
@@ -207,10 +228,11 @@ class ServiciosController extends Controller
     }
 
     //mostrar componenets o vista
-    public function componente(){
+    public function componente()
+    {
         $logoEmpresa = DB::table('empresas')
-                        ->select('logo_empresa','nombre_corto')
-                        ->get();
+            ->select('logo_empresa', 'nombre_corto')
+            ->get();
         return view('/cliente/nuevaCita', ['logoEmpresa' => $logoEmpresa]);
     }
 }
