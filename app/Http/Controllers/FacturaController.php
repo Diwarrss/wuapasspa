@@ -29,7 +29,7 @@ class FacturaController extends Controller
                                     (GROUP_CONCAT(servicios.nombre_servicio SEPARATOR ', ')) as nombre_servicio,
                                     SUM(servicios.valor_servicio) as valor_total")
             )
-            ->where('reservaciones.estado_reservacion', 2)
+            ->where([['reservaciones.estado_reservacion', 2], ['servicios_solicitudes.reservaciones_id', null]])
             ->groupBy('reservaciones.id')
             ->orderByDesc('solicitudes.id')
             ->get();

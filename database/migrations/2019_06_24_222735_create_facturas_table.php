@@ -17,16 +17,20 @@ class CreateFacturasTable extends Migration
             $table->increments('id');
             $table->string('prefijo', 5)->nullable();
             $table->integer('numero_factura');
-            $table->enum('tipo_comprobante', [\App\Factura::FACTURA, \App\Factura::NOMINA,
-                                            \App\Factura::GASTOS, \App\Factura::INGRESOS])
-                    ->default(\App\Factura::FACTURA);
+            $table->enum('tipo_comprobante', [
+                \App\Factura::FACTURA, \App\Factura::NOMINA,
+                \App\Factura::GASTOS, \App\Factura::INGRESOS
+            ])
+                ->default(\App\Factura::FACTURA);
             $table->unsignedInteger('creado_por');
             $table->foreign('creado_por')->references('id')->on('users');
-            $table->enum('estado_factura', [\App\Factura::PAGADA, \App\Factura::ABONADA,
-                                \App\Factura::PENDIENTE, \App\Factura::ANULADA])
-                    ->default(\App\Factura::PAGADA);
+            $table->enum('estado_factura', [
+                \App\Factura::PAGADA, \App\Factura::ABONADA,
+                \App\Factura::PENDIENTE, \App\Factura::ANULADA
+            ])
+                ->default(\App\Factura::PAGADA);
             $table->enum('tipo_pago', [\App\Factura::EFECTIVO, \App\Factura::TARJETA])
-                    ->default(\App\Factura::EFECTIVO)->nullable();
+                ->default(\App\Factura::EFECTIVO)->nullable();
             $table->decimal('valor_descuento', 12, 2)->default(0);
             $table->decimal('valor_total', 12, 2);
             $table->string('nota_factura', 250)->nullable();
