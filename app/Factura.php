@@ -19,4 +19,16 @@ class Factura extends Model
     //TIPO PAGO
     const EFECTIVO = 1;
     const TARJETA = 2;
+
+    protected $fillable = [
+        'prefijo',
+        'numero_factura',
+        'tipo_comprobante',
+        'creado_por',
+        'estado_factura',
+        'tipo_pago',
+        'valor_descuento',
+        'valor_total',
+        'nota_factura'
+    ];
 }

@@ -344,6 +344,7 @@
                 <button
                   type="button"
                   class="btn btn-success"
+                  @click="facturarCargos();"
                   :disabled="valorRecibido < valorNeto || descuento > subtotal"
                 >
                   <i class="fas fa-shopping-cart"></i> Facturar
@@ -375,7 +376,10 @@ export default {
       descuento: 0,
       valorNeto: "",
       valorRecibido: 0,
-      valorCambio: ""
+      valorCambio: "",
+      arrayErrors: [],
+      tipo_pago: 1,
+      notaFactura: ""
     };
   },
   watch: {},
@@ -457,6 +461,41 @@ export default {
         })
         .finally(function() {
           // always executed
+        });
+    },
+    //metodo para facturar los cargos
+    facturarCargos() {
+      let me = this;
+      axios
+        .post("/facturarCargos", {
+          informacionFacturar: me.informacionFacturar,
+          prefijo: "FV ",
+          tipo_comprobante: 1,
+          estado_factura: 1,
+          tipo_pago: me.tipo_pago,
+          valor_descuento: me.descuento,
+          valor_total: me.valorNeto,
+          nota_factura: me.notaFactura
+        })
+        .then(function(response) {
+          Swal.fire({
+            position: "top-end",
+            title: "Cargos Facturados con éxito!",
+            type: "success",
+            showConfirmButton: false,
+            timer: 1500
+          }).then(function() {
+            me.cerrarModalPago();
+            me.regresar();
+          });
+          console.log(response);
+        })
+        .catch(function(error) {
+          if (error.response.status == 422) {
+            //preguntamos si el error es 422
+            me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+          }
+          console.log(error);
         });
     },
     //aqui tenemos el script para datatables para los que se facturaran

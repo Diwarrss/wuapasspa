@@ -43,7 +43,7 @@
         data() {
             return {
                 servicios : [],
-                servicioSeleccionado: ["1"],
+                servicioSeleccionado: [],
                 arrayErrors: [],
                 fecha_probable: '',
                 comentario:''

@@ -2858,7 +2858,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       servicios: [],
-      servicioSeleccionado: ["1"],
+      servicioSeleccionado: [],
       arrayErrors: [],
       fecha_probable: '',
       comentario: ''
@@ -44926,7 +44926,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! c:\laragon\www\wuapasspa\resources\js\appCliente.js */"./resources/js/appCliente.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\wuapasspa\resources\js\appCliente.js */"./resources/js/appCliente.js");
 
 
 /***/ })
