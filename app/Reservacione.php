@@ -45,15 +45,18 @@ class Reservacione extends Model
         'fechaHoraInicio_reserva',
         'fechaHoraFinal_reserva',
         'asignadopor',
-        'estado_reservacion'
+        'estado_reservacion',
+        'facturas_id'
     ];
 
     //para las relaciones Eloquent
-    public function user(){
-        return $this->belongsTo('App\User');//una reserva la hace un Usuario
+    public function user()
+    {
+        return $this->belongsTo('App\User'); //una reserva la hace un Usuario
     }
 
-    public function solicitud(){
-        return $this->belongsTo('App\Solicitude');//una reserva pertenece a una solicitud
+    public function solicitud()
+    {
+        return $this->belongsTo('App\Solicitude'); //una reserva pertenece a una solicitud
     }
 }

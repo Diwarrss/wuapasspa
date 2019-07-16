@@ -22,9 +22,13 @@ class CreateReservacionesTable extends Migration
             $table->timestamp('fechaHoraInicio_reserva')->default('0000-00-00 00:00:00');
             $table->timestamp('fechaHoraFinal_reserva')->default('0000-00-00 00:00:00');
             $table->integer('asignadopor');
-            $table->enum('estado_reservacion', [\App\Reservacione::PENDIENTE, \App\Reservacione::ATENTIDO,
-                                                \App\Reservacione::NOASISTIO, \App\Reservacione::ENESPERA, \App\Reservacione::CANCELO])
-                    ->default(\App\Reservacione::PENDIENTE);
+            $table->enum('estado_reservacion', [
+                \App\Reservacione::PENDIENTE, \App\Reservacione::ATENTIDO,
+                \App\Reservacione::NOASISTIO, \App\Reservacione::ENESPERA, \App\Reservacione::CANCELO
+            ])
+                ->default(\App\Reservacione::PENDIENTE);
+            $table->unsignedInteger('facturas_id')->nullable();
+            $table->foreign('facturas_id')->references('id')->on('facturas');
             $table->timestamps();
         });
     }

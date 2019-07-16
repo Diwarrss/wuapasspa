@@ -31,7 +31,7 @@ class FacturaController extends Controller
                                     (GROUP_CONCAT(servicios.nombre_servicio SEPARATOR ', ')) as nombre_servicio,
                                     SUM(servicios.valor_servicio) as valor_total")
             )
-            ->where([['reservaciones.estado_reservacion', 2], ['servicios_solicitudes.reservaciones_id', null]])
+            ->where([['reservaciones.estado_reservacion', 2], ['reservaciones.facturas_id', null]])
             ->groupBy('reservaciones.id')
             ->orderByDesc('solicitudes.id')
             ->get();
@@ -73,7 +73,7 @@ class FacturaController extends Controller
         //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
         //para validar
         /*$request->validate([
-            
+
             'servicios' => 'required',
             'fecha_probable' => 'required',
             'comentario' => 'required'

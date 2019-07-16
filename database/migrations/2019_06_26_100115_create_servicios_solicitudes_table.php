@@ -18,13 +18,6 @@ class CreateServiciosSolicitudesTable extends Migration
             $table->foreign('servicios_servicios_id')->references('id')->on('servicios');
             $table->unsignedInteger('solicitudes_solicitudes_id')->nullable();
             $table->foreign('solicitudes_solicitudes_id')->references('id')->on('solicitudes');
-            $table->unsignedInteger('facturas_id')->nullable();
-            $table->foreign('facturas_id')->references('id')->on('facturas');
-            $table->unsignedInteger('empleado_id')->nullable();
-            $table->foreign('empleado_id')->references('id')->on('users');
-            $table->unsignedInteger('reservaciones_id')->nullable();
-            $table->foreign('reservaciones_id')->references('id')->on('reservaciones');
-            $table->integer('cantidad_facturada')->nullable();
         });
     }
 
