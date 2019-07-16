@@ -53,18 +53,52 @@ class CajaController extends Controller
         }
     }
 
+    public function actualizarCaja(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        try {
+            //usaremos transacciones
+            DB::beginTransaction();
+            //buscar primero el User a modificar
+            $caja = Caja::find($request->id);
+
+            //para validar los formularios
+            $request->validate([
+                'nombre_caja' => 'required|min:3|max:150',
+                'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                'estado_caja' => 'required'
+            ]);
+
+            $caja->empleado_id = $request->empleado_id;
+            $caja->nombre_caja = $request->nombre_caja;;
+            $caja->valor_inicial = $request->valor_inicial;
+            $caja->valor_producido = $request->valor_producido;
+            $caja->estado_caja = $request->estado_caja;
+            $caja->save(); //guardamos en la tabla users con el metodo save en la BD
+
+            DB::commit(); //
+        } catch (Exception $e) {
+            DB::rollBack(); //si hay error no ejecute la transaccion
+        }
+    }
+
 
     public function listarCajar(Request $request)
     {
         if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
-        //creamos la consulta de los usuarios que pertenecen al rol Empleados
+        //creamos la consulta de los usuarios que pertenecen al rol cajas
         $caja = Caja::join('users', 'cajas.empleado_id', '=', 'users.id')
             ->select(
                 'cajas.id',
                 'cajas.nombre_caja',
                 'cajas.valor_inicial',
                 'cajas.valor_producido',
+                'cajas.estado_caja as estado_cajaNum',
+                'cajas.empleado_id',
+                DB::raw("IF(cajas.estado_caja=1, 'Activo', 'Desactivado') as estado_caja"),
                 DB::raw("CONCAT(users.nombre_usuario,' ',users.apellido_usuario) as nombre_usuario")
             )
             ->get();

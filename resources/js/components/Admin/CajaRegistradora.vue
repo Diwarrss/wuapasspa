@@ -70,6 +70,8 @@
                     <th>Nombre Caja</th>
                     <th>Valor Inicial</th>
                     <th>Valor Producido</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody style="font-weight: normal;"></tbody>
@@ -225,7 +227,7 @@ import moment from "moment";
 export default {
   data() {
     return {
-      id: 0, //id del empleado
+      idCaja: "", //id de la caja ya listada
       rol_user: "", //empleado Rol
       arrayCaja: [],
       empresas_empresas_id: 1,
@@ -303,6 +305,32 @@ export default {
             {
               data: "valor_producido",
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+            },
+            {
+              render: function(data, type, row) {
+                if (row.estado_caja === "Activo") {
+                  return (
+                    '<span class="label label-success">' +
+                    row.estado_caja +
+                    "</span>"
+                  );
+                } else {
+                  return (
+                    '<span class="label label-danger">' +
+                    row.estado_caja +
+                    "</span>"
+                  );
+                }
+              }
+            },
+            {
+              render: function(data, type, row) {
+                if (row.estado_caja === "Activo") {
+                  return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Caja"><i class="fas fa-close"></i> Desactivar</button>';
+                } else {
+                  return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-success activar btn-sm" title="Activar Caja"><i class="fas fa-check"></i> Activar</button>';
+                }
+              }
             }
           ]
         });
@@ -326,20 +354,13 @@ export default {
 
           //var data = me.arrayEmpleados;
           //$(this).parents('tr') esto es para obtener por fila
-          //console.log('Row data:' + data);
-
-          me.id = data["id"]; //el id es este q es de datatables o este id es de la consulta cualquiera sirve
-          me.rol_user = data["roles_roles_id"];
-          me.empresas_empresas_id = data["empresas_empresas_id"];
-          me.nombre_usuario = data["nombre_usuario"];
-          me.apellido_usuario = data["apellido_usuario"];
-          me.usuario = data["usuario"];
-          me.email = data["email"];
-          me.password = "";
-          me.celular = data["celular"];
-          me.fecha_cumple = data["fecha_cumple"];
-          me.imagen = data["imagen"];
-          me.estado_usuario = data["estado_usuario"];
+          //console.log(data);
+          (me.idCaja = data["id"]),
+            (me.idEmpleadoElegido = data["empleado_id"]),
+            (me.nombre_caja = data["nombre_caja"]),
+            (me.valor_inicial = data["valor_inicial"]),
+            (me.valor_producido = data["valor_producido"]),
+            (me.estado_caja = data["estado_cajaNum"]);
         });
         //para desactivar el empleado
         tablaEmpleados.on("click", ".desactivar", function() {
@@ -501,20 +522,14 @@ export default {
       this.arrayErrors = [];
 
       axios
-        .put("/actualizarEmpleado", {
+        .put("/actualizarCaja", {
           //enviamos los tados que hay en nuestros parametros
-          id: this.id,
-          roles_roles_id: this.rol_user,
-          empresas_empresas_id: this.empresas_empresas_id,
-          nombre_usuario: this.nombre_usuario,
-          apellido_usuario: this.apellido_usuario,
-          usuario: this.usuario,
-          email: this.email,
-          password: this.password,
-          celular: this.celular,
-          fecha_cumple: moment(this.fecha_cumple).format("YYYY-MM-DD"),
-          imagen: this.imagen,
-          estado_usuario: this.estado_usuario
+          id: me.idCaja,
+          empleado_id: me.idEmpleadoElegido,
+          nombre_caja: me.nombre_caja,
+          valor_inicial: me.valor_inicial,
+          valor_producido: me.valor_producido,
+          estado_caja: me.estado_caja
         })
         .then(function(response) {
           //para actualizar la tabla de datatables
