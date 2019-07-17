@@ -6,7 +6,8 @@ use App\Caja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // para obtener el id del cliente que hace la solicitud
+use Illuminate\Support\Facades\Auth; // para obtener el id del cliente que hace la solicitud+
+use Illuminate\Validation\Rule; //validaciones personalizadas
 
 class CajaController extends Controller
 {
@@ -32,8 +33,22 @@ class CajaController extends Controller
             //usaremos transacciones
             DB::beginTransaction();
             //para validar los formularios
+            // 'empleado_id' valida que el usuario al que se va asoriar la caja, lo siguiente:
+            //                 -que  no tenga caja activa, - que el rol sea diferente a administrador
             $request->validate([
-                'empleado_id' => 'required|unique:cajas',
+                'empleado_id' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        $encontrar = Caja::join('users', 'cajas.empleado_id', '=', 'users.id')->where([
+                            ['cajas.estado_caja', '=', 1],
+                            ['users.roles_roles_id', '<>', '1'],
+                            ['cajas.empleado_id', '=', $value]
+                        ])->count();
+                        if ($encontrar > 0) {
+                            $fail(' El Empleado ya tiene caja Asociada');
+                        }
+                    },
+                ],
                 'nombre_caja' => 'required|min:3|max:150',
                 'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                 'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
@@ -63,8 +78,21 @@ class CajaController extends Controller
             //buscar primero el User a modificar
             $caja = Caja::find($request->id);
 
-            //para validar los formularios
+            //para validar los formularios   ignorar el id de la caja
             $request->validate([
+                'empleado_id' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        $encontrar = Caja::join('users', 'cajas.empleado_id', '=', 'users.id')->where([
+                            ['cajas.estado_caja', '=', 1],
+                            ['users.roles_roles_id', '<>', '1'],
+                            ['cajas.empleado_id', '=', $value]
+                        ])->count();
+                        if ($encontrar > 1) {
+                            $fail(' El Empleado ya tiene caja Asociada');
+                        }
+                    },
+                ],
                 'nombre_caja' => 'required|min:3|max:150',
                 'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                 'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
