@@ -73,7 +73,7 @@ class FacturaController extends Controller
 
     public function facturarCargos(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
         //para validar
         /*$request->validate([
 

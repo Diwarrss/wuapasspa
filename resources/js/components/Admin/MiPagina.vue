@@ -750,6 +750,7 @@
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "asc" ]],
+                        "pagingType": "full",
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showCategoria",
                         "columns": [
@@ -870,6 +871,7 @@
                         "lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "Todos"]],
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
+                        "pagingType": "full",
                         //"order": [[ 0, "asc" ]],
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showServicios",
@@ -992,6 +994,7 @@
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "asc" ]],
+                        "pagingType": "full",
                         "serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showImagenes",
                         "columns": [
