@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Caja;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -78,26 +79,35 @@ class CajaController extends Controller
             //buscar primero el User a modificar
             $caja = Caja::find($request->id);
 
-            //para validar los formularios   ignorar el id de la caja
-            $request->validate([
-                'empleado_id' => [
-                    'required',
-                    function ($attribute, $value, $fail) {
-                        $encontrar = Caja::join('users', 'cajas.empleado_id', '=', 'users.id')->where([
-                            ['cajas.estado_caja', '=', 1],
-                            ['users.roles_roles_id', '<>', '1'],
-                            ['cajas.empleado_id', '=', $value]
-                        ])->count();
-                        if ($encontrar > 1) {
-                            $fail(' El Empleado ya tiene caja Asociada');
-                        }
-                    },
-                ],
-                'nombre_caja' => 'required|min:3|max:150',
-                'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
-                'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
-                'estado_caja' => 'required'
-            ]);
+            //consultar usuaris admin
+            $UserAdmin = User::select('id')->where('roles_roles_id', 1)->get();
+            $existeAdmin = $UserAdmin->find($request->empleado_id);
+
+            if($existeAdmin == null){
+                //para validar los formularios   ignorar el id de la caja
+                $request->validate([
+                    'empleado_id' => [
+                        'required',
+                        Rule::unique('cajas')->ignore($request->id)->where(function ($query) {
+                            return $query->where('estado_caja', 1);
+                        })
+                    ],
+                    'nombre_caja' => 'required|min:3|max:150',
+                    'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                    'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                    'estado_caja' => 'required'
+                ]);
+            }
+            else {
+                $request->validate([
+                    'empleado_id' => 'required',
+                    'nombre_caja' => 'required|min:3|max:150',
+                    'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                    'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                    'estado_caja' => 'required'
+                ]);
+            }
+
 
             $caja->empleado_id = $request->empleado_id;
             $caja->nombre_caja = $request->nombre_caja;;
