@@ -30,8 +30,8 @@
                   <p v-text="dataCajaDiv[0].valor_inicial"></p>
                 </div>
                 <div class="col-md-4">
-                  <h4>Valor Producido</h4>
-                  <p v-text="dataCajaDiv[0].valor_producido"></p>
+                  <h4>Valor Neto</h4>
+                  <p v-text="dataCajaDiv[0].valor_producido - dataCajaDiv[0].valor_gastos"></p>
                 </div>
               </div>
             </div>
@@ -70,6 +70,7 @@
                     <th>Nombre Caja</th>
                     <th>Valor Inicial</th>
                     <th>Valor Producido</th>
+                    <th>Valor Gastos</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
@@ -152,6 +153,27 @@
                       class="text-red"
                       v-if="arrayErrors.valor_producido"
                       v-text="arrayErrors.valor_producido[0]"
+                    ></p>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label
+                    for="valor_producido"
+                    class="col-sm-4 control-label hidden-xs"
+                  >Valor Gastado</label>
+
+                  <div class="col-sm-8 col-xs-12">
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="valor_producido"
+                      v-model="valor_gastos"
+                      placeholder="Valor Gastos"
+                    />
+                    <p
+                      class="text-red"
+                      v-if="arrayErrors.valor_gastos"
+                      v-text="arrayErrors.valor_gastos[0]"
                     ></p>
                   </div>
                 </div>
@@ -239,6 +261,7 @@ export default {
       empleados: [],
       usuario: "",
       valor_producido: "",
+      valor_gastos: "",
       password: "",
       password2: "",
       celular: "",
@@ -307,6 +330,10 @@ export default {
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
             },
             {
+              data: "valor_gastos",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+            },
+            {
               render: function(data, type, row) {
                 if (row.estado_caja === "Activo") {
                   return (
@@ -325,11 +352,7 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (row.estado_caja === "Activo") {
-                  return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Caja"><i class="fas fa-close"></i> Desactivar</button>';
-                } else {
-                  return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-success activar btn-sm" title="Activar Caja"><i class="fas fa-check"></i> Activar</button>';
-                }
+                return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button>';
               }
             }
           ]
@@ -360,121 +383,8 @@ export default {
             (me.nombre_caja = data["nombre_caja"]),
             (me.valor_inicial = data["valor_inicial"]),
             (me.valor_producido = data["valor_producido"]),
+            (me.valor_gastos = data["valor_gastos"]),
             (me.estado_caja = data["estado_cajaNum"]);
-        });
-        //para desactivar el empleado
-        tablaEmpleados.on("click", ".desactivar", function() {
-          jQuery.noConflict(); // para evitar errores
-          //para si es responsivo obtenemos la data
-          var current_row = jQuery(this).parents("tr"); //Get the current row
-          if (current_row.hasClass("child")) {
-            //Check if the current row is a child row
-            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
-          }
-          var datos = tablaEmpleados.row(current_row).data();
-          //console.log(datos);
-
-          me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
-          Swal.fire({
-            title: "¿Desactivar el empleado?",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "green",
-            cancelButtonColor: "red",
-            confirmButtonText: '<i class="fas fa-check"></i> Si',
-            cancelButtonText: '<i class="fas fa-times"></i> No'
-          }).then(result => {
-            if (result.value) {
-              // /cancelarReservacion
-              axios
-                .put("/updateEstadoEmple", {
-                  id: me.id,
-                  estado_usuario: 2
-                })
-                .then(function(response) {
-                  Swal.fire({
-                    position: "top-end",
-                    type: "success",
-                    title: "Empleado Desactivado!",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  jQuery("#tablaEmpleados")
-                    .DataTable()
-                    .ajax.reload(null, false);
-                })
-                .catch(function(error) {
-                  if (error.response.status == 422) {
-                    //preguntamos si el error es 422
-                    Swal.fire({
-                      position: "top-end",
-                      type: "error",
-                      title: "Se produjo un Error, Reintentar",
-                      showConfirmButton: false,
-                      timer: 1500
-                    });
-                  }
-                  console.log(error.response.data.errors);
-                });
-            }
-          });
-        });
-        //para Activar el empleado
-        tablaEmpleados.on("click", ".activar", function() {
-          jQuery.noConflict(); // para evitar errores
-          //para si es responsivo obtenemos la data
-          var current_row = jQuery(this).parents("tr"); //Get the current row
-          if (current_row.hasClass("child")) {
-            //Check if the current row is a child row
-            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
-          }
-          var datos = tablaEmpleados.row(current_row).data();
-          //console.log(datos);
-
-          me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
-          Swal.fire({
-            title: "Activar el empleado?",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "green",
-            cancelButtonColor: "red",
-            confirmButtonText: '<i class="fas fa-check"></i> Si',
-            cancelButtonText: '<i class="fas fa-times"></i> No'
-          }).then(result => {
-            if (result.value) {
-              // /cancelarReservacion
-              axios
-                .put("/updateEstadoEmple", {
-                  id: me.id,
-                  estado_usuario: 1
-                })
-                .then(function(response) {
-                  Swal.fire({
-                    position: "top-end",
-                    type: "success",
-                    title: "Empleado Activado!",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  jQuery("#tablaEmpleados")
-                    .DataTable()
-                    .ajax.reload(null, false);
-                })
-                .catch(function(error) {
-                  if (error.response.status == 422) {
-                    //preguntamos si el error es 422
-                    Swal.fire({
-                      position: "top-end",
-                      type: "error",
-                      title: "Se produjo un Error, Reintentar",
-                      showConfirmButton: false,
-                      timer: 1500
-                    });
-                  }
-                  console.log(error.response.data.errors);
-                });
-            }
-          });
         });
       });
     },
@@ -488,6 +398,7 @@ export default {
           nombre_caja: data.nombre_caja,
           valor_inicial: data.valor_inicial,
           valor_producido: data.valor_producido,
+          valor_gastos: data.valor_gastos,
           estado_caja: data.estado_caja
         })
         .then(function(response) {
@@ -529,6 +440,7 @@ export default {
           nombre_caja: me.nombre_caja,
           valor_inicial: me.valor_inicial,
           valor_producido: me.valor_producido,
+          valor_gastos: me.valor_gastos,
           estado_caja: me.estado_caja
         })
         .then(function(response) {
@@ -536,6 +448,7 @@ export default {
           jQuery("#tablaEmpleados")
             .DataTable()
             .ajax.reload(null, false);
+          me.infoCajaDiv();
           me.cerrarModal();
           Swal.fire({
             position: "top-end",
@@ -594,6 +507,7 @@ export default {
         (this.valor_inicial = ""),
         (this.idEmpleadoElegido = ""),
         (this.valor_producido = ""),
+        (this.valor_gastos = ""),
         (this.estado_caja = ""),
         (this.arrayErrors = []);
     }
