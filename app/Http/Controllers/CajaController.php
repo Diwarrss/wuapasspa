@@ -80,6 +80,7 @@ class CajaController extends Controller
             $caja = Caja::find($request->id);
 
             //consultar usuaris admin
+            //valida que el admin tenga muchas cajas pero los agendadores solo una que este activa
             $UserAdmin = User::select('id')->where('roles_roles_id', 1)->get();
             $existeAdmin = $UserAdmin->find($request->empleado_id);
 

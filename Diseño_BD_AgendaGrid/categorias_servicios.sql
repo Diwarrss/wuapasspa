@@ -1,7 +1,4 @@
-INSERT INTO `categorias` (`
-id`,
-`nombre_categoria
-`, `estado_categoria`, `url_video`, `imagenes_imagenes_id`, `created_at`, `updated_at`) VALUES
+INSERT INTO `categorias` (`id`,`nombre_categoria`, `estado_categoria`, `url_video`, `imagenes_imagenes_id`, `created_at`, `updated_at`) VALUES
 (1, 'UÑAS', '1', '', NULL, '2019-06-27 15:33:45', '2019-06-27 15:49:00'),
 (2, 'PESTAÑAS Y CEJAS', '1', '', NULL, '2019-06-27 15:34:03', '2019-06-27 16:08:10'),
 (3, 'DEPILACIONES CON CERA', '1', '', NULL, '2019-06-27 15:34:15', '2019-06-27 15:34:15'),
@@ -9,10 +6,7 @@ id`,
 (5, 'MASAJE CORPORAL', '1', '', NULL, '2019-06-27 15:34:34', '2019-06-27 15:34:54'),
 (6, 'CABELLO', '1', '', NULL, '2019-06-27 15:34:50', '2019-06-27 15:34:50');
 
-INSERT INTO `servicios` (`
-id`,
-`nombre_servicio
-`, `descripcion_servicio`, `estado_servicio`, `url_video`, `valor_servicio`, `empresas_empresas_id`, `imagenes_imagenes_id`, `categorias_categorias_id`, `created_at`, `updated_at`) VALUES
+INSERT INTO `servicios` (`id`,`nombre_servicio`, `descripcion_servicio`, `estado_servicio`, `url_video`, `valor_servicio`, `empresas_empresas_id`, `imagenes_imagenes_id`, `categorias_categorias_id`, `created_at`, `updated_at`) VALUES
 (1, 'Pedispa sales relajantes', 'Pediespa con todo', '1', '', '25000.00', 1, NULL, 1, '2019-06-27 15:37:01', '2019-06-27 15:59:28'),
 (2, 'Manicure  tradicional', 'null', '1', '', '10000.00', 1, NULL, 1, '2019-06-27 15:49:32', '2019-06-27 15:52:29'),
 (3, 'Pedicure tradicional', 'null', '1', '', '12000.00', 1, NULL, 1, '2019-06-27 15:52:17', '2019-06-27 15:53:09'),
