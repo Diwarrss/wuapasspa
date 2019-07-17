@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Movimiento extends Model
 {
+    //tipo_movimiento
+    const INGRESO = 1;
+    const EGRESO = 2;
+
     protected $fillable = [
         'factura_id',
         'caja_id',
-        'valor_recibido',
+        'valor_movimiento',
         'valor_pendiente',
-        'valor_egreso'
+        'tipo_movimiento'
     ];
 }

@@ -85,15 +85,15 @@ class FacturaController extends Controller
         try {
             DB::beginTransaction();
 
-            //revisar porque cuando no hay factura no incrementa sale error
-            $saberUltimoFactura = Factura::orderBy('numero_factura', 'desc')->first()->id;
-            //saber el ultimo
-            //$ultimo = $saberUltimoFactura->last();
-            $numFactura = $saberUltimoFactura + 1;
+            /* //revisar porque cuando no hay factura no incrementa sale error
+                $saberUltimoFactura = Factura::orderBy('numero_factura', 'desc')->first()->id;
+                //saber el ultimo
+                //$ultimo = $saberUltimoFactura->last();
+                $numFactura = $saberUltimoFactura + 1; */
 
             $facturas = new Factura();
             $facturas->prefijo = $request->prefijo;
-            $facturas->numero_factura = $numFactura;
+            $facturas->numero_factura = 1;
             $facturas->tipo_comprobante = $request->tipo_comprobante;
             $facturas->creado_por = Auth::user()->id;
             $facturas->estado_factura = $request->estado_factura;
@@ -112,9 +112,9 @@ class FacturaController extends Controller
             $movimiento = new Movimiento();
             $movimiento->factura_id = $facturas->id;
             $movimiento->caja_id = $request->id_caja;
-            $movimiento->valor_recibido = $request->valor_total;
+            $movimiento->valor_movimiento = $request->valor_total;
             $movimiento->valor_pendiente = 0;
-            $movimiento->valor_egreso = 0;
+            $movimiento->tipo_movimiento = 1; //para q sea un ingreso
             $movimiento->save();
 
             //se recibe lo que se tiene en la propiedad informacionFacturar array detalles

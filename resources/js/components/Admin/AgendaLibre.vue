@@ -45,7 +45,7 @@
                                 day: 'Día',
                                 all_day: 'Todo el día'
                             }"
-                            :time-range="[8,19]"
+                            :time-range="[5,22]"
                             :available-views="['month', 'week', 'day']"
                             :initial-date="dateInit"
                             initial-view="day"

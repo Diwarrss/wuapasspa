@@ -11,6 +11,7 @@ class Caja extends Model
         'nombre_caja',
         'valor_inicial',
         'valor_producido',
+        'valor_gastos',
         'estado_caja'
     ];
 }

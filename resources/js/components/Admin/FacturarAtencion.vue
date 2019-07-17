@@ -324,6 +324,13 @@
                               </div>
                             </div>
                           </div>
+                          <div
+                            class="col-md-12 callout callout-danger text-center"
+                            v-if="id_caja == 0"
+                          >
+                            <h4>¡Alerta!</h4>
+                            <p>El Usuario Actual no tiene Caja Registradora Asociada, porfavor verificar.</p>
+                          </div>
                         </div>
                       </div>
                       <div id="pagoTarjeta" class="tab-pane fade">
@@ -345,7 +352,7 @@
                   type="button"
                   class="btn btn-success"
                   @click="facturarCargos();"
-                  :disabled="valorRecibido < valorNeto || descuento > subtotal"
+                  :disabled="valorRecibido < valorNeto || descuento > subtotal || id_caja == 0"
                 >
                   <i class="fas fa-shopping-cart"></i> Facturar
                 </button>
@@ -380,7 +387,7 @@ export default {
       arrayErrors: [],
       tipo_pago: 1,
       notaFactura: "",
-      id_caja: ""
+      id_caja: 0
     };
   },
   watch: {},
@@ -485,39 +492,52 @@ export default {
     //metodo para facturar los cargos
     facturarCargos() {
       let me = this;
-      axios
-        .post("/facturarCargos", {
-          informacionFacturar: me.informacionFacturar,
-          prefijo: "FV ",
-          estado_factura: 1,
-          tipo_comprobante: 1,
-          tipo_pago: me.tipo_pago,
-          valor_descuento: me.descuento,
-          valor_total: me.valorNeto,
-          nota_factura: me.notaFactura,
-          id_reserva: me.id_reserva,
-          id_caja: me.id_caja
-        })
-        .then(function(response) {
-          Swal.fire({
-            position: "top-end",
-            title: "Cargos Facturados con éxito!",
-            type: "success",
-            showConfirmButton: false,
-            timer: 1500
-          }).then(function() {
-            me.cerrarModalPago();
-            me.regresar();
-          });
-          //console.log(response);
-        })
-        .catch(function(error) {
-          if (error.response.status == 422) {
-            //preguntamos si el error es 422
-            me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
-          }
-          console.log(error);
+      if (me.id_caja == 0) {
+        Swal.fire({
+          position: "top-end",
+          title: "El Usuario actual no tiene Caja Registradora!",
+          type: "error",
+          showConfirmButton: false,
+          timer: 3500
+        }).then(function() {
+          me.cerrarModalPago();
+          me.regresar();
         });
+      } else {
+        axios
+          .post("/facturarCargos", {
+            informacionFacturar: me.informacionFacturar,
+            prefijo: "FV ",
+            estado_factura: 1,
+            tipo_comprobante: 1,
+            tipo_pago: me.tipo_pago,
+            valor_descuento: me.descuento,
+            valor_total: me.valorNeto,
+            nota_factura: me.notaFactura,
+            id_reserva: me.id_reserva,
+            id_caja: me.id_caja
+          })
+          .then(function(response) {
+            Swal.fire({
+              position: "top-end",
+              title: "Cargos Facturados con éxito!",
+              type: "success",
+              showConfirmButton: false,
+              timer: 1500
+            }).then(function() {
+              me.cerrarModalPago();
+              me.regresar();
+            });
+            //console.log(response);
+          })
+          .catch(function(error) {
+            if (error.response.status == 422) {
+              //preguntamos si el error es 422
+              me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+            }
+            console.log(error);
+          });
+      }
     },
     //aqui tenemos el script para datatables para los que se facturaran
     listarFacturacion() {
@@ -720,6 +740,7 @@ export default {
       let me = this;
       me.descuento = 0;
       me.valorRecibido = 0;
+      me.id_caja = 0;
     }
   },
   mounted() {

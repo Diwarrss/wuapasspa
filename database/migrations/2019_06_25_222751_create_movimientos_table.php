@@ -19,9 +19,12 @@ class CreateMovimientosTable extends Migration
             $table->foreign('factura_id')->references('id')->on('facturas');
             $table->unsignedInteger('caja_id');
             $table->foreign('caja_id')->references('id')->on('cajas');
-            $table->decimal('valor_recibido', 12,2)->default(0);
-            $table->decimal('valor_pendiente', 12,2)->default(0);
-            $table->decimal('valor_egreso', 12,2)->default(0);
+            $table->decimal('valor_movimiento', 12, 2)->default(0);
+            $table->decimal('valor_pendiente', 12, 2)->default(0);
+            $table->enum('tipo_movimiento', [
+                \App\Movimiento::INGRESO, \App\Movimiento::EGRESO
+            ])
+                ->default(\App\Movimiento::INGRESO);
             $table->timestamps();
         });
     }

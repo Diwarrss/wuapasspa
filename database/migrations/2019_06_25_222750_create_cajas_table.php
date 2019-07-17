@@ -20,6 +20,7 @@ class CreateCajasTable extends Migration
             $table->string('nombre_caja', 150);
             $table->decimal('valor_inicial', 12, 2);
             $table->decimal('valor_producido', 12, 2);
+            $table->decimal('valor_gastos', 12, 2)->default(0);
             $table->enum('estado_caja', [\App\User::ACTIVO, \App\User::DESACTIVADO])->default(\App\User::ACTIVO); //con enum obligamos a que solo permita esos valores y dejamos por defecto Activo
             $table->timestamps();
         });
