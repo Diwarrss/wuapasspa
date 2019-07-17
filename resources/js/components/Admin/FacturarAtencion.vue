@@ -379,7 +379,8 @@ export default {
       valorCambio: "",
       arrayErrors: [],
       tipo_pago: 1,
-      notaFactura: ""
+      notaFactura: "",
+      id_caja: ""
     };
   },
   watch: {},
@@ -408,6 +409,24 @@ export default {
     }
   },
   methods: {
+    //listar la caja del Usuario
+    infoCajaDiv() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/infoCajaDiv")
+        .then(function(response) {
+          me.id_caja = response.data[0].id;
+          //console.log(me.lista_empleados);
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
     //mostrar todos los empleados con Rol Empleado Activos
     listaEmpleados() {
       let me = this;
@@ -470,12 +489,14 @@ export default {
         .post("/facturarCargos", {
           informacionFacturar: me.informacionFacturar,
           prefijo: "FV ",
-          tipo_comprobante: 1,
           estado_factura: 1,
+          tipo_comprobante: 1,
           tipo_pago: me.tipo_pago,
           valor_descuento: me.descuento,
           valor_total: me.valorNeto,
-          nota_factura: me.notaFactura
+          nota_factura: me.notaFactura,
+          id_reserva: me.id_reserva,
+          id_caja: me.id_caja
         })
         .then(function(response) {
           Swal.fire({
@@ -488,7 +509,7 @@ export default {
             me.cerrarModalPago();
             me.regresar();
           });
-          console.log(response);
+          //console.log(response);
         })
         .catch(function(error) {
           if (error.response.status == 422) {
@@ -707,6 +728,7 @@ export default {
     this.infoEmpresa();
     this.listaEmpleados();
     this.listarServicios();
+    this.infoCajaDiv();
   }
 };
 </script>

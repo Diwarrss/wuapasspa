@@ -8,6 +8,9 @@ use App\Reservacione;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Servicios_solicitudes;
+use Carbon\Carbon;
+use App\DetalleFactura;
+use App\Movimiento;
 
 class FacturaController extends Controller
 {
@@ -79,7 +82,10 @@ class FacturaController extends Controller
             'comentario' => 'required'
         ]);*/
         //para generear la transacccion
-        return DB::transaction(function () use ($request) {
+        try {
+            DB::beginTransaction();
+
+            //revisar porque cuando no hay factura no incrementa sale error
             $saberUltimoFactura = Factura::orderBy('numero_factura', 'desc')->first()->id;
             //saber el ultimo
             //$ultimo = $saberUltimoFactura->last();
@@ -97,13 +103,36 @@ class FacturaController extends Controller
             $facturas->nota_factura = $request->nota_factura;
             $facturas->save();
 
-            foreach ($request->informacionFacturar as $informacionFacturar) {
-                $informacionFacturar = Servicios_solicitudes::findOrFail($informacionFacturar->id_solicitud);
-                $informacionFacturar->facturas_id = $facturas->numero_factura;
-                $informacionFacturar->empleado_id = $informacionFacturar->id_atendido_por;
-                $informacionFacturar->reservaciones_id = $informacionFacturar->id_reserva;
-                $informacionFacturar->cantidad_facturada = $informacionFacturar->cantidad;
+            //se captura el id de la reserva a actualizar el id_factura
+            $reserva = Reservacione::find($request->id_reserva);
+            $reserva->facturas_id = $facturas->id; //colocamos el id de la factura creada
+            $reserva->save();
+
+            //creamos el movimiento de la factura hacia la caja
+            $movimiento = new Movimiento();
+            $movimiento->factura_id = $facturas->id;
+            $movimiento->caja_id = $request->id_caja;
+            $movimiento->valor_recibido = $request->valor_total;
+            $movimiento->valor_pendiente = 0;
+            $movimiento->valor_egreso = 0;
+            $movimiento->save();
+
+            //se recibe lo que se tiene en la propiedad informacionFacturar array detalles
+            $detalles = $request->informacionFacturar;
+
+            foreach ($detalles as $key => $det) {
+                $detalle = new DetalleFactura(); //creamos el objeto detalle q hace referencia al modelo detallefactura
+                $detalle->facturas_id = $facturas->id;
+                $detalle->servicios_servicios_id = $det['id_servicio'];
+                $detalle->empleado_id = $det['id_atendido_por'];
+                $detalle->cantidad_facturada = $det['cantidad'];
+                $detalle->valor_servicio = $det['valor_servicio'];
+                $detalle->save();
             }
-        });
+
+            DB::commit(); //se ahce el commit pa update base datos
+        } catch (Exception $e) {
+            DB::rollBack();
+        }
     }
 }

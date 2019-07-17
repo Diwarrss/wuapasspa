@@ -10,6 +10,7 @@ class Caja extends Model
         'empleado_id',
         'nombre_caja',
         'valor_inicial',
-        'valor_producido'
+        'valor_producido',
+        'estado_caja'
     ];
 }
