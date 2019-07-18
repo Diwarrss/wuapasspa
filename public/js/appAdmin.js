@@ -2527,8 +2527,7 @@ __webpack_require__.r(__webpack_exports__);
           "order": [],
           //no colocar ordenamiento
           //"order": [[ 0, "asc" ]],
-          "serverSide": true,
-          //Lado servidor activar o no mas de 20000 registros
+          //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
           "ajax": "/listarAnonimas",
           "columns": [{
             data: 'nombre_completo_cliente'
@@ -4816,6 +4815,43 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4864,6 +4900,75 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    //listar todas las facturas realizadas en el dia FacturaController
+    listarFacturacionDiaria: function listarFacturacionDiaria() {
+      var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+
+      jQuery(document).ready(function () {
+        var tablaFacturasDiarias = jQuery("#tablaFacturasDiarias").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          //processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [[0, "asc"]],
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ajax: "/listarFacturacionDiaria",
+          columns: [{
+            data: "num_factura"
+          }, {
+            data: "fecha_factura"
+          }, {
+            render: function render(data, type, row) {
+              if (row.nombre_cliente != null) {
+                return row.nombre_cliente;
+              } else {
+                return row.nombre_anonimo;
+              }
+            }
+          }, {
+            render: function render(data, type, row) {
+              if (row.estado_factura === "1") {
+                return row.estado_factura;
+              } else if (row.estado_factura === "2") {
+                return row.estado_factura;
+              } else if (row.estado_factura === "3") {
+                return row.estado_factura;
+              } else {
+                return row.estado_factura;
+              }
+            }
+          }, {
+            data: "valor_total",
+            className: "sum",
+            render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+          }, {
+            render: function render(data, type, row) {
+              return "<button type=\"button\" class=\"btn btn-default imprimir\" title=\"Imprimir Factura\">\n                            <i class=\"fas fa-print\"></i> Imprimir\n                        </button>";
+            }
+          }],
+          footerCallback: function footerCallback(row, data, start, end, display) {
+            var api = this.api();
+            var numberFormat = jQuery.fn.dataTable.render.number(".", ",", 2, "$ ").display; //sumeme el data que tenga la clase sum
+
+            api.columns(".sum", {
+              page: "current"
+            }).every(function () {
+              var sum = this.data().reduce(function (a, b) {
+                var x = parseFloat(a) || 0;
+                var y = parseFloat(b) || 0;
+                return x + y;
+              }, 0);
+              /* console.log(sum); */
+              // Update footer
+
+              $(this.footer()).html(numberFormat(sum));
+            });
+          }
+        });
+      });
+    },
     //listar la caja del Usuario
     infoCajaDiv: function infoCajaDiv() {
       var me = this; // Make a request for a user with a given ID
@@ -4974,8 +5079,7 @@ __webpack_require__.r(__webpack_exports__);
           responsive: true,
           order: [],
           //no colocar ordenamiento
-          serverSide: true,
-          //Lado servidor activar o no mas de 20000 registros
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarFacturacion",
           columns: [{
             render: function render(data, type, row) {
@@ -5112,6 +5216,7 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       me.mostrarDiv = 1;
       me.listarFacturacion();
+      me.listarFacturacionDiaria();
     },
     formatearValor: function formatearValor(value) {
       var val = (value / 1).toFixed(2).replace(".", ",");
@@ -5154,11 +5259,11 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       me.descuento = 0;
       me.valorRecibido = 0;
-      me.id_caja = 0;
     }
   },
   mounted: function mounted() {
     this.listarFacturacion();
+    this.listarFacturacionDiaria();
     this.infoFacturador();
     this.infoEmpresa();
     this.listaEmpleados();
@@ -42781,7 +42886,11 @@ var render = function() {
         ])
       : _vm._e(),
     _vm._v(" "),
-    _vm._m(9),
+    _vm.mostrarDiv == 1
+      ? _c("section", { staticClass: "content" }, [_vm._m(9)])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm._m(10),
     _vm._v(" "),
     _c("section", [
       _c("div", { staticClass: "modal fade in", attrs: { id: "modalPagos" } }, [
@@ -42794,12 +42903,12 @@ var render = function() {
                 attrs: { "content-type": "multipart/form-data" }
               },
               [
-                _vm._m(10),
+                _vm._m(11),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-body" }, [
                   _c("div", { staticClass: "box-body" }, [
                     _c("div", {}, [
-                      _vm._m(11),
+                      _vm._m(12),
                       _vm._v(" "),
                       _c("div", { staticClass: "tab-content row" }, [
                         _c(
@@ -42831,7 +42940,7 @@ var render = function() {
                                           [
                                             _vm.informacionFacturar.length > 0
                                               ? _c("tr", [
-                                                  _vm._m(12),
+                                                  _vm._m(13),
                                                   _vm._v(" "),
                                                   _c("td", [
                                                     _vm._v(
@@ -42849,7 +42958,7 @@ var render = function() {
                                             _vm._v(" "),
                                             _vm.informacionFacturar.length > 0
                                               ? _c("tr", [
-                                                  _vm._m(13),
+                                                  _vm._m(14),
                                                   _vm._v(" "),
                                                   _c("td", [
                                                     _c("input", {
@@ -42889,7 +42998,7 @@ var render = function() {
                                             _vm._v(" "),
                                             _vm.informacionFacturar.length > 0
                                               ? _c("tr", [
-                                                  _vm._m(14),
+                                                  _vm._m(15),
                                                   _vm._v(" "),
                                                   _c("td", [
                                                     _vm._v(
@@ -42983,7 +43092,7 @@ var render = function() {
                           ]
                         ),
                         _vm._v(" "),
-                        _vm._m(15)
+                        _vm._m(16)
                       ])
                     ])
                   ])
@@ -43197,6 +43306,61 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("td", { attrs: { colspan: "3", align: "right" } }, [
       _c("strong", [_vm._v("Total Neto:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "box box-success" }, [
+      _c("div", { staticClass: "box-header" }, [
+        _c("h3", { staticClass: "box-title" }, [
+          _c("i", { staticClass: "far fa-list-alt" }),
+          _vm._v(" Facturación Diaria\n        ")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "table-responsive container-fluid" }, [
+        _c(
+          "table",
+          {
+            staticClass: "table table-bordered table-hover",
+            staticStyle: { width: "100%" },
+            attrs: { id: "tablaFacturasDiarias" }
+          },
+          [
+            _c("thead", [
+              _c("tr", [
+                _c("th", [_vm._v("# Factura")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Fecha Factura")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Cliente")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Estado Factura")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Valor Total")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Acciones")])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("tbody", { staticStyle: { "font-weight": "normal" } }),
+            _vm._v(" "),
+            _c("tfoot", [
+              _c("tr", [
+                _c(
+                  "th",
+                  { staticClass: "text-right", attrs: { colspan: "4" } },
+                  [_vm._v("Total:")]
+                ),
+                _vm._v(" "),
+                _c("th", { attrs: { colspan: "2" } })
+              ])
+            ])
+          ]
+        )
+      ])
     ])
   },
   function() {

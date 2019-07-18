@@ -111,6 +111,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');
+        Route::get('/listarFacturacionDiaria', 'FacturaController@listarFacturacionDiaria')->name('listarFacturacionDiaria');
         Route::get('/mostrarInfoFacturar', 'FacturaController@mostrarInfoFacturar')->name('mostrarInfoFacturar');
         Route::get('/serviciosFaturables', 'ServiciosController@serviciosFaturables')->name('serviciosFaturables');
         Route::post('/facturarCargos', 'FacturaController@facturarCargos')->name('facturarCargos');

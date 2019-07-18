@@ -198,6 +198,43 @@
         </div>
       </div>
     </section>
+    <!-- seccion parte para mostrar el total de facturados -->
+    <section v-if="mostrarDiv == 1" class="content">
+      <div class="box box-success">
+        <div class="box-header">
+          <h3 class="box-title">
+            <i class="far fa-list-alt"></i> Facturación Diaria
+          </h3>
+        </div>
+
+        <div class="table-responsive container-fluid">
+          <table
+            id="tablaFacturasDiarias"
+            class="table table-bordered table-hover"
+            style="width:100%"
+          >
+            <thead>
+              <tr>
+                <th># Factura</th>
+                <th>Fecha Factura</th>
+                <th>Cliente</th>
+                <th>Estado Factura</th>
+                <th>Valor Total</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody style="font-weight: normal;"></tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" class="text-right">Total:</th>
+                <th colspan="2"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!--Modal mostrar Servicios-->
     <section>
       <div class="modal fade in" id="modalServicios">
@@ -416,6 +453,81 @@ export default {
     }
   },
   methods: {
+    //listar todas las facturas realizadas en el dia FacturaController
+    listarFacturacionDiaria() {
+      let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+      jQuery(document).ready(function() {
+        var tablaFacturasDiarias = jQuery("#tablaFacturasDiarias").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          //processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [[0, "asc"]],
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ajax: "/listarFacturacionDiaria",
+          columns: [
+            { data: "num_factura" },
+            { data: "fecha_factura" },
+            {
+              render: function(data, type, row) {
+                if (row.nombre_cliente != null) {
+                  return row.nombre_cliente;
+                } else {
+                  return row.nombre_anonimo;
+                }
+              }
+            },
+            {
+              render: function(data, type, row) {
+                if (row.estado_factura === "1") {
+                  return row.estado_factura;
+                } else if (row.estado_factura === "2") {
+                  return row.estado_factura;
+                } else if (row.estado_factura === "3") {
+                  return row.estado_factura;
+                } else {
+                  return row.estado_factura;
+                }
+              }
+            },
+            {
+              data: "valor_total",
+              className: "sum",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+            },
+            {
+              render: function(data, type, row) {
+                return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>`;
+              }
+            }
+          ],
+          footerCallback: function(row, data, start, end, display) {
+            var api = this.api();
+            var numberFormat = jQuery.fn.dataTable.render.number(
+              ".",
+              ",",
+              2,
+              "$ "
+            ).display;
+            //sumeme el data que tenga la clase sum
+            api.columns(".sum", { page: "current" }).every(function() {
+              var sum = this.data().reduce(function(a, b) {
+                var x = parseFloat(a) || 0;
+                var y = parseFloat(b) || 0;
+                return x + y;
+              }, 0);
+              /* console.log(sum); */
+              // Update footer
+              $(this.footer()).html(numberFormat(sum));
+            });
+          }
+        });
+      });
+    },
     //listar la caja del Usuario
     infoCajaDiv() {
       let me = this;
@@ -551,7 +663,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [], //no colocar ordenamiento
-          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarFacturacion",
           columns: [
             {
@@ -699,6 +811,7 @@ export default {
       let me = this;
       me.mostrarDiv = 1;
       me.listarFacturacion();
+      me.listarFacturacionDiaria();
     },
     formatearValor(value) {
       let val = (value / 1).toFixed(2).replace(".", ",");
@@ -740,11 +853,11 @@ export default {
       let me = this;
       me.descuento = 0;
       me.valorRecibido = 0;
-      me.id_caja = 0;
     }
   },
   mounted() {
     this.listarFacturacion();
+    this.listarFacturacionDiaria();
     this.infoFacturador();
     this.infoEmpresa();
     this.listaEmpleados();

@@ -11,6 +11,7 @@ use App\Servicios_solicitudes;
 use Carbon\Carbon;
 use App\DetalleFactura;
 use App\Movimiento;
+use Carbon\Carbon as CarbonCarbon;
 
 class FacturaController extends Controller
 {
@@ -37,6 +38,33 @@ class FacturaController extends Controller
             ->where([['reservaciones.estado_reservacion', 2], ['reservaciones.facturas_id', null]])
             ->groupBy('reservaciones.id')
             ->orderByDesc('solicitudes.id')
+            ->get();
+
+        return datatables($listarFacturar)->toJson();
+    }
+
+    public function listarFacturacionDiaria()
+    {
+        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        $fechahoy = Carbon::now()->format('Y-m-d');
+
+        $listarFacturar = DB::table('facturas')
+            ->join('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
+            ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
+            ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
+            ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
+            ->select(
+                'facturas.id as id_factura',
+                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as num_factura"),
+                DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
+                'anonimos.nombre_anonimo',
+                DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
+                'facturas.valor_total',
+                'facturas.estado_factura'
+            )
+            ->where([['facturas.created_at', 'like', '%' . $fechahoy . '%']])
+            //->orderByDesc('facturas.id')
             ->get();
 
         return datatables($listarFacturar)->toJson();
