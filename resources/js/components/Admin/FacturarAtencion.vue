@@ -315,48 +315,50 @@
                         <div class="box-body">
                           <div class="col-md-6">
                             <div class="box box-primary">
-                              <div class="box-body">
-                                <table class="table table-bordered table-hover">
-                                  <tbody style="font-weight: normal; font-size: 18px;">
-                                    <tr v-if="informacionFacturar.length > 0">
-                                      <td align="right">
-                                        <strong>Subtotal:</strong>
-                                      </td>
-                                      <td>$ {{formatearValor(subtotal = calcularSubtotal)}}</td>
-                                    </tr>
-                                    <tr v-if="informacionFacturar.length > 0">
-                                      <td align="right">
-                                        <strong>Descuento:</strong>
-                                      </td>
-                                      <td>
-                                        <input
-                                          type="number"
-                                          v-model="descuento"
-                                          class="form-control"
-                                        />
-                                      </td>
-                                    </tr>
-                                    <tr v-if="informacionFacturar.length > 0">
-                                      <td align="right">
-                                        <strong>Total Neto:</strong>
-                                      </td>
-                                      <td>$ {{formatearValor(valorNeto = calcularNeto)}}</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
+                              <div
+                                class="box-body row text-center"
+                                style="font-weight: normal; font-size: 22px;"
+                              >
+                                <div class="col-md-6 col-sm-6">
+                                  <strong>Subtotal:</strong>
+                                </div>
+                                <div
+                                  class="col-md-6 col-sm-6"
+                                >$ {{formatearValor(subtotal = calcularSubtotal)}}</div>
+                                <div class="col-md-6 col-sm-6">
+                                  <strong>Descuento:</strong>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                  <input type="number" v-model="descuento" class="form-control" />
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                  <strong>Total Neto:</strong>
+                                </div>
+                                <div
+                                  class="col-md-6 col-sm-6"
+                                >$ {{formatearValor(valorNeto = calcularNeto)}}</div>
                               </div>
                             </div>
                           </div>
                           <div class="col-md-6">
                             <div class="box box-primary">
-                              <div class="box-body">
+                              <div class="box-body" style="font-weight: normal; font-size: 22px;">
                                 <div class="text-center">
-                                  <h3>Valor Recibido</h3>
-                                  <input type="number" class="form-control" v-model="valorRecibido" />
+                                  <strong>
+                                    <p>Valor Recibido</p>
+                                  </strong>
+                                  <input
+                                    type="number"
+                                    class="form-control input-lg"
+                                    id="valorR"
+                                    v-model="valorRecibido"
+                                  />
                                 </div>
                                 <div class="text-center">
-                                  <h3>Valor Cambio</h3>
-                                  <h3>$ {{formatearValor(valorRecibido - valorNeto)}}</h3>
+                                  <strong>
+                                    <p>Valor Cambio</p>
+                                  </strong>
+                                  <p>$ {{formatearValor(valorRecibido - valorNeto)}}</p>
                                 </div>
                               </div>
                             </div>
@@ -482,13 +484,13 @@ export default {
             {
               render: function(data, type, row) {
                 if (row.estado_factura === "1") {
-                  return row.estado_factura;
+                  return '<span class="label label-success">Pagada</span>';
                 } else if (row.estado_factura === "2") {
-                  return row.estado_factura;
+                  return '<span class="label label-info">Pago Parcial</span>';
                 } else if (row.estado_factura === "3") {
-                  return row.estado_factura;
+                  return '<span class="label label-warning">Pendiente</span>';
                 } else {
-                  return row.estado_factura;
+                  return '<span class="label label-danger">Anulada</span>';
                 }
               }
             },
@@ -499,9 +501,38 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
-                            <i class="fas fa-print"></i> Imprimir
+                if (row.estado_factura === "1") {
+                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger anular" title="Anular Factura">
+                            <i class="fas fa-close"></i>
                         </button>`;
+                } else if (row.estado_factura === "2") {
+                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger anular" title="Anular Factura">
+                            <i class="fas fa-close"></i>
+                        </button>
+                        <button type="button" class="btn btn-warning abonarPago" title="Agregar Pago">
+                            <i class="fas fa-plus-circle"></i> <i class="fas fa-dollar-sign"></i>
+                        </button>`;
+                } else if (row.estado_factura === "3") {
+                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger anular" title="Anular Factura">
+                            <i class="fas fa-close"></i>
+                        </button>
+                        <button type="button" class="btn btn-success pagarFactura" title="Pagar Factura">
+                            <i class="fas fa-money-bill-alt"></i>
+                        </button>`;
+                } else {
+                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
+                        </button>`;
+                }
               }
             }
           ],
@@ -841,8 +872,13 @@ export default {
     //abrimos la modal de pagos
     abrirPagos() {
       let me = this;
-
+      me.valorRecibido = "";
       jQuery.noConflict();
+      //para hacer focus en un input de la modal
+      $("#modalPagos").on("shown.bs.modal", function() {
+        $("#valorR").focus();
+      });
+      //mostramos la modal
       $("#modalPagos").modal("show");
     },
     cerrarModalPago() {

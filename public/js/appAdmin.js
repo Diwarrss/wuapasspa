@@ -4852,6 +4852,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4930,13 +4932,13 @@ __webpack_require__.r(__webpack_exports__);
           }, {
             render: function render(data, type, row) {
               if (row.estado_factura === "1") {
-                return row.estado_factura;
+                return '<span class="label label-success">Pagada</span>';
               } else if (row.estado_factura === "2") {
-                return row.estado_factura;
+                return '<span class="label label-info">Pago Parcial</span>';
               } else if (row.estado_factura === "3") {
-                return row.estado_factura;
+                return '<span class="label label-warning">Pendiente</span>';
               } else {
-                return row.estado_factura;
+                return '<span class="label label-danger">Anulada</span>';
               }
             }
           }, {
@@ -4945,7 +4947,15 @@ __webpack_require__.r(__webpack_exports__);
             render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
           }, {
             render: function render(data, type, row) {
-              return "<button type=\"button\" class=\"btn btn-default imprimir\" title=\"Imprimir Factura\">\n                            <i class=\"fas fa-print\"></i> Imprimir\n                        </button>";
+              if (row.estado_factura === "1") {
+                return "<button type=\"button\" class=\"btn btn-default imprimir\" title=\"Imprimir Factura\">\n                            <i class=\"fas fa-print\"></i>\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger anular\" title=\"Anular Factura\">\n                            <i class=\"fas fa-close\"></i>\n                        </button>";
+              } else if (row.estado_factura === "2") {
+                return "<button type=\"button\" class=\"btn btn-default imprimir\" title=\"Imprimir Factura\">\n                            <i class=\"fas fa-print\"></i>\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger anular\" title=\"Anular Factura\">\n                            <i class=\"fas fa-close\"></i>\n                        </button>\n                        <button type=\"button\" class=\"btn btn-warning abonarPago\" title=\"Agregar Pago\">\n                            <i class=\"fas fa-plus-circle\"></i> <i class=\"fas fa-dollar-sign\"></i>\n                        </button>";
+              } else if (row.estado_factura === "3") {
+                return "<button type=\"button\" class=\"btn btn-default imprimir\" title=\"Imprimir Factura\">\n                            <i class=\"fas fa-print\"></i>\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger anular\" title=\"Anular Factura\">\n                            <i class=\"fas fa-close\"></i>\n                        </button>\n                        <button type=\"button\" class=\"btn btn-success pagarFactura\" title=\"Pagar Factura\">\n                            <i class=\"fas fa-money-bill-alt\"></i>\n                        </button>";
+              } else {
+                return "<button type=\"button\" class=\"btn btn-default imprimir\" title=\"Imprimir Factura\">\n                            <i class=\"fas fa-print\"></i>\n                        </button>";
+              }
             }
           }],
           footerCallback: function footerCallback(row, data, start, end, display) {
@@ -5246,7 +5256,13 @@ __webpack_require__.r(__webpack_exports__);
     //abrimos la modal de pagos
     abrirPagos: function abrirPagos() {
       var me = this;
-      jQuery.noConflict();
+      me.valorRecibido = "";
+      jQuery.noConflict(); //para hacer focus en un input de la modal
+
+      $("#modalPagos").on("shown.bs.modal", function () {
+        $("#valorR").focus();
+      }); //mostramos la modal
+
       $("#modalPagos").modal("show");
     },
     cerrarModalPago: function cerrarModalPago() {
@@ -42921,152 +42937,157 @@ var render = function() {
                             _c("div", { staticClass: "box-body" }, [
                               _c("div", { staticClass: "col-md-6" }, [
                                 _c("div", { staticClass: "box box-primary" }, [
-                                  _c("div", { staticClass: "box-body" }, [
-                                    _c(
-                                      "table",
-                                      {
-                                        staticClass:
-                                          "table table-bordered table-hover"
-                                      },
-                                      [
-                                        _c(
-                                          "tbody",
-                                          {
-                                            staticStyle: {
-                                              "font-weight": "normal",
-                                              "font-size": "18px"
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "box-body row text-center",
+                                      staticStyle: {
+                                        "font-weight": "normal",
+                                        "font-size": "22px"
+                                      }
+                                    },
+                                    [
+                                      _vm._m(13),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "col-md-6 col-sm-6" },
+                                        [
+                                          _vm._v(
+                                            "$ " +
+                                              _vm._s(
+                                                _vm.formatearValor(
+                                                  (_vm.subtotal =
+                                                    _vm.calcularSubtotal)
+                                                )
+                                              )
+                                          )
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm._m(14),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "col-md-6 col-sm-6" },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: _vm.descuento,
+                                                expression: "descuento"
+                                              }
+                                            ],
+                                            staticClass: "form-control",
+                                            attrs: { type: "number" },
+                                            domProps: { value: _vm.descuento },
+                                            on: {
+                                              input: function($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.descuento =
+                                                  $event.target.value
+                                              }
                                             }
-                                          },
-                                          [
-                                            _vm.informacionFacturar.length > 0
-                                              ? _c("tr", [
-                                                  _vm._m(13),
-                                                  _vm._v(" "),
-                                                  _c("td", [
-                                                    _vm._v(
-                                                      "$ " +
-                                                        _vm._s(
-                                                          _vm.formatearValor(
-                                                            (_vm.subtotal =
-                                                              _vm.calcularSubtotal)
-                                                          )
-                                                        )
-                                                    )
-                                                  ])
-                                                ])
-                                              : _vm._e(),
-                                            _vm._v(" "),
-                                            _vm.informacionFacturar.length > 0
-                                              ? _c("tr", [
-                                                  _vm._m(14),
-                                                  _vm._v(" "),
-                                                  _c("td", [
-                                                    _c("input", {
-                                                      directives: [
-                                                        {
-                                                          name: "model",
-                                                          rawName: "v-model",
-                                                          value: _vm.descuento,
-                                                          expression:
-                                                            "descuento"
-                                                        }
-                                                      ],
-                                                      staticClass:
-                                                        "form-control",
-                                                      attrs: { type: "number" },
-                                                      domProps: {
-                                                        value: _vm.descuento
-                                                      },
-                                                      on: {
-                                                        input: function(
-                                                          $event
-                                                        ) {
-                                                          if (
-                                                            $event.target
-                                                              .composing
-                                                          ) {
-                                                            return
-                                                          }
-                                                          _vm.descuento =
-                                                            $event.target.value
-                                                        }
-                                                      }
-                                                    })
-                                                  ])
-                                                ])
-                                              : _vm._e(),
-                                            _vm._v(" "),
-                                            _vm.informacionFacturar.length > 0
-                                              ? _c("tr", [
-                                                  _vm._m(15),
-                                                  _vm._v(" "),
-                                                  _c("td", [
-                                                    _vm._v(
-                                                      "$ " +
-                                                        _vm._s(
-                                                          _vm.formatearValor(
-                                                            (_vm.valorNeto =
-                                                              _vm.calcularNeto)
-                                                          )
-                                                        )
-                                                    )
-                                                  ])
-                                                ])
-                                              : _vm._e()
-                                          ]
-                                        )
-                                      ]
-                                    )
-                                  ])
+                                          })
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm._m(15),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "col-md-6 col-sm-6" },
+                                        [
+                                          _vm._v(
+                                            "$ " +
+                                              _vm._s(
+                                                _vm.formatearValor(
+                                                  (_vm.valorNeto =
+                                                    _vm.calcularNeto)
+                                                )
+                                              )
+                                          )
+                                        ]
+                                      )
+                                    ]
+                                  )
                                 ])
                               ]),
                               _vm._v(" "),
                               _c("div", { staticClass: "col-md-6" }, [
                                 _c("div", { staticClass: "box box-primary" }, [
-                                  _c("div", { staticClass: "box-body" }, [
-                                    _c("div", { staticClass: "text-center" }, [
-                                      _c("h3", [_vm._v("Valor Recibido")]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.valorRecibido,
-                                            expression: "valorRecibido"
-                                          }
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: { type: "number" },
-                                        domProps: { value: _vm.valorRecibido },
-                                        on: {
-                                          input: function($event) {
-                                            if ($event.target.composing) {
-                                              return
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "box-body",
+                                      staticStyle: {
+                                        "font-weight": "normal",
+                                        "font-size": "22px"
+                                      }
+                                    },
+                                    [
+                                      _c(
+                                        "div",
+                                        { staticClass: "text-center" },
+                                        [
+                                          _vm._m(16),
+                                          _vm._v(" "),
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: _vm.valorRecibido,
+                                                expression: "valorRecibido"
+                                              }
+                                            ],
+                                            staticClass:
+                                              "form-control input-lg",
+                                            attrs: {
+                                              type: "number",
+                                              id: "valorR"
+                                            },
+                                            domProps: {
+                                              value: _vm.valorRecibido
+                                            },
+                                            on: {
+                                              input: function($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.valorRecibido =
+                                                  $event.target.value
+                                              }
                                             }
-                                            _vm.valorRecibido =
-                                              $event.target.value
-                                          }
-                                        }
-                                      })
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("div", { staticClass: "text-center" }, [
-                                      _c("h3", [_vm._v("Valor Cambio")]),
+                                          })
+                                        ]
+                                      ),
                                       _vm._v(" "),
-                                      _c("h3", [
-                                        _vm._v(
-                                          "$ " +
-                                            _vm._s(
-                                              _vm.formatearValor(
-                                                _vm.valorRecibido -
-                                                  _vm.valorNeto
-                                              )
+                                      _c(
+                                        "div",
+                                        { staticClass: "text-center" },
+                                        [
+                                          _vm._m(17),
+                                          _vm._v(" "),
+                                          _c("p", [
+                                            _vm._v(
+                                              "$ " +
+                                                _vm._s(
+                                                  _vm.formatearValor(
+                                                    _vm.valorRecibido -
+                                                      _vm.valorNeto
+                                                  )
+                                                )
                                             )
-                                        )
-                                      ])
-                                    ])
-                                  ])
+                                          ])
+                                        ]
+                                      )
+                                    ]
+                                  )
                                 ])
                               ]),
                               _vm._v(" "),
@@ -43092,7 +43113,7 @@ var render = function() {
                           ]
                         ),
                         _vm._v(" "),
-                        _vm._m(16)
+                        _vm._m(18)
                       ])
                     ])
                   ])
@@ -43508,7 +43529,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", { attrs: { align: "right" } }, [
+    return _c("div", { staticClass: "col-md-6 col-sm-6" }, [
       _c("strong", [_vm._v("Subtotal:")])
     ])
   },
@@ -43516,7 +43537,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", { attrs: { align: "right" } }, [
+    return _c("div", { staticClass: "col-md-6 col-sm-6" }, [
       _c("strong", [_vm._v("Descuento:")])
     ])
   },
@@ -43524,9 +43545,21 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", { attrs: { align: "right" } }, [
+    return _c("div", { staticClass: "col-md-6 col-sm-6" }, [
       _c("strong", [_vm._v("Total Neto:")])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("strong", [_c("p", [_vm._v("Valor Recibido")])])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("strong", [_c("p", [_vm._v("Valor Cambio")])])
   },
   function() {
     var _vm = this
