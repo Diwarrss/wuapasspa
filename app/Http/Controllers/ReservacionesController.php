@@ -516,6 +516,33 @@ class ReservacionesController extends Controller
             ->toJson();
     }
 
+    //para mostrar total de reservas anonimas para reporte
+    public function listarTotalAnonimas(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        $anonimas = DB::table('anonimos')
+            ->join('reservaciones', 'reservaciones.id', '=', 'anonimos.reservaciones_id')
+            ->select(
+                'reservaciones.id as id',
+                'anonimos.nombre_anonimo as nombre_completo_cliente',
+                'anonimos.celular_anonimo as celular',
+                'anonimos.notas_anonimo as notas',
+                DB::raw("(CASE reservaciones.estado_reservacion
+                                WHEN 1 THEN 'Por Confirmar'
+                                WHEN 2 THEN 'Atendido'
+                                WHEN 3 THEN 'No Asistió'
+                                WHEN 4 THEN 'En Espera'
+                                ELSE 'Cancelo' END) AS estado_reservacion_nombre"),
+                DB::raw("CONCAT(DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%d/%m/%Y %h:%i %p'),' a ',
+                        DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%h:%i %p')) as fecha_reserva")
+            )
+            ->orderBy('reservaciones.id', 'desc')
+            ->get();
+
+        return datatables($anonimas)
+            ->toJson();
+    }
     //cancelar reservacion o enemilar da igual a efecto visual
     public function cancelar(Request $request)
     {

@@ -74,6 +74,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/showNoAsistio', 'ReservacionesController@showNoAsistio')->name('showNoAsistio');
         Route::get('/showCanceladas', 'ReservacionesController@showCanceladas')->name('showCanceladas');
         //Vista de Reportes
+        Route::get('/listarTotalAnonimas', 'ReservacionesController@listarTotalAnonimas')->name('listarTotalAnonimas');
         Route::get('/showCitasMes', 'ReportesController@showCitasMes')->name('showCitasMes');
         Route::get('/showCitasAtendidas', 'ReportesController@showCitasAtendidas')->name('showCitasAtendidas');
         Route::get('/showCitasNoAsis', 'ReportesController@showCitasNoAsis')->name('showCitasNoAsis');

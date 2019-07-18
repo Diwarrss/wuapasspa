@@ -3241,6 +3241,40 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3259,6 +3293,7 @@ __webpack_require__.r(__webpack_exports__);
       empleados: [],
       usuario: "",
       valor_producido: "",
+      valor_gastos: "",
       password: "",
       password2: "",
       celular: "",
@@ -3323,6 +3358,9 @@ __webpack_require__.r(__webpack_exports__);
             data: "valor_producido",
             render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
           }, {
+            data: "valor_gastos",
+            render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+          }, {
             render: function render(data, type, row) {
               if (row.estado_caja === "Activo") {
                 return '<span class="label label-success">' + row.estado_caja + "</span>";
@@ -3332,11 +3370,7 @@ __webpack_require__.r(__webpack_exports__);
             }
           }, {
             render: function render(data, type, row) {
-              if (row.estado_caja === "Activo") {
-                return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-danger desactivar btn-sm" title="Desactivar Caja"><i class="fas fa-close"></i> Desactivar</button>';
-              } else {
-                return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-success activar btn-sm" title="Activar Caja"><i class="fas fa-check"></i> Activar</button>';
-              }
+              return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button>';
             }
           }]
         }); //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
@@ -3363,119 +3397,7 @@ __webpack_require__.r(__webpack_exports__);
           //$(this).parents('tr') esto es para obtener por fila
           //console.log(data);
 
-          me.idCaja = data["id"], me.idEmpleadoElegido = data["empleado_id"], me.nombre_caja = data["nombre_caja"], me.valor_inicial = data["valor_inicial"], me.valor_producido = data["valor_producido"], me.estado_caja = data["estado_cajaNum"];
-        }); //para desactivar el empleado
-
-        tablaEmpleados.on("click", ".desactivar", function () {
-          jQuery.noConflict(); // para evitar errores
-          //para si es responsivo obtenemos la data
-
-          var current_row = jQuery(this).parents("tr"); //Get the current row
-
-          if (current_row.hasClass("child")) {
-            //Check if the current row is a child row
-            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
-          }
-
-          var datos = tablaEmpleados.row(current_row).data(); //console.log(datos);
-
-          me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
-
-          Swal.fire({
-            title: "¿Desactivar el empleado?",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "green",
-            cancelButtonColor: "red",
-            confirmButtonText: '<i class="fas fa-check"></i> Si',
-            cancelButtonText: '<i class="fas fa-times"></i> No'
-          }).then(function (result) {
-            if (result.value) {
-              // /cancelarReservacion
-              axios.put("/updateEstadoEmple", {
-                id: me.id,
-                estado_usuario: 2
-              }).then(function (response) {
-                Swal.fire({
-                  position: "top-end",
-                  type: "success",
-                  title: "Empleado Desactivado!",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-                jQuery("#tablaEmpleados").DataTable().ajax.reload(null, false);
-              })["catch"](function (error) {
-                if (error.response.status == 422) {
-                  //preguntamos si el error es 422
-                  Swal.fire({
-                    position: "top-end",
-                    type: "error",
-                    title: "Se produjo un Error, Reintentar",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                }
-
-                console.log(error.response.data.errors);
-              });
-            }
-          });
-        }); //para Activar el empleado
-
-        tablaEmpleados.on("click", ".activar", function () {
-          jQuery.noConflict(); // para evitar errores
-          //para si es responsivo obtenemos la data
-
-          var current_row = jQuery(this).parents("tr"); //Get the current row
-
-          if (current_row.hasClass("child")) {
-            //Check if the current row is a child row
-            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
-          }
-
-          var datos = tablaEmpleados.row(current_row).data(); //console.log(datos);
-
-          me.id = datos["id"]; //capturamos el id para enviarlo por put en el metodo
-
-          Swal.fire({
-            title: "Activar el empleado?",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "green",
-            cancelButtonColor: "red",
-            confirmButtonText: '<i class="fas fa-check"></i> Si',
-            cancelButtonText: '<i class="fas fa-times"></i> No'
-          }).then(function (result) {
-            if (result.value) {
-              // /cancelarReservacion
-              axios.put("/updateEstadoEmple", {
-                id: me.id,
-                estado_usuario: 1
-              }).then(function (response) {
-                Swal.fire({
-                  position: "top-end",
-                  type: "success",
-                  title: "Empleado Activado!",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-                jQuery("#tablaEmpleados").DataTable().ajax.reload(null, false);
-              })["catch"](function (error) {
-                if (error.response.status == 422) {
-                  //preguntamos si el error es 422
-                  Swal.fire({
-                    position: "top-end",
-                    type: "error",
-                    title: "Se produjo un Error, Reintentar",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                }
-
-                console.log(error.response.data.errors);
-              });
-            }
-          });
+          me.idCaja = data["id"], me.idEmpleadoElegido = data["empleado_id"], me.nombre_caja = data["nombre_caja"], me.valor_inicial = data["valor_inicial"], me.valor_producido = data["valor_producido"], me.valor_gastos = data["valor_gastos"], me.estado_caja = data["estado_cajaNum"];
         });
       });
     },
@@ -3487,6 +3409,7 @@ __webpack_require__.r(__webpack_exports__);
         nombre_caja: data.nombre_caja,
         valor_inicial: data.valor_inicial,
         valor_producido: data.valor_producido,
+        valor_gastos: data.valor_gastos,
         estado_caja: data.estado_caja
       }).then(function (response) {
         //para actualizar la tabla de datatables
@@ -3510,6 +3433,10 @@ __webpack_require__.r(__webpack_exports__);
         console.log(data.arrayErrors);
       });
     },
+    formatearValor: function formatearValor(value) {
+      var val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
     actualizarEmpleado: function actualizarEmpleado() {
       //creamos variable q corresponde a this de mis variables de data()
       var me = this; //reseteamos los errores
@@ -3522,10 +3449,12 @@ __webpack_require__.r(__webpack_exports__);
         nombre_caja: me.nombre_caja,
         valor_inicial: me.valor_inicial,
         valor_producido: me.valor_producido,
+        valor_gastos: me.valor_gastos,
         estado_caja: me.estado_caja
       }).then(function (response) {
         //para actualizar la tabla de datatables
         jQuery("#tablaEmpleados").DataTable().ajax.reload(null, false);
+        me.infoCajaDiv();
         me.cerrarModal();
         Swal.fire({
           position: "top-end",
@@ -3584,7 +3513,7 @@ __webpack_require__.r(__webpack_exports__);
       jQuery("#tablaEmpleados").DataTable().ajax.reload(); //toca con jQuery para recargar la tabla si no genera conflicto
 
       this.arrayErrors = [];
-      this.nombre_caja = "", this.valor_inicial = "", this.idEmpleadoElegido = "", this.valor_producido = "", this.estado_caja = "", this.arrayErrors = [];
+      this.nombre_caja = "", this.valor_inicial = "", this.idEmpleadoElegido = "", this.valor_producido = "", this.valor_gastos = "", this.estado_caja = "", this.arrayErrors = [];
     }
   },
   mounted: function mounted() {
@@ -6101,6 +6030,7 @@ __webpack_require__.r(__webpack_exports__);
           "order": [],
           //no colocar ordenamiento
           //"order": [[ 0, "asc" ]],
+          "pagingType": "full",
           "serverSide": true,
           //Lado servidor activar o no mas de 20000 registros
           "ajax": "/showCategoria",
@@ -6224,6 +6154,7 @@ __webpack_require__.r(__webpack_exports__);
           "responsive": true,
           "order": [],
           //no colocar ordenamiento
+          "pagingType": "full",
           //"order": [[ 0, "asc" ]],
           "serverSide": true,
           //Lado servidor activar o no mas de 20000 registros
@@ -6357,6 +6288,7 @@ __webpack_require__.r(__webpack_exports__);
           "order": [],
           //no colocar ordenamiento
           //"order": [[ 0, "asc" ]],
+          "pagingType": "full",
           "serverSide": true,
           //Lado servidor activar o no mas de 20000 registros
           "ajax": "/showImagenes",
@@ -7016,6 +6948,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -7056,6 +6993,117 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     this.verPerfil();
     this.cantidadSolicitudes();
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {};
+  },
+  methods: {
+    listarAgeAnonima: function listarAgeAnonima() {
+      var me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+
+      var data = this;
+      jQuery(document).ready(function () {
+        var tablaAgendasL = jQuery("#tablaAgendasL").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [],
+          //no colocar ordenamiento
+          //"order": [[ 0, "asc" ]],
+          serverSide: true,
+          //Lado servidor activar o no mas de 20000 registros
+          ajax: "/listarTotalAnonimas",
+          columns: [{
+            data: "nombre_completo_cliente"
+          }, {
+            data: "fecha_reserva"
+          }, {
+            data: "notas"
+          }, {
+            render: function render(data, type, row) {
+              return '<a href="https://wa.me/57' + row.celular + "?text=Hola, " + row.nombre_completo_cliente + ", Tu Cita en Wuapas Spa es el " + row.fecha_reserva + '. Responde Confirmar o Cancelar, muchas gracias" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
+            }
+          }, {
+            render: function render(data, type, row) {
+              if (row.estado_reservacion_nombre === "En Espera") {
+                return '<span class="label label-warning">' + row.estado_reservacion_nombre + "</span>";
+              } else if (row.estado_reservacion_nombre === "No Asistió") {
+                return '<span class="label label-danger">' + row.estado_reservacion_nombre + "</span>";
+              } else if (row.estado_reservacion_nombre === "Atendido") {
+                return '<span class="label label-success">' + row.estado_reservacion_nombre + "</span>";
+              } else if (row.estado_reservacion_nombre === "Por Confirmar") {
+                return '<span class="label label-info">' + row.estado_reservacion_nombre + "</span>";
+              }
+            }
+          }]
+        });
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.listarAgeAnonima();
   }
 });
 
@@ -40249,34 +40297,66 @@ var render = function() {
           ? _c("div", { staticClass: "col-md-4" }, [
               _c("div", { staticClass: "small-box bg-green" }, [
                 _c("div", { staticClass: "inner" }, [
-                  _c("h4", {
-                    staticClass: "text-center",
-                    domProps: {
-                      textContent: _vm._s(_vm.dataCajaDiv[0].nombre_caja)
-                    }
-                  }),
+                  _c("strong", [
+                    _c("h3", {
+                      staticClass: "text-center",
+                      domProps: {
+                        textContent: _vm._s(_vm.dataCajaDiv[0].nombre_caja)
+                      }
+                    })
+                  ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-md-3" }, [
+                    _c("div", { staticClass: "col-md-4" }, [
                       _c("h4", [_vm._v("Valor Inicial")]),
                       _vm._v(" "),
-                      _c("p", {
-                        domProps: {
-                          textContent: _vm._s(_vm.dataCajaDiv[0].valor_inicial)
-                        }
-                      })
+                      _c("strong", [
+                        _c("p", [
+                          _vm._v(
+                            "$ " +
+                              _vm._s(
+                                _vm.formatearValor(
+                                  _vm.dataCajaDiv[0].valor_inicial
+                                )
+                              )
+                          )
+                        ])
+                      ])
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-md-4" }, [
-                      _c("h4", [_vm._v("Valor Producido")]),
+                      _c("h4", [_vm._v("Valor Neto")]),
                       _vm._v(" "),
-                      _c("p", {
-                        domProps: {
-                          textContent: _vm._s(
-                            _vm.dataCajaDiv[0].valor_producido
+                      _c("strong", [
+                        _c("p", [
+                          _vm._v(
+                            "$ " +
+                              _vm._s(
+                                _vm.formatearValor(
+                                  _vm.dataCajaDiv[0].valor_producido -
+                                    _vm.dataCajaDiv[0].valor_gastos
+                                )
+                              )
                           )
-                        }
-                      })
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-4" }, [
+                      _c("h4", [_vm._v("Valor Gastos")]),
+                      _vm._v(" "),
+                      _c("strong", [
+                        _c("p", [
+                          _vm._v(
+                            "$ " +
+                              _vm._s(
+                                _vm.formatearValor(
+                                  _vm.dataCajaDiv[0].valor_gastos
+                                )
+                              )
+                          )
+                        ])
+                      ])
                     ])
                   ])
                 ]),
@@ -40500,6 +40580,56 @@ var render = function() {
                             domProps: {
                               textContent: _vm._s(
                                 _vm.arrayErrors.valor_producido[0]
+                              )
+                            }
+                          })
+                        : _vm._e()
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "col-sm-4 control-label hidden-xs",
+                        attrs: { for: "valor_producido" }
+                      },
+                      [_vm._v("Valor Gastado")]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-sm-8 col-xs-12" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.valor_gastos,
+                            expression: "valor_gastos"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "number",
+                          id: "valor_producido",
+                          placeholder: "Valor Gastos"
+                        },
+                        domProps: { value: _vm.valor_gastos },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.valor_gastos = $event.target.value
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _vm.arrayErrors.valor_gastos
+                        ? _c("p", {
+                            staticClass: "text-red",
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.arrayErrors.valor_gastos[0]
                               )
                             }
                           })
@@ -40764,6 +40894,8 @@ var staticRenderFns = [
                 _c("th", [_vm._v("Valor Inicial")]),
                 _vm._v(" "),
                 _c("th", [_vm._v("Valor Producido")]),
+                _vm._v(" "),
+                _c("th", [_vm._v("Valor Gastos")]),
                 _vm._v(" "),
                 _c("th", [_vm._v("Estado")]),
                 _vm._v(" "),
@@ -46587,6 +46719,26 @@ var render = function() {
                       "router-link",
                       {
                         attrs: {
+                          to: "/reportAgendalibre",
+                          "data-toggle": "push-menu"
+                        }
+                      },
+                      [
+                        _c("i", { staticClass: "fas fa-user-plus text-green" }),
+                        _vm._v(" Agendas Libres\n              ")
+                      ]
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  [
+                    _c(
+                      "router-link",
+                      {
+                        attrs: {
                           to: "/agendaAtendidos",
                           "data-toggle": "push-menu"
                         }
@@ -46827,6 +46979,98 @@ var staticRenderFns = [
     return _c("li", { staticClass: "header text-center" }, [
       _c("i", { staticClass: "fas fa-wrench" }),
       _vm._v(" Configuración\n        ")
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d&":
+/*!**************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d& ***!
+  \**************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm._m(0)
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "content-wrapper" }, [
+      _c("section", { staticClass: "content-header" }, [
+        _c("h1", [
+          _c("i", { staticClass: "fas fas fa-user-plus" }),
+          _vm._v(" Agenda Libre\n      "),
+          _c("small", [_vm._v("Información")])
+        ]),
+        _vm._v(" "),
+        _c("ol", { staticClass: "breadcrumb" }, [
+          _c("li", [
+            _c("a", { attrs: { href: "/admin" } }, [
+              _c("i", { staticClass: "fas fa-tachometer-alt" }),
+              _vm._v(" Inicio\n        ")
+            ])
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "active" }, [
+            _c("i", { staticClass: "fas fas fa-user-plus" }),
+            _vm._v(" Agenda Libre\n      ")
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("section", { staticClass: "content" }, [
+        _c("div", { staticClass: "box box-success" }, [
+          _c("div", { staticClass: "box-header" }, [
+            _c("h3", { staticClass: "box-title" }, [
+              _c("i", { staticClass: "far fa-list-alt" }),
+              _vm._v(" Agendas Libres\n        ")
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "table-responsive container-fluid" }, [
+            _c(
+              "table",
+              {
+                staticClass: "table table-bordered table-hover",
+                staticStyle: { width: "100%" },
+                attrs: { id: "tablaAgendasL" }
+              },
+              [
+                _c("thead", [
+                  _c("tr", [
+                    _c("th", [_vm._v("Cliente")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Fecha Cita")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Nota")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("WhatsApp")]),
+                    _vm._v(" "),
+                    _c("th", [_vm._v("Estado")])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("tbody", { staticStyle: { "font-weight": "normal" } })
+              ]
+            )
+          ])
+        ])
+      ])
     ])
   }
 ]
@@ -63517,6 +63761,8 @@ var Empleados = __webpack_require__(/*! ./components/Admin/Empleados.vue */ "./r
 
 var Roles = __webpack_require__(/*! ./components/Admin/Roles.vue */ "./resources/js/components/Admin/Roles.vue")["default"];
 
+var ReportAgendalibre = __webpack_require__(/*! ./components/Admin/ReportAgendalibre.vue */ "./resources/js/components/Admin/ReportAgendalibre.vue")["default"];
+
 var ReportCitas = __webpack_require__(/*! ./components/Admin/ReportCitas.vue */ "./resources/js/components/Admin/ReportCitas.vue")["default"];
 
 var ReportEmpleados = __webpack_require__(/*! ./components/Admin/ReportEmpleados.vue */ "./resources/js/components/Admin/ReportEmpleados.vue")["default"];
@@ -63580,6 +63826,9 @@ var routes = [{
 }, {
   path: "/roles",
   component: Roles
+}, {
+  path: "/reportAgendalibre",
+  component: ReportAgendalibre
 }, {
   path: "/reportCitas",
   component: ReportCitas
@@ -64745,6 +64994,75 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 component.options.__file = "resources/js/components/Admin/Nomina.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Admin/ReportAgendalibre.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/components/Admin/ReportAgendalibre.vue ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ReportAgendalibre_vue_vue_type_template_id_4fa5bd9d___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d& */ "./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d&");
+/* harmony import */ var _ReportAgendalibre_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReportAgendalibre.vue?vue&type=script&lang=js& */ "./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ReportAgendalibre_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ReportAgendalibre_vue_vue_type_template_id_4fa5bd9d___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ReportAgendalibre_vue_vue_type_template_id_4fa5bd9d___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Admin/ReportAgendalibre.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportAgendalibre_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ReportAgendalibre.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportAgendalibre_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d& ***!
+  \********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportAgendalibre_vue_vue_type_template_id_4fa5bd9d___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Admin/ReportAgendalibre.vue?vue&type=template&id=4fa5bd9d&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportAgendalibre_vue_vue_type_template_id_4fa5bd9d___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportAgendalibre_vue_vue_type_template_id_4fa5bd9d___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 

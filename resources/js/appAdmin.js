@@ -129,6 +129,7 @@ const AgendaCumple = require("./components/Admin/AgendaCumple.vue").default;
 const Clientes = require("./components/Admin/Clientes.vue").default;
 const Empleados = require("./components/Admin/Empleados.vue").default;
 const Roles = require("./components/Admin/Roles.vue").default;
+const ReportAgendalibre = require("./components/Admin/ReportAgendalibre.vue").default;
 const ReportCitas = require("./components/Admin/ReportCitas.vue").default;
 const ReportEmpleados = require("./components/Admin/ReportEmpleados.vue")
     .default;
@@ -152,29 +153,98 @@ const Nomina = require("./components/Admin/Nomina.vue").default;
 // either be an actual component constructor created via
 // `Vue.extend()`, or just a component options object.
 // We'll talk about nested routes later.
-const routes = [
-    { path: "*", component: Error404 },
-    { path: "/", component: Solicitudes },
-    { path: "/agendaLibre", component: AgendaLibre },
-    { path: "/agendaEnEspera", component: AgendaEnEspera },
-    { path: "/agendaAtendidos", component: AgendaAtendidos },
-    { path: "/agendaNoAsistio", component: AgendaNoAsistio },
-    { path: "/agendaCancelaron", component: AgendaCancelaron },
-    { path: "/buzonSugerencias", component: BuzonSugerencias },
-    { path: "/agendaCumple", component: AgendaCumple },
-    { path: "/clientes", component: Clientes },
-    { path: "/empleados", component: Empleados },
-    { path: "/roles", component: Roles },
-    { path: "/reportCitas", component: ReportCitas },
-    { path: "/reportEmpleados", component: ReportEmpleados },
-    { path: "/reportServicios", component: ReportServicios },
-    { path: "/miperfil", component: MiPerfil },
-    { path: "/mipagina", component: MiPagina },
-    { path: "/miAgenda", component: miAgenda },
-    { path: "/misAtenciones", component: misAtenciones },
-    { path: "/cajaRegistradora", component: CajaRegistradora },
-    { path: "/facturarAtencion", component: FacturarAtencion },
-    { path: "/nomina", component: Nomina }
+const routes = [{
+        path: "*",
+        component: Error404
+    },
+    {
+        path: "/",
+        component: Solicitudes
+    },
+    {
+        path: "/agendaLibre",
+        component: AgendaLibre
+    },
+    {
+        path: "/agendaEnEspera",
+        component: AgendaEnEspera
+    },
+    {
+        path: "/agendaAtendidos",
+        component: AgendaAtendidos
+    },
+    {
+        path: "/agendaNoAsistio",
+        component: AgendaNoAsistio
+    },
+    {
+        path: "/agendaCancelaron",
+        component: AgendaCancelaron
+    },
+    {
+        path: "/buzonSugerencias",
+        component: BuzonSugerencias
+    },
+    {
+        path: "/agendaCumple",
+        component: AgendaCumple
+    },
+    {
+        path: "/clientes",
+        component: Clientes
+    },
+    {
+        path: "/empleados",
+        component: Empleados
+    },
+    {
+        path: "/roles",
+        component: Roles
+    },
+    {
+        path: "/reportAgendalibre",
+        component: ReportAgendalibre
+    },
+    {
+        path: "/reportCitas",
+        component: ReportCitas
+    },
+    {
+        path: "/reportEmpleados",
+        component: ReportEmpleados
+    },
+    {
+        path: "/reportServicios",
+        component: ReportServicios
+    },
+    {
+        path: "/miperfil",
+        component: MiPerfil
+    },
+    {
+        path: "/mipagina",
+        component: MiPagina
+    },
+    {
+        path: "/miAgenda",
+        component: miAgenda
+    },
+    {
+        path: "/misAtenciones",
+        component: misAtenciones
+    },
+    {
+        path: "/cajaRegistradora",
+        component: CajaRegistradora
+    },
+    {
+        path: "/facturarAtencion",
+        component: FacturarAtencion
+    },
+    {
+        path: "/nomina",
+        component: Nomina
+    }
 ];
 
 // 3. Create the router instance and pass the `routes` option

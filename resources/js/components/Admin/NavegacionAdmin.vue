@@ -134,6 +134,11 @@
                 </router-link>
               </li>
               <li>
+                <router-link to="/reportAgendalibre" data-toggle="push-menu">
+                  <i class="fas fa-user-plus text-green"></i> Agendas Libres
+                </router-link>
+              </li>
+              <li>
                 <router-link to="/agendaAtendidos" data-toggle="push-menu">
                   <i class="fas fa-calendar-check text-green"></i> Atendidos
                 </router-link>

@@ -23,15 +23,27 @@
           <!-- elemeto cajita -->
           <div class="small-box bg-green">
             <div class="inner">
-              <h4 class="text-center" v-text="dataCajaDiv[0].nombre_caja"></h4>
+              <strong>
+                <h3 class="text-center" v-text="dataCajaDiv[0].nombre_caja"></h3>
+              </strong>
               <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <h4>Valor Inicial</h4>
-                  <p v-text="dataCajaDiv[0].valor_inicial"></p>
+                  <strong>
+                    <p>$ {{formatearValor(dataCajaDiv[0].valor_inicial)}}</p>
+                  </strong>
                 </div>
                 <div class="col-md-4">
                   <h4>Valor Neto</h4>
-                  <p v-text="dataCajaDiv[0].valor_producido - dataCajaDiv[0].valor_gastos"></p>
+                  <strong>
+                    <p>$ {{formatearValor(dataCajaDiv[0].valor_producido - dataCajaDiv[0].valor_gastos)}}</p>
+                  </strong>
+                </div>
+                <div class="col-md-4">
+                  <h4>Valor Gastos</h4>
+                  <strong>
+                    <p>$ {{formatearValor(dataCajaDiv[0].valor_gastos)}}</p>
+                  </strong>
                 </div>
               </div>
             </div>
@@ -425,6 +437,10 @@ export default {
           console.log(error);
           console.log(data.arrayErrors);
         });
+    },
+    formatearValor(value) {
+      let val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     actualizarEmpleado() {
       //creamos variable q corresponde a this de mis variables de data()

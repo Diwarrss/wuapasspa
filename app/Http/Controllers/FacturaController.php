@@ -85,15 +85,15 @@ class FacturaController extends Controller
         try {
             DB::beginTransaction();
 
-            /* //revisar porque cuando no hay factura no incrementa sale error
-                $saberUltimoFactura = Factura::orderBy('numero_factura', 'desc')->first()->id;
-                //saber el ultimo
-                //$ultimo = $saberUltimoFactura->last();
-                $numFactura = $saberUltimoFactura + 1; */
+            //revisar porque cuando no hay factura no incrementa sale error
+            $saberUltimoFactura = Factura::orderBy('numero_factura', 'desc')->first()->id;
+            //saber el ultimo
+            //$ultimo = $saberUltimoFactura->last();
+            $numFactura = $saberUltimoFactura + 1;
 
             $facturas = new Factura();
             $facturas->prefijo = $request->prefijo;
-            $facturas->numero_factura = 1;
+            $facturas->numero_factura = $numFactura;
             $facturas->tipo_comprobante = $request->tipo_comprobante;
             $facturas->creado_por = Auth::user()->id;
             $facturas->estado_factura = $request->estado_factura;
