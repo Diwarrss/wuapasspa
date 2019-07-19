@@ -102,22 +102,21 @@ class FacturaController extends Controller
     public function facturarCargos(Request $request)
     {
         if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
-        //para validar
-        /*$request->validate([
-
-            'servicios' => 'required',
-            'fecha_probable' => 'required',
-            'comentario' => 'required'
-        ]);*/
         //para generear la transacccion
         try {
             DB::beginTransaction();
 
-            //revisar porque cuando no hay factura no incrementa sale error
-            $saberUltimoFactura = Factura::orderBy('numero_factura', 'desc')->first()->id;
-            //saber el ultimo
-            //$ultimo = $saberUltimoFactura->last();
-            $numFactura = $saberUltimoFactura + 1;
+            // Obtenemos el la ultima factura por fecha de creacion
+            $lastOrder = Factura::orderBy('created_at', 'desc')->first();
+
+            if (!$lastOrder) {
+                //si no hay ningun order pos dejamos  number en 0 al final sera 1
+                $number = 0;
+            } else {
+                //obtenemos el ultimo numero de la factura y le sumamos 1
+                $number = $lastOrder->numero_factura;
+            }
+            $numFactura = $number + 1; // sprintf('%06d', intval($number) + 1);
 
             $facturas = new Factura();
             $facturas->prefijo = $request->prefijo;

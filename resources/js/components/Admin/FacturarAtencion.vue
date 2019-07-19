@@ -888,7 +888,8 @@ export default {
     limpiarPago() {
       let me = this;
       me.descuento = 0;
-      me.valorRecibido = 0;
+      me.valorRecibido = "";
+      $("#valorR").focus();
     }
   },
   mounted() {
