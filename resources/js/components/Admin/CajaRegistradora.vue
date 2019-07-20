@@ -109,6 +109,7 @@
                     <th>Caja de Destino</th>
                     <th>Valor</th>
                     <th>Notas</th>
+                    <th>Fecha de Transferencia</th>
                     <th>Estado Transferencia</th>
                     <th>Acciones</th>
                   </tr>
@@ -447,6 +448,7 @@ export default {
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
             },
             { data: "notas" },
+            { data: "fecha_transferencia" },
             {
               render: function(data, type, row) {
                 if (row.estado_transferencia === "Recibida") {

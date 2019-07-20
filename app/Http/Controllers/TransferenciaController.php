@@ -36,6 +36,7 @@ class TransferenciaController extends Controller
                 'cajaDestino.nombre_caja as nombre_cajaDestino',
                 'transferencias.valor',
                 'transferencias.notas',
+                DB::raw("DATE_FORMAT(transferencias.created_at, '%d/%m/%Y %h:%i %p') as fecha_transferencia"),
                 DB::raw("IF(transferencias.estado_transferencia=1, 'Pendiente', 'Recibida') as estado_transferencia")
             )
             ->get();
