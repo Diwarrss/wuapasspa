@@ -93,6 +93,32 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box box-primary">
+            <div class="box-header"></div>
+            <div class="table-responsive container-fluid">
+              <table
+                id="tablaTransferencias"
+                class="table table-bordered table-hover"
+                style="width:100%"
+              >
+                <thead>
+                  <tr>
+                    <th>Caja de Origen</th>
+                    <th>Caja de Destino</th>
+                    <th>Valor</th>
+                    <th>Notas</th>
+                    <th>Estado Transferencia</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody style="font-weight: normal;"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
     <!-- Modal crear NUEVO, ACTUALIZAR Caja Registradora -->
     <div class="modal fade in" id="modalEmpleado">
@@ -400,6 +426,110 @@ export default {
         });
       });
     },
+    listarTransferencias() {
+      let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+      jQuery(document).ready(function() {
+        var tablaTransferencias = jQuery("#tablaTransferencias").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [], //no colocar ordenamiento
+          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ajax: "/listarTransferencia",
+          columns: [
+            { data: "nombre_cajaOrigen" },
+            { data: "nombre_cajaDestino" },
+            {
+              data: "valor",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+            },
+            { data: "notas" },
+            {
+              render: function(data, type, row) {
+                if (row.estado_transferencia === "Recibida") {
+                  return (
+                    '<span class="label label-success">' +
+                    row.estado_transferencia +
+                    "</span>"
+                  );
+                } else {
+                  return (
+                    '<span class="label label-danger">' +
+                    row.estado_transferencia +
+                    "</span>"
+                  );
+                }
+              }
+            },
+            {
+              render: function(data, type, row) {
+                if (row.estado_transferencia === "Pendiente") {
+                  return '<button class="btn btn-warning confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
+                } else {
+                  return '<button class="btn btn-success btn-sm" title="Confirmar Transferencia" disabled><i class="fas fa-ban"></i>  Confirmada</button>';
+                }
+              }
+            }
+          ]
+        });
+
+        //funcion que se ejecuta al hacer click en la tabla y abrimos la modal apartir de la clase edit
+        tablaTransferencias.on("click", ".confirmar", function() {
+          jQuery.noConflict(); // para evitar errores
+
+          Swal.fire({
+            title: "Esta Seguro de Confirmar la Transferencia",
+            text: "Una vez Confirmada no se podra deshacer la operacion",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "green",
+            cancelButtonColor: "red",
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(result => {
+            if (result.value) {
+              // /cancelarReservacion
+              // axios.put('/cancelarReservaciones', {
+              //     id: me.id
+              // }).then(function (response) {
+              //     Swal.fire({
+              //         position: 'top-end',
+              //         type: 'success',
+              //         title: 'Cita Cancelada!',
+              //         showConfirmButton: false,
+              //         timer: 1500
+              //     });
+              //         //data.cantidadAgendadas();
+              //         jQuery('#tablaAgendasL').DataTable().ajax.reload(null,false);
+              //         data.listarReservaciones(data.idEmpleadoElegido);
+              // })
+              // .catch(function (error) {
+              //     if (error.response.status == 422) {//preguntamos si el error es 422
+              //         Swal.fire({
+              //             position: 'top-end',
+              //             type: 'error',
+              //             title: 'Se produjo un Error, Reintentar',
+              //             showConfirmButton: false,
+              //             timer: 1500
+              //         });
+              //     }
+              //     console.log(error.response.data.errors);
+              // });
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: "Transferencia Confirmada",
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }
+          });
+        });
+      });
+    },
     crearCaja() {
       //creamos variable q corresponde a this de mis variables de data()
       let data = this;
@@ -532,6 +662,7 @@ export default {
     this.listarEmpleados();
     this.infoCajaDiv();
     this.EmpleadoListaCrear();
+    this.listarTransferencias();
   }
 };
 </script>

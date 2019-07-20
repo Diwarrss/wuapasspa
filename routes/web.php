@@ -108,6 +108,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/empleadosAgendadores', 'UserController@empleadosAgendadores')->name('showEmpleado'); //ruta para usarlos en select de agendar
         Route::get('/infoCajaDiv', 'CajaController@infoCajaDiv')->name('infoCajaDiv');
         Route::put('/actualizarCaja', 'CajaController@actualizarCaja')->name('actualizarCaja');
+        //todas las operacoines de Tranferencias entre cajas listarTransferencia
+        Route::get('/listarTransferencia', 'TransferenciaController@listarTransferencia')->name('listarTransferencia');
 
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');

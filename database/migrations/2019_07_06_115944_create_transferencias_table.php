@@ -19,8 +19,9 @@ class CreateTransferenciasTable extends Migration
             $table->foreign('caja_origen')->references('id')->on('cajas');
             $table->unsignedInteger('caja_destino');
             $table->foreign('caja_destino')->references('id')->on('cajas');
-            $table->decimal('valor', 12,2);
+            $table->decimal('valor', 12, 2);
             $table->string('notas', 250);
+            $table->enum('estado_transferencia', [\App\Transferencia::PENDIENTE, \App\Transferencia::RECIBIDA])->default(\App\Transferencia::PENDIENTE); //con enum obligamos a que solo permita esos valores y dejamos por defecto Activo
             $table->timestamps();
         });
     }
