@@ -69,7 +69,11 @@
           </div>
           <br />
           <div class="box box-primary">
-            <div class="box-header"></div>
+            <div class="box-header">
+              <h4>
+                <i class="fas fa-cash-register"></i> Lista de Cajas
+              </h4>
+            </div>
             <div class="table-responsive container-fluid">
               <table
                 id="tablaEmpleados"
@@ -96,7 +100,11 @@
       <div class="row">
         <div class="col-md-12">
           <div class="box box-primary">
-            <div class="box-header"></div>
+            <div class="box-header">
+              <h4>
+                <i class="fas fa-exchange-alt"></i> Lista de Transferencias
+              </h4>
+            </div>
             <div class="table-responsive container-fluid">
               <table
                 id="tablaTransferencias"
