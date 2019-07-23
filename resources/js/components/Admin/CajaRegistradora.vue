@@ -289,6 +289,90 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
+    <!-- Modal Modal crear Transaccion -->
+    <div class="modal fade in" id="modalTransferencia">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-horizontal">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button>
+              <h4 class="modal-title">
+                <i class="fas fa-plus-circle"></i> Hacer Transferencia
+              </h4>
+            </div>
+            <div class="modal-body">
+              <div class="box-body">
+                <div class="form-group">
+                  <label for="cajaOrigen" class="col-sm-4 control-label hidden-xs">
+                    <i class="fas fa-cash-register"></i> Caja Origen:
+                  </label>
+                  <div class="col-sm-6">
+                    <select class="form-control" id="cajaOrigen" v-model="IdCajaOrigenTrans">
+                      <option disabled v-bind:value="IdCajaOrigenTrans">{{NomCajaOrigenTrans}}</option>
+                    </select>
+                    <p
+                      class="text-red"
+                      v-if="arrayErrors.cajaOrigen"
+                      v-text="arrayErrors.cajaOrigen[0]"
+                    ></p>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cajaDestino" class="col-sm-4 control-label hidden-xs">
+                    <i class="fas fa-cash-register"></i> Caja Destino:
+                  </label>
+                  <div class="col-sm-6">
+                    <select class="form-control" id="cajaDestino" v-model="IdCajaDestinoTrans">
+                      <option disabled value>Escoge la Caja</option>
+                      <option
+                        :disabled="cajaTranferencia.id == IdCajaOrigenTrans"
+                        v-for="cajaTranferencia in cajasTranferencias"
+                        :key="cajaTranferencia.id"
+                        v-bind:value="cajaTranferencia.id"
+                      >{{ cajaTranferencia.nombre_caja}}</option>
+                    </select>
+                    <p
+                      class="text-red"
+                      v-if="arrayErrors.cajaDestino"
+                      v-text="arrayErrors.cajaDestino[0]"
+                    ></p>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="valorATransferir" class="col-sm-4 control-label hidden-xs">Valor</label>
+                  <div class="col-sm-8 col-xs-12">
+                    <money
+                      class="form-control input-md"
+                      v-bind="money"
+                      v-model="valorATransferir"
+                    >{{valorATransferir}}</money>
+                    <p
+                      class="text-red"
+                      v-if="arrayErrors.valorATransferir"
+                      v-text="arrayErrors.valorATransferir[0]"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger pull-left" @click="cerrarModal();">
+                <i class="fas fa-times"></i> Cancelar
+              </button>
+              <button type="button" class="btn btn-success" @click="transferir();">
+                <i class="fas fa-check"></i> Transferir
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
   </div>
 </template>
 <script>
@@ -306,6 +390,11 @@ export default {
       dataCajaDiv: [],
       idEmpleadoElegido: "",
       empleados: [],
+      cajasTranferencias: [],
+      IdCajaOrigenTrans: "",
+      NomCajaOrigenTrans: "",
+      IdCajaDestinoTrans: "",
+      valorATransferir: "",
       usuario: "",
       valor_producido: "",
       valor_gastos: "",
@@ -317,7 +406,16 @@ export default {
       estado_usuario: 1,
       arrayErrors: [],
       tipoAccionModal: 0,
-      arrayEmpleados: []
+      arrayEmpleados: [],
+      //para usar el vue componente de moneyConcurrente
+      money: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "$ ",
+        suffix: "",
+        precision: 0,
+        masked: false
+      }
     };
   },
   methods: {
@@ -330,6 +428,21 @@ export default {
           // data.comentario=response.data[0].comentario;
           //console.log(response.data);
           data.empleados = response.data;
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        });
+    },
+    cajasListTranferencias() {
+      var data = this;
+      axios
+        .get("/cajasListTranferencias")
+        .then(function(response) {
+          // data.fechaprobable=response.data[0].fechaprobable;
+          // data.comentario=response.data[0].comentario;
+          //console.log(response.data);
+          data.cajasTranferencias = response.data;
         })
         .catch(function(error) {
           // handle error
@@ -399,7 +512,7 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button>';
+                return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button>  <button class="btn btn-success transferencia btn-sm" title="Desactivar Empleado"><i class="fas fa-money-bill-wave"></i> Transferir</button>';
               }
             }
           ]
@@ -432,6 +545,30 @@ export default {
             (me.valor_producido = data["valor_producido"]),
             (me.valor_gastos = data["valor_gastos"]),
             (me.estado_caja = data["estado_cajaNum"]);
+        });
+
+        tablaEmpleados.on("click", ".transferencia", function() {
+          jQuery.noConflict(); // para evitar errores
+          $("#modalTransferencia").modal("show"); //mostramos la modal
+
+          //aplica para si no es responsiva la tabla
+          //var data= tablaEmpleados.row($(this).parents('tr')).data();//optenemos los datos de esa fila seleccionada variable data
+
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var data = tablaEmpleados.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+
+          //var data = me.arrayEmpleados;
+          //$(this).parents('tr') esto es para obtener por fila
+          //console.log(data);
+          me.IdCajaOrigenTrans = data["id"];
+          me.NomCajaOrigenTrans = data["nombre_caja"];
+          me.IdCajaDestinoTrans = "";
+          me.valorATransferir = "";
         });
       });
     },
@@ -578,6 +715,16 @@ export default {
           console.log(data.arrayErrors);
         });
     },
+    transferir() {
+      this.cerrarModal();
+      Swal.fire({
+        position: "top-end",
+        type: "warning",
+        title: "Depronto mañana",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    },
     formatearValor(value) {
       let val = (value / 1).toFixed(2).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -653,7 +800,7 @@ export default {
       }
     },
     cerrarModal() {
-      $("[data-dismiss=modal]").trigger({ type: "click" }); //para cerrar la modal con boostrap 3
+      jQuery("[data-dismiss=modal]").trigger({ type: "click" }); //para cerrar la modal con boostrap 3
       jQuery("#tablaEmpleados")
         .DataTable()
         .ajax.reload(); //toca con jQuery para recargar la tabla si no genera conflicto
@@ -665,7 +812,11 @@ export default {
         (this.valor_producido = ""),
         (this.valor_gastos = ""),
         (this.estado_caja = ""),
-        (this.arrayErrors = []);
+        (this.arrayErrors = []),
+        (this.IdCajaOrigenTrans = ""),
+        (this.NomCajaOrigenTrans = ""),
+        (this.IdCajaDestinoTrans = ""),
+        (this.valorATransferir = "");
     }
   },
   mounted() {
@@ -673,6 +824,7 @@ export default {
     this.infoCajaDiv();
     this.EmpleadoListaCrear();
     this.listarTransferencias();
+    this.cajasListTranferencias();
   }
 };
 </script>

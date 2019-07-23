@@ -110,6 +110,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/actualizarCaja', 'CajaController@actualizarCaja')->name('actualizarCaja');
         //todas las operacoines de Tranferencias entre cajas listarTransferencia
         Route::get('/listarTransferencia', 'TransferenciaController@listarTransferencia')->name('listarTransferencia');
+        Route::get('/cajasListTranferencias', 'CajaController@cajasListTranferencias')->name('cajasListTranferencias');
 
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');

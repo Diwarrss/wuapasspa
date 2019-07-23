@@ -86,7 +86,7 @@ class CajaController extends Controller
             $UserAdmin = User::select('id')->where('roles_roles_id', 1)->get();
             $existeAdmin = $UserAdmin->find($request->empleado_id);
 
-            if($existeAdmin == null){
+            if ($existeAdmin == null) {
                 //para validar los formularios   ignorar el id de la caja
                 $request->validate([
                     'empleado_id' => [
@@ -101,8 +101,7 @@ class CajaController extends Controller
                     'valor_gastos' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                     'estado_caja' => 'required'
                 ]);
-            }
-            else {
+            } else {
                 $request->validate([
                     'empleado_id' => 'required',
                     'nombre_caja' => 'required|min:3|max:150',
@@ -155,6 +154,14 @@ class CajaController extends Controller
                 return $caja->id;
             })
             ->toJson();
+    }
+
+    //listar caja para transferencias
+    public function cajasListTranferencias(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        $caja = Caja::select('cajas.id', 'cajas.nombre_caja')->get();
+        return $caja;
     }
 
 
