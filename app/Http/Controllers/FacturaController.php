@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use App\DetalleFactura;
 use App\Movimiento;
 use Carbon\Carbon as CarbonCarbon;
+use App\Caja;
+use App\FacturaAnulada;
 
 class FacturaController extends Controller
 {
@@ -56,6 +58,7 @@ class FacturaController extends Controller
             ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
             ->select(
                 'facturas.id as id_factura',
+                'reservaciones.id as id_reserva',
                 DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as num_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
                 'anonimos.nombre_anonimo',
@@ -156,6 +159,48 @@ class FacturaController extends Controller
                 $detalle->valor_servicio = $det['valor_servicio'];
                 $detalle->save();
             }
+
+            DB::commit(); //se ahce el commit pa update base datos
+        } catch (Exception $e) {
+            DB::rollBack();
+        }
+    }
+
+    //para anular las facturas
+    public function anularFactura(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        //para validar
+        $request->validate([
+            'motivo_anulacion' => 'required|max:350'
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $anular = Factura::find($request->id_factura);
+            $anular->estado_factura = 4;
+            $anular->save();
+
+            //quitar de la reservacion solicitada
+            $reservaLiberar = Reservacione::find($request->id_reserva);
+            $reservaLiberar->facturas_id = null;
+            $reservaLiberar->save();
+
+            //creamos registro de factura anulada
+            $facturaAnulada = new FacturaAnulada();
+            $facturaAnulada->facturas_id = $request->id_factura;
+            $facturaAnulada->anulado_por = $request->id_facturadopor;
+            $facturaAnulada->descripcion = $request->motivo_anulacion;
+            $facturaAnulada->save();
+
+            //obtenemos el valor producido de la caja por el ID con first
+            $valorProducido = Caja::select('valor_producido')->where('id', $request->id_caja)->first();
+            //actualizar valor de la caja actual menos el que anulo
+            $updateCaja = Caja::find($request->id_caja);
+            //restamos el valor consultado menos el valor de la factura
+            $updateCaja->valor_producido = $valorProducido->valor_producido - $request->valor_total;
+            $updateCaja->save();
 
             DB::commit(); //se ahce el commit pa update base datos
         } catch (Exception $e) {

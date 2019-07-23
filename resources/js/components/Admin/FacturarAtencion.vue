@@ -423,15 +423,30 @@
               </div>
               <div class="modal-body">
                 <div class="box-body">
-                  <div class="form-group" v>
-                    <label for="nombre_usuario" class="col-sm-4 control-label hidden-xs">Nombre Caja</label>
-                    <div class="col-sm-8 col-xs-12">
-                      <input
-                        type="text"
+                  <div class="container-fluid">
+                    <div class="form-group text-center">
+                      <h4>
+                        <strong>Número Factura:</strong>
+                        {{num_factura}}
+                      </h4>
+                      <h4>
+                        <strong>Anulado Por:</strong>
+                        {{nombre_facturador}}
+                      </h4>
+                    </div>
+                    <div class="form-group">
+                      <h4>Motivo de Anulación:</h4>
+                      <textarea
                         class="form-control"
-                        id="nombre_usuario"
-                        placeholder="Nombre Caja"
-                      />
+                        rows="3"
+                        placeholder="Escribe aquí porque anulas la factura"
+                        v-model="motivo_anulacion"
+                      ></textarea>
+                      <p
+                        class="text-red"
+                        v-if="arrayErrors.motivo_anulacion"
+                        v-text="arrayErrors.motivo_anulacion[0]"
+                      ></p>
                     </div>
                   </div>
                 </div>
@@ -467,6 +482,7 @@ export default {
       fecha_actual: "",
       nombre_cliente: "",
       nombre_anonimo: "",
+      id_facturadopor: "",
       nombre_facturador: "",
       nombre_empresa: "",
       lista_empleados: [],
@@ -480,6 +496,9 @@ export default {
       notaFactura: "",
       id_caja: 0,
       id_factura: "",
+      num_factura: "",
+      motivo_anulacion: "",
+      valor_total: 0,
       //para usar el vue componente de moneyConcurrente
       money: {
         decimal: ",",
@@ -564,34 +583,34 @@ export default {
             {
               render: function(data, type, row) {
                 if (row.estado_factura === "1") {
-                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
-                        <button type="button" class="btn btn-danger anular" title="Anular Factura">
+                        <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
                             <i class="fas fa-close"></i>
                         </button>`;
                 } else if (row.estado_factura === "2") {
-                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
-                        <button type="button" class="btn btn-danger anular" title="Anular Factura">
+                        <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
                             <i class="fas fa-close"></i>
                         </button>
-                        <button type="button" class="btn btn-warning abonarPago" title="Agregar Pago">
+                        <button style="margin: 1px" type="button" class="btn btn-warning abonarPago" title="Agregar Pago">
                             <i class="fas fa-plus-circle"></i> <i class="fas fa-dollar-sign"></i>
                         </button>`;
                 } else if (row.estado_factura === "3") {
-                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
-                        <button type="button" class="btn btn-danger anular" title="Anular Factura">
+                        <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
                             <i class="fas fa-close"></i>
                         </button>
-                        <button type="button" class="btn btn-success pagarFactura" title="Pagar Factura">
+                        <button style="margin: 1px" type="button" class="btn btn-success pagarFactura" title="Pagar Factura">
                             <i class="fas fa-money-bill-alt"></i>
                         </button>`;
                 } else {
-                  return `<button type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>`;
                 }
@@ -633,6 +652,9 @@ export default {
           var datos = tablaFacturasDiarias.row(current_row).data();
 
           me.id_factura = datos["id_factura"];
+          me.num_factura = datos["num_factura"];
+          me.valor_total = datos["valor_total"];
+          me.id_reserva = datos["id_reserva"];
         });
       });
     },
@@ -696,6 +718,7 @@ export default {
       axios
         .get("/showPerfil")
         .then(function(response) {
+          me.id_facturadopor = response.data[0].id;
           me.nombre_facturador =
             response.data[0].nombre_usuario +
             " " +
@@ -862,7 +885,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [], //no colocar ordenamiento
-          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/serviciosFaturables",
           columns: [
             {
@@ -968,9 +991,60 @@ export default {
       me.valorRecibido = "";
       $("#valorR").focus();
     },
+    //anular la factura FacturaController
+    anularFactura() {
+      let me = this;
+      Swal.fire({
+        title: "¿Seguro que desea anular la Factura?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "green",
+        cancelButtonColor: "red",
+        confirmButtonText: '<i class="fas fa-check"></i> Si',
+        cancelButtonText: '<i class="fas fa-times"></i> No'
+      }).then(result => {
+        if (result.value) {
+          axios
+            .post("/anularFactura", {
+              id_factura: me.id_factura,
+              motivo_anulacion: me.motivo_anulacion,
+              id_caja: me.id_caja,
+              valor_total: me.valor_total,
+              id_facturadopor: me.id_facturadopor,
+              id_reserva: me.id_reserva
+            }) //le envio el parametro completo
+            .then(function(response) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: "Factura Anulada con éxito!",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(function() {
+                jQuery("#tablaFacturasDiarias")
+                  .DataTable()
+                  .ajax.reload(null, false);
+                jQuery("#tablaFacturacion")
+                  .DataTable()
+                  .ajax.reload();
+                me.cerrarModalAnular();
+              });
+              //console.log(response);
+            })
+            .catch(function(error) {
+              if (error.response.status == 422) {
+                //preguntamos si el error es 422
+                me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+              }
+            });
+        }
+      });
+    },
     cerrarModalAnular() {
       $("[data-dismiss=modal]").trigger({ type: "click" });
       this.id_factura = "";
+      this.motivo_anulacion = "";
+      this.arrayErrors = [];
     }
   },
   mounted() {

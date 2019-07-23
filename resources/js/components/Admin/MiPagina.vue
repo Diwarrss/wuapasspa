@@ -751,7 +751,7 @@
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "asc" ]],
                         "pagingType": "full",
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showCategoria",
                         "columns": [
                                 {data:'nombre_categoria'},
@@ -873,7 +873,7 @@
                         "order": [],//no colocar ordenamiento
                         "pagingType": "full",
                         //"order": [[ 0, "asc" ]],
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showServicios",
                         "columns": [
                                 {data:'nombre_servicio'},
@@ -995,7 +995,7 @@
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "asc" ]],
                         "pagingType": "full",
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showImagenes",
                         "columns": [
                                 {render: function (data, type, row) {

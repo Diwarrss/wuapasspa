@@ -316,7 +316,7 @@
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "asc" ]],
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showSolicitudesPendientes",
                         "columns": [
                                 {data:'nombre_completo'},
@@ -424,7 +424,7 @@
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "desc" ]],
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showReservaAgendada",
                         "columns": [
                                 {data:'fechaAgendada'},

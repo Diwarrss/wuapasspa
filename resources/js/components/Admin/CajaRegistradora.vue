@@ -476,7 +476,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [], //no colocar ordenamiento
-          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarCajar",
           columns: [
             { data: "nombre_usuario" },
@@ -512,7 +512,8 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return '<button class="btn btn-warning edit btn-sm" title="Editar Caja"><i class="fas fa-edit"></i> Editar</button>  <button class="btn btn-success transferencia btn-sm" title="Desactivar Empleado"><i class="fas fa-money-bill-wave"></i> Transferir</button>';
+                return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>  
+                  <button class="btn btn-success transferencia btn-sm" title="Desactivar Empleado" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
               }
             }
           ]

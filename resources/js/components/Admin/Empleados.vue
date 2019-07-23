@@ -190,7 +190,7 @@
                         "lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "Todos"]],
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showEmpleadosDT",
                         "columns": [
                                 {data:'nombre_completo'},
