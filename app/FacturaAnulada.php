@@ -11,6 +11,7 @@ class FacturaAnulada extends Model
         'id',
         'facturas_id',
         'anulado_por',
-        'descripcion'
+        'descripcion',
+        'nombre_cliente'
     ];
 }

@@ -446,7 +446,7 @@
                                     if (row.estado_reservacion_nombre === 'Por Confirmar'){
                                         return '<button type="button" style="margin: 1px" class="btn btn-danger btn-sm cancelar" title="Cancelar Reservación"><i class="far fa-calendar-times"></i> Cancelar</button> <button type="button" style="margin: 1px" class="btn btn-success btn-sm confirmar" title="Aceptar Reservación"><i class="fas fa-check"></i> Confirmar</button>';
                                     }else{
-                                        return '<button type="button" style="margin: 1px" class="btn btn-success btn-sm atendido" title="Atendido"><i class="fas fa-calendar-check"></i> Atentido</button> <button type="button" style="margin: 1px" class="btn btn-warning btn-sm noasistio" title="No Asistió"><i class="far fa-calendar-times"></i> No Asistió</button>';
+                                        return '<button type="button" style="margin: 1px" class="btn btn-success btn-sm atendido" title="Atendido"><i class="fas fa-calendar-check"></i> Atentido</button> <button type="button" style="margin: 1px" class="btn btn-warning btn-sm noasistio" title="No Asistió"><i class="far fa-calendar-times"></i> No Asistió</button> <button type="button" style="margin: 1px" class="btn btn-danger btn-sm cancelar" title="Cancelar Reservación"><i class="far fa-calendar-times"></i> Cancelar</button>';
                                         }
                                     }
                                 }

@@ -73,6 +73,33 @@ class FacturaController extends Controller
         return datatables($listarFacturar)->toJson();
     }
 
+    public function historialFacturas()
+    {
+        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        $listarFacturar = DB::table('facturas')
+            ->leftjoin('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
+            ->leftjoin('factura_anuladas', 'factura_anuladas.facturas_id', '=', 'facturas.id')
+            ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
+            ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
+            ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
+            ->select(
+                'facturas.id as id_factura',
+                'factura_anuladas.nombre_cliente as nomCliente_anulada',
+                DB::raw("DATE_FORMAT(factura_anuladas.created_at, '%d/%m/%Y %h:%i %p') as fecha_anulacion"),
+                'reservaciones.id as id_reserva',
+                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as num_factura"),
+                DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
+                'anonimos.nombre_anonimo',
+                DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
+                'facturas.valor_total',
+                'facturas.estado_factura'
+            )
+            ->get();
+
+        return datatables($listarFacturar)->toJson();
+    }
+
     public function mostrarInfoFacturar(Request $request)
     {
         //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
@@ -147,6 +174,14 @@ class FacturaController extends Controller
             $movimiento->tipo_movimiento = 1; //para q sea un ingreso
             $movimiento->save();
 
+            //actualizamos la caja asociada del usuario obtenemos el valor producido Actual de la caja por el ID con first
+            $valorProducido = Caja::select('valor_producido')->where('id', $request->id_caja)->first();
+            //actualizar valor de la caja actual menos el que anulo
+            $updateCaja = Caja::find($request->id_caja);
+            //restamos el valor consultado menos el valor de la factura
+            $updateCaja->valor_producido = $valorProducido->valor_producido + $request->valor_total;
+            $updateCaja->save();
+
             //se recibe lo que se tiene en la propiedad informacionFacturar array detalles
             $detalles = $request->informacionFacturar;
 
@@ -192,7 +227,17 @@ class FacturaController extends Controller
             $facturaAnulada->facturas_id = $request->id_factura;
             $facturaAnulada->anulado_por = $request->id_facturadopor;
             $facturaAnulada->descripcion = $request->motivo_anulacion;
+            $facturaAnulada->nombre_cliente = $request->nombre_cliente;
             $facturaAnulada->save();
+
+            //creamos el registro del movimiento tipo egreso al anular
+            $movimiento = new Movimiento();
+            $movimiento->factura_id = $request->id_factura;
+            $movimiento->caja_id = $request->id_caja;
+            $movimiento->valor_movimiento = $request->valor_total;
+            $movimiento->valor_pendiente = 0;
+            $movimiento->tipo_movimiento = 2; //para q sea un egreso anulacion
+            $movimiento->save();
 
             //obtenemos el valor producido de la caja por el ID con first
             $valorProducido = Caja::select('valor_producido')->where('id', $request->id_caja)->first();

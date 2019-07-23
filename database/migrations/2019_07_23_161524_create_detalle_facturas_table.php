@@ -24,6 +24,8 @@ class CreateDetalleFacturasTable extends Migration
             $table->foreign('empleado_id')->references('id')->on('users');
             $table->integer('cantidad_facturada');
             $table->decimal('valor_servicio', 12, 2);
+            $table->unsignedInteger('nomina_id')->nullable()->comment('Saber si se ha pagado el servicio al Empleado, asocia el id de la Nomina realizada o pago');
+            $table->foreign('nomina_id')->references('id')->on('nominas');
             $table->timestamps();
         });
     }

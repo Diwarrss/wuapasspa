@@ -175,7 +175,7 @@
                         "responsive": true,
                         "order": [],//no colocar ordenamiento
                         //"order": [[ 0, "asc" ]],
-                        "serverSide": true, //Lado servidor activar o no mas de 20000 registros
+                        //"serverSide": true, //Lado servidor activar o no mas de 20000 registros
                         "ajax": "/showClientesDT",
                         "columns": [
                                 {data:'nombre_completo'},

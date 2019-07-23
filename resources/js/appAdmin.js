@@ -153,6 +153,8 @@ const CajaRegistradora = require("./components/Admin/CajaRegistradora.vue")
 const FacturarAtencion = require("./components/Admin/FacturarAtencion.vue")
     .default;
 const Nomina = require("./components/Admin/Nomina.vue").default;
+const HistorialFacturas = require("./components/Admin/HistorialFacturas.vue")
+    .default;
 
 // 2. Define some routes
 // Each route should map to a component. The "component" can
@@ -250,6 +252,10 @@ const routes = [{
     {
         path: "/nomina",
         component: Nomina
+    },
+    {
+        path: "/historialFacturas",
+        component: HistorialFacturas
     }
 ];
 

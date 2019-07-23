@@ -20,6 +20,7 @@ class CreateFacturaAnuladasTable extends Migration
             $table->unsignedInteger('anulado_por');
             $table->foreign('anulado_por')->references('id')->on('users');
             $table->string('descripcion', '350');
+            $table->string('nombre_cliente', '300');
             $table->timestamps();
         });
     }

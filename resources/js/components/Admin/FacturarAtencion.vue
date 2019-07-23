@@ -25,7 +25,11 @@
       </div>
       <br />
       <div class="box box-primary">
-        <div class="box-header"></div>
+        <div class="box-header">
+          <h3 class="box-title">
+            <i class="far fa-list-alt"></i> Facturar Atenciones
+          </h3>
+        </div>
         <div class="table-responsive container-fluid">
           <table id="tablaFacturacion" class="table table-bordered table-hover" style="width:100%">
             <thead>
@@ -655,6 +659,11 @@ export default {
           me.num_factura = datos["num_factura"];
           me.valor_total = datos["valor_total"];
           me.id_reserva = datos["id_reserva"];
+          if (datos["nombre_cliente"] == null) {
+            me.nombre_cliente = datos["nombre_anonimo"];
+          } else {
+            me.nombre_cliente = datos["nombre_cliente"];
+          }
         });
       });
     },
@@ -1011,7 +1020,8 @@ export default {
               id_caja: me.id_caja,
               valor_total: me.valor_total,
               id_facturadopor: me.id_facturadopor,
-              id_reserva: me.id_reserva
+              id_reserva: me.id_reserva,
+              nombre_cliente: me.nombre_cliente
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({

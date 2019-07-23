@@ -115,10 +115,14 @@ Route::group(['middleware' => 'auth'], function () {
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');
         Route::get('/listarFacturacionDiaria', 'FacturaController@listarFacturacionDiaria')->name('listarFacturacionDiaria');
+        Route::get('/historialFacturas', 'FacturaController@historialFacturas')->name('historialFacturas');
         Route::get('/mostrarInfoFacturar', 'FacturaController@mostrarInfoFacturar')->name('mostrarInfoFacturar');
         Route::get('/serviciosFaturables', 'ServiciosController@serviciosFaturables')->name('serviciosFaturables');
         Route::post('/facturarCargos', 'FacturaController@facturarCargos')->name('facturarCargos');
         Route::post('/anularFactura', 'FacturaController@anularFactura')->name('anularFactura');
+
+        //Controlador de Nomina
+        Route::get('/listarEmpleadosNomina', 'NominaController@listarEmpleadosNomina')->name('listarEmpleadosNomina');
     });
 
     //middleware que solo permite acceso a agendador
