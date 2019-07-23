@@ -161,7 +161,7 @@
                   <strong>Descuento:</strong>
                 </td>
                 <td>
-                  <input type="number" v-model="descuento" class="form-control" />
+                  <money class="form-control" v-bind="money" v-model="descuento">{{descuento}}</money>
                 </td>
               </tr>
               <tr v-if="informacionFacturar.length > 0">
@@ -329,7 +329,11 @@
                                   <strong>Descuento:</strong>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
-                                  <input type="number" v-model="descuento" class="form-control" />
+                                  <money
+                                    class="form-control input-lg"
+                                    v-bind="money"
+                                    v-model="descuento"
+                                  >{{descuento}}</money>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
                                   <strong>Total Neto:</strong>
@@ -347,16 +351,12 @@
                                   <strong>
                                     <p>Valor Recibido</p>
                                   </strong>
-                                  <input
-                                    type="text"
-                                    pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$"
-                                    data-type="currency"
-                                    placeholder="$50,000.00"
+                                  <money
                                     class="form-control input-lg"
+                                    v-bind="money"
                                     id="valorR"
-                                    name="valorR"
                                     v-model="valorRecibido"
-                                  />
+                                  >{{valorRecibido}}</money>
                                 </div>
                                 <div class="text-center">
                                   <strong>
@@ -407,6 +407,54 @@
         <!-- /.modal-dialog -->
       </div>
     </section>
+    <!-- modal para anular factura -->
+    <section>
+      <div class="modal fade in" id="modalAnularFactura">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form class="form-horizontal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-plus-circle"></i> Anular Factura
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box-body">
+                  <div class="form-group" v>
+                    <label for="nombre_usuario" class="col-sm-4 control-label hidden-xs">Nombre Caja</label>
+                    <div class="col-sm-8 col-xs-12">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nombre_usuario"
+                        placeholder="Nombre Caja"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger pull-left"
+                  @click="cerrarModalAnular();"
+                >
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" @click="anularFactura();">
+                  <i class="fas fa-check"></i> Anular
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
   </div>
 </template>
 <script>
@@ -430,7 +478,17 @@ export default {
       arrayErrors: [],
       tipo_pago: 1,
       notaFactura: "",
-      id_caja: 0
+      id_caja: 0,
+      id_factura: "",
+      //para usar el vue componente de moneyConcurrente
+      money: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "$ ",
+        suffix: "",
+        precision: 0,
+        masked: false
+      }
     };
   },
   watch: {},
@@ -459,86 +517,6 @@ export default {
     }
   },
   methods: {
-    formatoOnline() {
-      $("input[data-type='currency']").on({
-        keyup: function() {
-          formatCurrency($(this));
-        },
-        blur: function() {
-          formatCurrency($(this), "blur");
-        }
-      });
-    },
-    formatNumber(n) {
-      // format number 1000000 to 1,234,567
-      return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    },
-    formatCurrency(input, blur) {
-      // appends $ to value, validates decimal side
-      // and puts cursor back in right position.
-
-      // get input value
-      var input_val = input.val();
-
-      // don't validate empty input
-      if (input_val === "") {
-        return;
-      }
-
-      // original length
-      var original_len = input_val.length;
-
-      // initial caret position
-      var caret_pos = input.prop("selectionStart");
-
-      // check for decimal
-      if (input_val.indexOf(".") >= 0) {
-        // get position of first decimal
-        // this prevents multiple decimals from
-        // being entered
-        var decimal_pos = input_val.indexOf(".");
-
-        // split number by decimal point
-        var left_side = input_val.substring(0, decimal_pos);
-        var right_side = input_val.substring(decimal_pos);
-
-        // add commas to left side of number
-        left_side = formatNumber(left_side);
-
-        // validate right side
-        right_side = formatNumber(right_side);
-
-        // On blur make sure 2 numbers after decimal
-        if (blur === "blur") {
-          right_side += "00";
-        }
-
-        // Limit decimal to only 2 digits
-        right_side = right_side.substring(0, 2);
-
-        // join number by .
-        input_val = "$" + left_side + "." + right_side;
-      } else {
-        // no decimal entered
-        // add commas to number
-        // remove all non-digits
-        input_val = formatNumber(input_val);
-        input_val = "$" + input_val;
-
-        // final formatting
-        if (blur === "blur") {
-          input_val += ".00";
-        }
-      }
-
-      // send updated string to input
-      input.val(input_val);
-
-      // put caret back in the right position
-      var updated_len = input_val.length;
-      caret_pos = updated_len - original_len + caret_pos;
-      input[0].setSelectionRange(caret_pos, caret_pos);
-    },
     //listar todas las facturas realizadas en el dia FacturaController
     listarFacturacionDiaria() {
       let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
@@ -640,6 +618,21 @@ export default {
               $(this.footer()).html(numberFormat(sum));
             });
           }
+        });
+
+        //Metodo para anular factura
+        tablaFacturasDiarias.on("click", ".anular", function() {
+          jQuery.noConflict(); // para evitar errores
+          $("#modalAnularFactura").modal("show"); //mostramos la modal
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaFacturasDiarias.row(current_row).data();
+
+          me.id_factura = datos["id_factura"];
         });
       });
     },
@@ -974,6 +967,10 @@ export default {
       me.descuento = 0;
       me.valorRecibido = "";
       $("#valorR").focus();
+    },
+    cerrarModalAnular() {
+      $("[data-dismiss=modal]").trigger({ type: "click" });
+      this.id_factura = "";
     }
   },
   mounted() {
@@ -984,9 +981,6 @@ export default {
     this.listaEmpleados();
     this.listarServicios();
     this.infoCajaDiv();
-    this.formatoOnline();
-    this.formatNumber();
-    this.formatCurrency();
   }
 };
 </script>

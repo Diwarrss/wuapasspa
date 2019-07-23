@@ -49,6 +49,12 @@ Vue.use(VueScheduler);
 import "vue-datetime/dist/vue-datetime.css";
 import "v-calendar-scheduler/lib/main.css"; //jpara vue sheluder
 
+//importando v-money
+import money from 'v-money'
+Vue.use(money, {
+    precision: 2
+})
+
 //importamos el componente de datepicker
 /*import Datepicker from 'vuejs-datepicker';
 Vue.use(Datepicker);*/
