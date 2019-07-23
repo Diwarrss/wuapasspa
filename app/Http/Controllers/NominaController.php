@@ -21,8 +21,7 @@ class NominaController extends Controller
             )
             ->groupBy('detalle_facturas.empleado_id')
             ->where([
-                ['detalle_facturas.nomina_id', null], ['facturas.estado_factura', [1, 2]],
-                ['facturas.tipo_comprobante', 1]
+                ['detalle_facturas.nomina_id', null], ['facturas.estado_factura', [1, 2]]
             ])
             ->get();
 
