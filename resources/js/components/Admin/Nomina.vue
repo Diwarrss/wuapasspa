@@ -32,7 +32,7 @@
               <tr>
                 <th>Empleado</th>
                 <th>Cant. Servicios</th>
-                <th>Valor Total</th>
+                <th>Valor Total Servicios</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -58,12 +58,60 @@
                   <span aria-hidden="true">×</span>
                 </button>
                 <h4 class="modal-title">
-                  <i class="fas fa-plus-circle"></i> Crear Nómina
+                  <i class="fas fa-plus-circle"></i> Información Nómina
                 </h4>
               </div>
               <div class="modal-body">
-                <div class="box-body">
-                  <div class="container-fluid"></div>
+                <div class="text-right">
+                  <h5>
+                    <strong>Pagado Por:</strong>
+                    {{nombre_realizado}}
+                  </h5>
+                </div>
+                <div class="box box-success">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">
+                      <h4>
+                        <strong>Pagado A:</strong>
+                        {{nombre_empleado}}
+                      </h4>
+                      <h5>
+                        <strong>Periodo de Pago:</strong>
+                        {{minFecha}}
+                        <strong>hasta</strong>
+                        {{maxFecha}}
+                      </h5>
+                    </h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="box-body text-center" style="font-weight: normal; font-size: 22px;">
+                      <form class="form-inline">
+                        <div class="form-group col-md-12">
+                          <label>
+                            <strong>Valor Servicios:</strong>
+                          </label>
+                          ${{formatearValor(valor_total_servicios)}}
+                        </div>
+                        <div class="form-group col-md-12">
+                          <label>
+                            <strong>% A Pagar:</strong>
+                          </label>
+                          <money
+                            class="form-control input-lg"
+                            v-bind="money"
+                            id="valorPorcentaje"
+                            v-model="porcentaje_pagado"
+                          >{{porcentaje_pagado}}</money>
+                        </div>
+                        <div class="form-group col-md-12">
+                          <label>
+                            <strong>Valor A Pagar:</strong>
+                          </label>
+                          ${{formatearValor(valor_pagado = calcularValorPagar)}}
+                        </div>
+                      </form>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="modal-footer">
@@ -74,7 +122,12 @@
                 >
                   <i class="fas fa-times"></i> Cancelar
                 </button>
-                <button type="button" class="btn btn-success" @click="pagarNomina();">
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  @click="pagarNomina();"
+                  :disabled="valor_pagado > valor_total_servicios || valor_pagado == 0"
+                >
                   <i class="fas fa-check"></i> Pagar Nómina
                 </button>
               </div>
@@ -88,12 +141,40 @@
   </div>
 </template>
 <script>
+import moment from "moment";
 export default {
   data() {
-    return {};
+    return {
+      realizado_por: 0,
+      nombre_realizado: "",
+      nombre_empleado: "",
+      empleado_id: 0,
+      valor_total_servicios: 0,
+      porcentaje_pagado: 0,
+      valor_pagado: 0,
+      minFecha: "",
+      maxFecha: "",
+      //para usar el vue componente de moneyConcurrente
+      money: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "",
+        suffix: " %",
+        precision: 0,
+        masked: false
+      }
+    };
   },
   watch: {},
-  computed: {},
+  computed: {
+    //calcular el subtotal de la factura
+    calcularValorPagar: function() {
+      var resultado = 0.0;
+      resultado = (this.porcentaje_pagado * this.valor_total_servicios) / 100;
+
+      return resultado;
+    }
+  },
   methods: {
     //listar todas las facturas realizadas FacturaController
     listarEmpleadosNomina() {
@@ -159,13 +240,96 @@ export default {
           }
           var datos = tablaNomina.row(current_row).data();
 
-          me.id_factura = datos["id_factura"];
+          me.nombre_empleado = datos["nombre_empleado"];
+          me.empleado_id = datos["empleado_id"];
+          me.valor_total_servicios = datos["valor_total_servicios"];
+          me.minFecha = moment(datos["minFecha"]).format("DD/MM/YYYY hh:mm a");
+          me.maxFecha = moment(datos["maxFecha"]).format("DD/MM/YYYY hh:mm a");
+
+          //para enviar el focus al input del porcentaje
+          $("#modalPagarNomina").on("shown.bs.modal", function() {
+            $("#valorPorcentaje").focus();
+          });
         });
       });
+    },
+    //realizar pago de nomina del empleado
+    pagarNomina() {
+      let me = this;
+      Swal.fire({
+        title: "¿Seguro de Pagar Nómina?",
+        html:
+          "<strong>Empleado: </strong>" +
+          me.nombre_empleado +
+          "<br><strong>Valor a Pagar:</strong> $" +
+          this.formatearValor(me.valor_pagado) +
+          "",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "green",
+        cancelButtonColor: "red",
+        confirmButtonText: '<i class="fas fa-check"></i> Si',
+        cancelButtonText: '<i class="fas fa-times"></i> No'
+      }).then(result => {
+        if (result.value) {
+          axios
+            .post("/pagarNomina", {
+              empleado_id: me.empleado_id
+            }) //le envio el parametro completo
+            .then(function(response) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: "Pago registrado con éxito!",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(function() {
+                me.cerrarModalNomina();
+              });
+              //console.log(response);
+            })
+            .catch(function(error) {
+              if (error.response.status == 422) {
+                //preguntamos si el error es 422
+                me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+              }
+            });
+        }
+      });
+    },
+    //obtener la informacion del empleado logueado actualmente
+    infoRealizadoPor() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/showPerfil")
+        .then(function(response) {
+          me.realizado_por = response.data[0].id;
+          me.nombre_realizado =
+            response.data[0].nombre_usuario +
+            " " +
+            response.data[0].apellido_usuario;
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
+    formatearValor(value) {
+      let val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    cerrarModalNomina() {
+      $("[data-dismiss=modal]").trigger({ type: "click" });
+      this.porcentaje_pagado = 0;
     }
   },
   mounted() {
     this.listarEmpleadosNomina();
+    this.infoRealizadoPor();
   }
 };
 </script>

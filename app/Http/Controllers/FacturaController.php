@@ -102,7 +102,7 @@ class FacturaController extends Controller
 
     public function mostrarInfoFacturar(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $id_reserva = $request->id_reserva;
 
@@ -121,7 +121,7 @@ class FacturaController extends Controller
                 'servicios.nombre_servicio',
                 'servicios.valor_servicio',
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
-                DB::raw("'1' as cantidad")
+                DB::raw("'1' as cantidad, '0' as valor_descuento")
             )
             ->where('reservaciones.id', '=', $id_reserva)
             ->get();
@@ -155,7 +155,7 @@ class FacturaController extends Controller
             $facturas->creado_por = Auth::user()->id;
             $facturas->estado_factura = $request->estado_factura;
             $facturas->tipo_pago = $request->tipo_pago;
-            $facturas->valor_descuento = $request->valor_descuento;
+            $facturas->valor_descuento = $request->descuento;
             $facturas->valor_total = $request->valor_total;
             $facturas->nota_factura = $request->nota_factura;
             $facturas->save();
@@ -192,6 +192,7 @@ class FacturaController extends Controller
                 $detalle->empleado_id = $det['id_atendido_por'];
                 $detalle->cantidad_facturada = $det['cantidad'];
                 $detalle->valor_servicio = $det['valor_servicio'];
+                $detalle->valor_descuento = $det['valor_descuento'];
                 $detalle->save();
             }
 

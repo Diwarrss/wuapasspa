@@ -111,13 +111,14 @@
                 <th>Servicios</th>
                 <th>Realizado Por</th>
                 <th>Cantidad</th>
-                <th>Valor</th>
+                <th>Descuento</th>
+                <th>Valor Servicio</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody style="font-weight: normal;">
               <tr v-if="informacionFacturar.length == 0">
-                <td colspan="5">
+                <td colspan="6">
                   <div
                     class="alert alert-danger text-center"
                     role="alert"
@@ -141,7 +142,15 @@
                   <input v-model="detalle.cantidad" type="number" max:3 class="form-control" />
                 </td>
                 <td>
-                  <span>$ {{formatearValor(detalle.cantidad*detalle.valor_servicio)}}</span>
+                  <!-- <input v-model="detalle.valor_descuento" type="number" max:3 class="form-control" /> -->
+                  <money
+                    class="form-control"
+                    v-bind="money"
+                    v-model="detalle.valor_descuento"
+                  >{{detalle.valor_descuento}}</money>
+                </td>
+                <td>
+                  <span>$ {{formatearValor((detalle.cantidad*detalle.valor_servicio)-detalle.valor_descuento)}}</span>
                 </td>
                 <td>
                   <button
@@ -155,21 +164,22 @@
                 </td>
               </tr>
               <tr v-if="informacionFacturar.length > 0">
-                <td colspan="3" align="right">
+                <td colspan="4" align="right">
                   <strong>Subtotal:</strong>
                 </td>
                 <td>$ {{formatearValor(subtotal = calcularSubtotal)}}</td>
               </tr>
               <tr v-if="informacionFacturar.length > 0">
-                <td colspan="3" align="right">
+                <td colspan="4" align="right">
                   <strong>Descuento:</strong>
                 </td>
                 <td>
-                  <money class="form-control" v-bind="money" v-model="descuento">{{descuento}}</money>
+                  $ {{formatearValor(descuento = calcularTotalDescuento)}}
+                  <!-- <money class="form-control" v-bind="money" v-model="descuento">{{descuento}}</money> -->
                 </td>
               </tr>
               <tr v-if="informacionFacturar.length > 0">
-                <td colspan="3" align="right">
+                <td colspan="4" align="right">
                   <strong>Total Neto:</strong>
                 </td>
                 <td>$ {{formatearValor(valorNeto = calcularNeto)}}</td>
@@ -332,13 +342,7 @@
                                 <div class="col-md-6 col-sm-6">
                                   <strong>Descuento:</strong>
                                 </div>
-                                <div class="col-md-6 col-sm-6">
-                                  <money
-                                    class="form-control input-lg"
-                                    v-bind="money"
-                                    v-model="descuento"
-                                  >{{descuento}}</money>
-                                </div>
+                                <div class="col-md-6 col-sm-6">$ {{formatearValor(descuento)}}</div>
                                 <div class="col-md-6 col-sm-6">
                                   <strong>Total Neto:</strong>
                                 </div>
@@ -516,6 +520,14 @@ export default {
   },
   watch: {},
   computed: {
+    //calcular el subtotal de la factura
+    calcularTotalDescuento: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.informacionFacturar.length; i++) {
+        resultado = resultado + this.informacionFacturar[i].valor_descuento;
+      }
+      return resultado;
+    },
     //calcular el subtotal de la factura
     calcularSubtotal: function() {
       var resultado = 0.0;
@@ -763,7 +775,7 @@ export default {
             estado_factura: 1,
             tipo_comprobante: 1,
             tipo_pago: me.tipo_pago,
-            valor_descuento: me.descuento,
+            descuento: me.descuento,
             valor_total: me.valorNeto,
             nota_factura: me.notaFactura,
             id_reserva: me.id_reserva,
@@ -927,6 +939,7 @@ export default {
           me.informacionFacturar.push({
             //llenamos el array con push
             cantidad: "1",
+            valor_descuento: "0",
             fecha_actual: me.fecha_actual,
             id_atendido_por: me.lista_empleados[0].id,
             id_reserva: me.id_reserva,
@@ -996,7 +1009,6 @@ export default {
     },
     limpiarPago() {
       let me = this;
-      me.descuento = 0;
       me.valorRecibido = "";
       $("#valorR").focus();
     },

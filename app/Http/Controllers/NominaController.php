@@ -16,8 +16,8 @@ class NominaController extends Controller
             ->select(
                 'detalle_facturas.empleado_id',
                 DB::raw("CONCAT(empleado.nombre_usuario, ' ',empleado.apellido_usuario) as nombre_empleado,
-                    SUM(detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada) as valor_total_servicios,
-                    SUM(detalle_facturas.cantidad_facturada) as cantidad_servicios")
+                    SUM((detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada)-detalle_facturas.valor_descuento) as valor_total_servicios,
+                    SUM(detalle_facturas.cantidad_facturada) as cantidad_servicios, min(detalle_facturas.created_at) as minFecha,max(detalle_facturas.created_at) as maxFecha")
             )
             ->groupBy('detalle_facturas.empleado_id')
             ->where([
@@ -27,4 +27,8 @@ class NominaController extends Controller
 
         return datatables($empleadosNomina)->toJson();
     }
+
+    //realizar el pago de la nomina a Empleado
+    public function pagarNomina(Request $request)
+    { }
 }

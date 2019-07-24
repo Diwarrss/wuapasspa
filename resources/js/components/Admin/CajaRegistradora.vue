@@ -34,7 +34,7 @@
                   </strong>
                 </div>
                 <div class="col-md-4">
-                  <h4>Valor Neto</h4>
+                  <h4>Valor Producido</h4>
                   <strong>
                     <p>$ {{formatearValor(dataCajaDiv[0].valor_producido - dataCajaDiv[0].valor_gastos)}}</p>
                   </strong>
