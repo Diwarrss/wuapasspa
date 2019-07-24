@@ -47,6 +47,44 @@
         </div>
       </div>
     </section>
+    <!-- modal para PAGAR NOMINA A EMPLEADO -->
+    <section>
+      <div class="modal fade in" id="modalPagarNomina">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form class="form-horizontal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-plus-circle"></i> Crear Nómina
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box-body">
+                  <div class="container-fluid"></div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger pull-left"
+                  @click="cerrarModalNomina();"
+                >
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" @click="pagarNomina();">
+                  <i class="fas fa-check"></i> Pagar Nómina
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
   </div>
 </template>
 <script>
@@ -107,6 +145,21 @@ export default {
               $(this.footer()).html(numberFormat(sum));
             });
           }
+        });
+
+        //Metodo para llamar modal pagar Nomina
+        tablaNomina.on("click", ".pagarNomina", function() {
+          jQuery.noConflict(); // para evitar errores
+          $("#modalPagarNomina").modal("show"); //mostramos la modal
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaNomina.row(current_row).data();
+
+          me.id_factura = datos["id_factura"];
         });
       });
     }
