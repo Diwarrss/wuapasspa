@@ -314,8 +314,8 @@
                     </select>
                     <p
                       class="text-red"
-                      v-if="arrayErrors.cajaOrigen"
-                      v-text="arrayErrors.cajaOrigen[0]"
+                      v-if="arrayErrors.caja_origen"
+                      v-text="arrayErrors.caja_origen[0]"
                     ></p>
                   </div>
                 </div>
@@ -336,8 +336,8 @@
                     </select>
                     <p
                       class="text-red"
-                      v-if="arrayErrors.cajaDestino"
-                      v-text="arrayErrors.cajaDestino[0]"
+                      v-if="arrayErrors.caja_destino"
+                      v-text="arrayErrors.caja_destino[0]"
                     ></p>
                   </div>
                 </div>
@@ -350,11 +350,7 @@
                       v-bind="money"
                       v-model="valorATransferir"
                     >{{valorATransferir}}</money>
-                    <p
-                      class="text-red"
-                      v-if="arrayErrors.valorATransferir"
-                      v-text="arrayErrors.valorATransferir[0]"
-                    ></p>
+                    <p class="text-red" v-if="arrayErrors.valor" v-text="arrayErrors.valor[0]"></p>
                   </div>
                 </div>
               </div>
@@ -512,7 +508,7 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>  
+                return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>
                   <button class="btn btn-success transferencia btn-sm" title="Desactivar Empleado" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
               }
             }
@@ -669,7 +665,7 @@ export default {
               Swal.fire({
                 position: "top-end",
                 type: "error",
-                title: "Transferencia Confirmada",
+                title: "pendiente mañana",
                 showConfirmButton: false,
                 timer: 1500
               });
@@ -717,14 +713,40 @@ export default {
         });
     },
     transferir() {
-      this.cerrarModal();
-      Swal.fire({
-        position: "top-end",
-        type: "warning",
-        title: "Depronto mañana",
-        showConfirmButton: false,
-        timer: 1500
-      });
+      //creamos variable q corresponde a this de mis variables de data()
+      let data = this;
+
+      axios
+        .post("/crearTransferencia", {
+          caja_origen: data.IdCajaOrigenTrans,
+          caja_destino: data.IdCajaDestinoTrans,
+          valor: data.valorATransferir
+          //notas: data.valor_producido,
+        })
+        .then(function(response) {
+          //para actualizar la tabla de datatables
+          jQuery("#tablaTransferencias")
+            .DataTable()
+            .ajax.reload(null, false);
+          data.infoCajaDiv();
+          data.cerrarModal();
+          Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: "Transferencia Realizada con Exito",
+            showConfirmButton: false,
+            timer: 1500
+          });
+          //console.log(response);
+        })
+        .catch(function(error) {
+          if (error.response.status == 422) {
+            //preguntamos si el error es 422
+            data.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+          }
+          console.log(error);
+          console.log(data.arrayErrors);
+        });
     },
     formatearValor(value) {
       let val = (value / 1).toFixed(2).replace(".", ",");

@@ -111,6 +111,7 @@ Route::group(['middleware' => 'auth'], function () {
         //todas las operacoines de Tranferencias entre cajas listarTransferencia
         Route::get('/listarTransferencia', 'TransferenciaController@listarTransferencia')->name('listarTransferencia');
         Route::get('/cajasListTranferencias', 'CajaController@cajasListTranferencias')->name('cajasListTranferencias');
+        Route::post('/crearTransferencia', 'TransferenciaController@crearTransferencia')->name('crearTransferencia');
 
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');

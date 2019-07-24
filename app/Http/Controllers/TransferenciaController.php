@@ -15,9 +15,58 @@ class TransferenciaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function crearTransferencia(Request $request)
     {
-        //
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        try {
+            //usaremos transacciones
+            DB::beginTransaction();
+            //para validar los formularios
+            // 'empleado_id' valida que el usuario al que se va asoriar la caja, lo siguiente:
+            //                 -que  no tenga caja activa, - que el rol sea diferente a administrador
+
+            $cajaOrigen = Caja::find($request->caja_origen);
+            $cajaDestino = Caja::find($request->caja_destino);
+            $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido - $cajaOrigen->valor_gastos;
+
+            if ($request->valor <= $cajaOrigenNeto) {
+                $request->validate([
+                    'caja_origen' => 'required',
+                    'caja_destino' => 'required',
+                    'valor' => 'max:10|regex:/^\d+(\.\d{1,2})?$/'
+                ]);
+            } else {
+                $request->validate([
+                    'caja_origen' => 'required',
+                    'caja_destino' => 'required',
+                    'valor' => [
+                        'max:10|regex:/^\d+(\.\d{1,2})?$/',
+                        function ($attribute, $value, $fail) {
+                            if (1 > 0) {
+                                $fail('El valor a Transferir supera al Existente');
+                            }
+                        }
+                    ]
+                ]);
+            }
+
+            $cajaOrigen->valor_producido =  $cajaOrigen->valor_producido -  $request->valor;
+            $cajaOrigen->save();
+            $cajaDestino->valor_producido =  $cajaDestino->valor_producido +  $request->valor;
+            $cajaDestino->save();
+
+            $Transferencia =  new Transferencia();
+            $Transferencia->caja_origen = $request->caja_origen;
+            $Transferencia->caja_destino = $request->caja_destino;
+            $Transferencia->valor = $request->valor;
+            $Transferencia->notas = 'NINGUNA';
+            $Transferencia->save();
+
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack(); //si hay error no ejecute la transaccion
+        }
     }
 
 
