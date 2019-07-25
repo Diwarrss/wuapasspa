@@ -27,22 +27,28 @@
                 <h3 class="text-center" v-text="dataCajaDiv[0].nombre_caja"></h3>
               </strong>
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <h4>Valor Inicial</h4>
                   <strong>
                     <p>$ {{formatearValor(dataCajaDiv[0].valor_inicial)}}</p>
                   </strong>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <h4>Valor Producido</h4>
                   <strong>
-                    <p>$ {{formatearValor(dataCajaDiv[0].valor_producido - dataCajaDiv[0].valor_gastos)}}</p>
+                    <p>$ {{formatearValor(dataCajaDiv[0].valor_producido)}}</p>
                   </strong>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <h4>Valor Gastos</h4>
                   <strong>
                     <p>$ {{formatearValor(dataCajaDiv[0].valor_gastos)}}</p>
+                  </strong>
+                </div>
+                <div class="col-md-3">
+                  <h4>Valor Neto</h4>
+                  <strong>
+                    <p>$ {{formatearValor((parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido) - parseInt(dataCajaDiv[0].valor_gastos) ))}}</p>
                   </strong>
                 </div>
               </div>
@@ -624,6 +630,18 @@ export default {
         tablaTransferencias.on("click", ".confirmar", function() {
           jQuery.noConflict(); // para evitar errores
 
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var data = tablaTransferencias.row(current_row).data(); //At this point, current_row refers to a valid row in the table, whether is a child row (collapsed by the DataTable's responsiveness) or a 'normal' row
+
+          //var data = me.arrayEmpleados;
+          //$(this).parents('tr') esto es para obtener por fila
+          //console.log(data);
+          var idTransferencia = data["id"];
+
           Swal.fire({
             title: "Esta Seguro de Confirmar la Transferencia",
             text: "Una vez Confirmada no se podra deshacer la operacion",
@@ -635,40 +653,34 @@ export default {
             cancelButtonText: '<i class="fas fa-times"></i> No'
           }).then(result => {
             if (result.value) {
-              // /cancelarReservacion
-              // axios.put('/cancelarReservaciones', {
-              //     id: me.id
-              // }).then(function (response) {
-              //     Swal.fire({
-              //         position: 'top-end',
-              //         type: 'success',
-              //         title: 'Cita Cancelada!',
-              //         showConfirmButton: false,
-              //         timer: 1500
-              //     });
-              //         //data.cantidadAgendadas();
-              //         jQuery('#tablaAgendasL').DataTable().ajax.reload(null,false);
-              //         data.listarReservaciones(data.idEmpleadoElegido);
-              // })
-              // .catch(function (error) {
-              //     if (error.response.status == 422) {//preguntamos si el error es 422
-              //         Swal.fire({
-              //             position: 'top-end',
-              //             type: 'error',
-              //             title: 'Se produjo un Error, Reintentar',
-              //             showConfirmButton: false,
-              //             timer: 1500
-              //         });
-              //     }
-              //     console.log(error.response.data.errors);
-              // });
-              Swal.fire({
-                position: "top-end",
-                type: "error",
-                title: "pendiente mañana",
-                showConfirmButton: false,
-                timer: 1500
-              });
+              axios
+                .put("/confirmarTransferencia", {
+                  id: idTransferencia
+                })
+                .then(function(response) {
+                  jQuery("#tablaTransferencias")
+                    .DataTable()
+                    .ajax.reload(null, false);
+                  jQuery("#tablaEmpleados")
+                    .DataTable()
+                    .ajax.reload(null, false);
+                  me.infoCajaDiv();
+                  Swal.fire({
+                    position: "top-end",
+                    type: "success",
+                    title: "Transferencia Realizada y Confirmada!",
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                })
+                .catch(function(error) {
+                  Swal.fire({
+                    position: "top-end",
+                    type: "error",
+                    title: "El valor a transferir ya no esta disponible",
+                    showConfirmButton: true
+                  });
+                });
             }
           });
         });
@@ -694,6 +706,7 @@ export default {
             .ajax.reload();
           data.cerrarModal();
           data.infoCajaDiv();
+          data.cajasListTranferencias();
           Swal.fire({
             position: "top-end",
             type: "success",

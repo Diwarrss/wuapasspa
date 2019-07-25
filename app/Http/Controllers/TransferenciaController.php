@@ -50,10 +50,7 @@ class TransferenciaController extends Controller
                 ]);
             }
 
-            $cajaOrigen->valor_producido =  $cajaOrigen->valor_producido -  $request->valor;
-            $cajaOrigen->save();
-            $cajaDestino->valor_producido =  $cajaDestino->valor_producido +  $request->valor;
-            $cajaDestino->save();
+
 
             $Transferencia =  new Transferencia();
             $Transferencia->caja_origen = $request->caja_origen;
@@ -62,6 +59,38 @@ class TransferenciaController extends Controller
             $Transferencia->notas = 'NINGUNA';
             $Transferencia->save();
 
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack(); //si hay error no ejecute la transaccion
+        }
+    }
+
+    public function confirmarTransferencia(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        try {
+            //usaremos transacciones
+            DB::beginTransaction();
+            //para validar los formularios
+            // 'empleado_id' valida que el usuario al que se va asoriar la caja, lo siguiente:
+            //                 -que  no tenga caja activa, - que el rol sea diferente a administrador
+            $Transferencia = Transferencia::find($request->id);
+            $cajaOrigen = Caja::find($Transferencia->caja_origen);
+            $cajaDestino = Caja::find($Transferencia->caja_destino);
+
+            $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido - $cajaOrigen->valor_gastos;
+
+            if ($Transferencia->valor <= $cajaOrigenNeto) {
+                $cajaOrigen->valor_producido =  $cajaOrigen->valor_producido -  $Transferencia->valor;
+                $cajaOrigen->save();
+                $cajaDestino->valor_producido =  $cajaDestino->valor_producido +  $Transferencia->valor;
+                $cajaDestino->save();
+                $Transferencia->estado_transferencia = '2';
+                $Transferencia->save();
+            } else {
+                throw new Exception('El valor a transferir ya no esta disponible');
+            }
 
             DB::commit();
         } catch (Exception $e) {
