@@ -580,8 +580,13 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (row.estado_factura === "1") {
+                if (row.estado_factura === "1" && row.nomina_id === null) {
                   return '<span class="label label-success">Pagada</span>';
+                } else if (
+                  row.estado_factura === "1" &&
+                  row.nomina_id != null
+                ) {
+                  return '<span class="label label-success">Pagada</span> <span class="label label-info">En Nómina</span>';
                 } else if (row.estado_factura === "2") {
                   return '<span class="label label-info">Pago Parcial</span>';
                 } else if (row.estado_factura === "3") {
@@ -598,12 +603,19 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (row.estado_factura === "1") {
+                if (row.estado_factura === "1" && row.nomina_id === null) {
                   return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
                         <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
                             <i class="fas fa-close"></i>
+                        </button>`;
+                } else if (
+                  row.estado_factura === "1" &&
+                  row.nomina_id != null
+                ) {
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
                         </button>`;
                 } else if (row.estado_factura === "2") {
                   return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">

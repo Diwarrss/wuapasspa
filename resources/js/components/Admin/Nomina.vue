@@ -17,7 +17,7 @@
         </li>
       </ol>
     </section>
-    <!-- Tabla de todas als facturas -->
+    <!-- Tabla de los empleados para pagar nomina -->
     <section class="content">
       <br />
       <div class="box box-primary">
@@ -28,6 +28,36 @@
         </div>
         <div class="table-responsive container-fluid">
           <table id="tablaNomina" class="table table-bordered table-hover" style="width:100%">
+            <thead>
+              <tr>
+                <th>Empleado</th>
+                <th>Cant. Servicios</th>
+                <th>Valor Total Servicios</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody style="font-weight: normal;"></tbody>
+            <tfoot>
+              <tr>
+                <th colspan="2" class="text-right">Total:</th>
+                <th colspan="2"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+    <!-- Tabla de todas los pagos de nomina hechos-->
+    <section class="content">
+      <br />
+      <div class="box box-primary">
+        <div class="box-header">
+          <h3 class="box-title">
+            <i class="far fa-list-alt"></i> Lista de Pagos a Empleados
+          </h3>
+        </div>
+        <div class="table-responsive container-fluid">
+          <table id="tablaTotalNominas" class="table table-bordered table-hover" style="width:100%">
             <thead>
               <tr>
                 <th>Empleado</th>
@@ -154,6 +184,7 @@ export default {
       valor_pagado: 0,
       minFecha: "",
       maxFecha: "",
+      id_caja: "",
       //para usar el vue componente de moneyConcurrente
       money: {
         decimal: ",",
@@ -274,7 +305,11 @@ export default {
         if (result.value) {
           axios
             .post("/pagarNomina", {
-              empleado_id: me.empleado_id
+              empleado_id: me.empleado_id,
+              id_caja: me.id_caja,
+              valor_pagado: me.valor_pagado,
+              porcentaje_pagado: me.porcentaje_pagado,
+              valor_total_servicios: me.valor_total_servicios
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({
@@ -284,6 +319,9 @@ export default {
                 showConfirmButton: false,
                 timer: 1500
               }).then(function() {
+                jQuery("#tablaNomina")
+                  .DataTable()
+                  .ajax.reload(null, false);
                 me.cerrarModalNomina();
               });
               //console.log(response);
@@ -296,6 +334,24 @@ export default {
             });
         }
       });
+    },
+    //listar la caja del Usuario
+    infoCajaDiv() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/infoCajaDiv")
+        .then(function(response) {
+          me.id_caja = response.data[0].id;
+          //console.log(me.lista_empleados);
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
     },
     //obtener la informacion del empleado logueado actualmente
     infoRealizadoPor() {
@@ -330,6 +386,7 @@ export default {
   mounted() {
     this.listarEmpleadosNomina();
     this.infoRealizadoPor();
+    this.infoCajaDiv();
   }
 };
 </script>

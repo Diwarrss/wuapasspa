@@ -27,7 +27,7 @@ class TransferenciaController extends Controller
 
             $cajaOrigen = Caja::find($request->caja_origen);
             $cajaDestino = Caja::find($request->caja_destino);
-            $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido - $cajaOrigen->valor_gastos;
+            $cajaOrigenNeto = ($cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido) - $cajaOrigen->valor_gastos;
 
             if ($request->valor <= $cajaOrigenNeto) {
                 $request->validate([

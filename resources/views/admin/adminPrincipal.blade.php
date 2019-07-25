@@ -24,10 +24,10 @@
     <!-- Estilo personalizado sweetalert-->
     <style>
         .swal2-popup {
-            font-size: 1.2rem !important;
+            font-size: 1.5rem !important;
             }
         .swal2-icon {
-            font-size: 1.2rem !important;
+            font-size: 1.5rem !important;
             }
     </style>
 </head>

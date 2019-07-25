@@ -53,6 +53,7 @@ class FacturaController extends Controller
 
         $listarFacturar = DB::table('facturas')
             ->join('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
+            ->join('detalle_facturas', 'detalle_facturas.facturas_id', '=', 'facturas.id')
             ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
             ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
             ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
@@ -64,9 +65,11 @@ class FacturaController extends Controller
                 'anonimos.nombre_anonimo',
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 'facturas.valor_total',
-                'facturas.estado_factura'
+                'facturas.estado_factura',
+                'detalle_facturas.nomina_id'
             )
             ->where([['facturas.created_at', 'like', '%' . $fechahoy . '%']])
+            ->groupBy('detalle_facturas.facturas_id')
             //->orderByDesc('facturas.id')
             ->get();
 
@@ -78,6 +81,7 @@ class FacturaController extends Controller
         //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $listarFacturar = DB::table('facturas')
+            ->join('detalle_facturas', 'detalle_facturas.facturas_id', '=', 'facturas.id')
             ->leftjoin('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
             ->leftjoin('factura_anuladas', 'factura_anuladas.facturas_id', '=', 'facturas.id')
             ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
@@ -93,8 +97,10 @@ class FacturaController extends Controller
                 'anonimos.nombre_anonimo',
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 'facturas.valor_total',
-                'facturas.estado_factura'
+                'facturas.estado_factura',
+                'detalle_facturas.nomina_id'
             )
+            ->groupBy('detalle_facturas.facturas_id')
             ->get();
 
         return datatables($listarFacturar)->toJson();

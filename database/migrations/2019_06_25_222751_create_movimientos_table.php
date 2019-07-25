@@ -15,7 +15,7 @@ class CreateMovimientosTable extends Migration
     {
         Schema::create('movimientos', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('factura_id');
+            $table->unsignedInteger('factura_id')->nullable();
             $table->foreign('factura_id')->references('id')->on('facturas');
             $table->unsignedInteger('caja_id');
             $table->foreign('caja_id')->references('id')->on('cajas');

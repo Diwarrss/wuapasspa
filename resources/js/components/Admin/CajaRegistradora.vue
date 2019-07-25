@@ -27,28 +27,30 @@
                 <h3 class="text-center" v-text="dataCajaDiv[0].nombre_caja"></h3>
               </strong>
               <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4 text-center">
                   <h4>Valor Inicial</h4>
                   <strong>
                     <p>$ {{formatearValor(dataCajaDiv[0].valor_inicial)}}</p>
                   </strong>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4 text-center">
                   <h4>Valor Producido</h4>
                   <strong>
                     <p>$ {{formatearValor(dataCajaDiv[0].valor_producido)}}</p>
                   </strong>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4 text-center">
                   <h4>Valor Gastos</h4>
                   <strong>
                     <p>$ {{formatearValor(dataCajaDiv[0].valor_gastos)}}</p>
                   </strong>
                 </div>
-                <div class="col-md-3">
-                  <h4>Valor Neto</h4>
+              </div>
+              <div class="row">
+                <div class="col-md-12 text-center">
+                  <h4>Valor Actual Caja</h4>
                   <strong>
-                    <p>$ {{formatearValor((parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido) - parseInt(dataCajaDiv[0].valor_gastos) ))}}</p>
+                    <p>$ {{formatearValor(((parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido)) - parseInt(dataCajaDiv[0].valor_gastos) ))}}</p>
                   </strong>
                 </div>
               </div>
@@ -585,7 +587,7 @@ export default {
           processing: true,
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
-          order: [], //no colocar ordenamiento
+          order: [[4, "desc"]], //no colocar ordenamiento
           serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarTransferencia",
           columns: [
