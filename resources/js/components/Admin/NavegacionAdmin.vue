@@ -45,6 +45,11 @@
               </span>
             </a>
             <ul class="treeview-menu">
+                <li>
+                <router-link to="/horarioCitas" data-toggle="push-menu">
+                  <i class="fas fa-user-clock  text-green"></i> Horarios
+                </router-link>
+              </li>
               <li>
                 <router-link to="/agendaLibre" data-toggle="push-menu">
                   <i class="far fa-calendar-plus text-green"></i> Agendar Libre

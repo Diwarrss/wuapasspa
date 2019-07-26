@@ -121,6 +121,7 @@ Vue.component(
 const Error404 = require("./components/Admin/Error404.vue").default;
 //para el Admin
 const Solicitudes = require("./components/Admin/Solicitudes.vue").default;
+const HorarioCitas = require("./components/Admin/HorarioCitas.vue").default;
 const AgendaLibre = require("./components/Admin/AgendaLibre.vue").default;
 const AgendaEnEspera = require("./components/Admin/AgendaEnEspera.vue").default;
 const AgendaAtendidos = require("./components/Admin/AgendaAtendidos.vue")
@@ -172,6 +173,10 @@ const routes = [{
     {
         path: "/agendaLibre",
         component: AgendaLibre
+    },
+    {
+        path: "/horarioCitas",
+        component: HorarioCitas
     },
     {
         path: "/agendaEnEspera",

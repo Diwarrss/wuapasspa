@@ -4,6 +4,7 @@
         <section class="content-header">
             <h1>
                 <i class="fas fa-calendar-alt"></i> Solicitudes <small>Agendar</small>
+                <a href="/admin#/horarioCitas" type="button" class="btn btn-success btn-lg" title="Ver Horarios de Empleados"><i class="fas fa-user-clock"></i> Horarios</a>
             </h1>
             <ol class="breadcrumb">
                 <li>
