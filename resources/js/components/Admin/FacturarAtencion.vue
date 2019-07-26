@@ -127,7 +127,7 @@
               </tr>
               <tr v-for="(detalle, index) in informacionFacturar" :key="detalle.id">
                 <td>
-                  <span>{{detalle.nombre_servicio}} ($ {{formatearValor(detalle.valor_servicio)}})</span>
+                  <span>{{detalle.nombre_servicio}} (${{formatearValor(detalle.valor_servicio)}})</span>
                 </td>
                 <td>
                   <select class="form-control" id="empleado" v-model="detalle.id_atendido_por">
@@ -150,7 +150,7 @@
                   >{{detalle.valor_descuento}}</money>
                 </td>
                 <td>
-                  <span>$ {{formatearValor((detalle.cantidad*detalle.valor_servicio)-detalle.valor_descuento)}}</span>
+                  <span>${{formatearValor((detalle.cantidad*detalle.valor_servicio)-detalle.valor_descuento)}}</span>
                 </td>
                 <td>
                   <button
@@ -167,14 +167,14 @@
                 <td colspan="4" align="right">
                   <strong>Subtotal:</strong>
                 </td>
-                <td>$ {{formatearValor(subtotal = calcularSubtotal)}}</td>
+                <td>${{formatearValor(subtotal = calcularSubtotal)}}</td>
               </tr>
               <tr v-if="informacionFacturar.length > 0">
                 <td colspan="4" align="right">
                   <strong>Descuento:</strong>
                 </td>
                 <td>
-                  $ {{formatearValor(descuento = calcularTotalDescuento)}}
+                  ${{formatearValor(descuento = calcularTotalDescuento)}}
                   <!-- <money class="form-control" v-bind="money" v-model="descuento">{{descuento}}</money> -->
                 </td>
               </tr>
@@ -182,7 +182,7 @@
                 <td colspan="4" align="right">
                   <strong>Total Neto:</strong>
                 </td>
-                <td>$ {{formatearValor(valorNeto = calcularNeto)}}</td>
+                <td>${{formatearValor(valorNeto = calcularNeto)}}</td>
               </tr>
             </tbody>
           </table>
@@ -338,17 +338,17 @@
                                 </div>
                                 <div
                                   class="col-md-6 col-sm-6"
-                                >$ {{formatearValor(subtotal = calcularSubtotal)}}</div>
+                                >${{formatearValor(subtotal = calcularSubtotal)}}</div>
                                 <div class="col-md-6 col-sm-6">
                                   <strong>Descuento:</strong>
                                 </div>
-                                <div class="col-md-6 col-sm-6">$ {{formatearValor(descuento)}}</div>
+                                <div class="col-md-6 col-sm-6">${{formatearValor(descuento)}}</div>
                                 <div class="col-md-6 col-sm-6">
                                   <strong>Total Neto:</strong>
                                 </div>
                                 <div
                                   class="col-md-6 col-sm-6"
-                                >$ {{formatearValor(valorNeto = calcularNeto)}}</div>
+                                >${{formatearValor(valorNeto = calcularNeto)}}</div>
                               </div>
                             </div>
                           </div>
@@ -370,7 +370,7 @@
                                   <strong>
                                     <p>Valor Cambio</p>
                                   </strong>
-                                  <p>$ {{formatearValor(valorRecibido - valorNeto)}}</p>
+                                  <p>${{formatearValor(valorRecibido - valorNeto)}}</p>
                                 </div>
                               </div>
                             </div>
@@ -511,7 +511,7 @@ export default {
       money: {
         decimal: ",",
         thousands: ".",
-        prefix: "$ ",
+        prefix: "$",
         suffix: "",
         precision: 0,
         masked: false
@@ -599,7 +599,7 @@ export default {
             {
               data: "valor_total",
               className: "sum",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               render: function(data, type, row) {
@@ -651,7 +651,7 @@ export default {
               ".",
               ",",
               2,
-              "$ "
+              "$"
             ).display;
             //sumeme el data que tenga la clase sum
             api.columns(".sum", { page: "current" }).every(function() {
@@ -850,7 +850,7 @@ export default {
             },
             {
               data: "valor_total",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               render: function(data, type, row) {
@@ -926,7 +926,7 @@ export default {
             },
             {
               data: "valor_servicio",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               render: function(data, type, row) {

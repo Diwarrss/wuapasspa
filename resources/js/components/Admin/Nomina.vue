@@ -227,7 +227,7 @@ export default {
             {
               data: "valor_total_servicios",
               className: "sum",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               render: function(data, type, row) {
@@ -243,7 +243,7 @@ export default {
               ".",
               ",",
               2,
-              "$ "
+              "$"
             ).display;
             //sumeme el data que tenga la clase sum
             api.columns(".sum", { page: "current" }).every(function() {
@@ -270,6 +270,82 @@ export default {
             current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
           }
           var datos = tablaNomina.row(current_row).data();
+
+          me.nombre_empleado = datos["nombre_empleado"];
+          me.empleado_id = datos["empleado_id"];
+          me.valor_total_servicios = datos["valor_total_servicios"];
+          me.minFecha = moment(datos["minFecha"]).format("DD/MM/YYYY hh:mm a");
+          me.maxFecha = moment(datos["maxFecha"]).format("DD/MM/YYYY hh:mm a");
+
+          //para enviar el focus al input del porcentaje
+          $("#modalPagarNomina").on("shown.bs.modal", function() {
+            $("#valorPorcentaje").focus();
+          });
+        });
+      });
+    },
+    listarPagosNomina() {
+      let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+      jQuery(document).ready(function() {
+        var tablaTotalNominas = jQuery("#tablaTotalNominas").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          //processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [[0, "asc"]],
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ajax: "/listarPagosNomina",
+          columns: [
+            { data: "nombre_empleado" },
+            { data: "cantidad_servicios" },
+            {
+              data: "valor_total_servicios",
+              className: "sum",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
+            },
+            {
+              render: function(data, type, row) {
+                return `<button style="margin: 1px" type="button" class="btn btn-success pagarNomina" title="Pagar a Cliente">
+                            <i class="fas fa-money-check-alt"></i> Liquidar
+                        </button>`;
+              }
+            }
+          ],
+          footerCallback: function(row, data, start, end, display) {
+            var api = this.api();
+            var numberFormat = jQuery.fn.dataTable.render.number(
+              ".",
+              ",",
+              2,
+              "$"
+            ).display;
+            //sumeme el data que tenga la clase sum
+            api.columns(".sum", { page: "current" }).every(function() {
+              var sum = this.data().reduce(function(a, b) {
+                var x = parseFloat(a) || 0;
+                var y = parseFloat(b) || 0;
+                return x + y;
+              }, 0);
+              /* console.log(sum); */
+              // Update footer
+              $(this.footer()).html(numberFormat(sum));
+            });
+          }
+        });
+
+        //Metodo para llamar modal pagar Nomina
+        tablaTotalNominas.on("click", ".pagarNomina", function() {
+          jQuery.noConflict(); // para evitar errores
+          $("#modalPagarNomina").modal("show"); //mostramos la modal
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaTotalNominas.row(current_row).data();
 
           me.nombre_empleado = datos["nombre_empleado"];
           me.empleado_id = datos["empleado_id"];

@@ -209,7 +209,7 @@ export default {
             {
               data: "valor_total",
               className: "sum",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               render: function(data, type, row) {
@@ -261,7 +261,7 @@ export default {
               ".",
               ",",
               2,
-              "$ "
+              "$"
             ).display;
             //sumeme el data que tenga la clase sum
             api.columns(".sum", { page: "current" }).every(function() {

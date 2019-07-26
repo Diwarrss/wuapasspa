@@ -14,7 +14,7 @@ class NominaController extends Controller
 {
     public function listarEmpleadosNomina(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
         $empleadosNomina = DetalleFactura::join('users as empleado', 'detalle_facturas.empleado_id', '=', 'empleado.id')
             ->join('facturas', 'facturas.id', '=', 'detalle_facturas.facturas_id')
             ->select(
@@ -76,5 +76,16 @@ class NominaController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
         }
+    }
+
+    public function listarPagosNomina(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+
+        $empleadosNomina = Nomina::join('detalle_facturas', 'detalle_facturas.nomina_id', '=', 'nominas.id')
+            ->groupBy('nominas.id')
+            ->get();
+
+        return datatables($empleadosNomina)->toJson();
     }
 }

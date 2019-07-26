@@ -126,6 +126,7 @@ Route::group(['middleware' => 'auth'], function () {
         //Controlador de Nomina
         Route::get('/listarEmpleadosNomina', 'NominaController@listarEmpleadosNomina')->name('listarEmpleadosNomina');
         Route::post('/pagarNomina', 'NominaController@pagarNomina')->name('pagarNomina');
+        Route::get('/listarPagosNomina', 'NominaController@listarPagosNomina')->name('listarPagosNomina');
     });
 
     //middleware que solo permite acceso a agendador

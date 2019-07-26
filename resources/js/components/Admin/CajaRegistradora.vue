@@ -30,19 +30,19 @@
                 <div class="col-md-4 text-center">
                   <h4>Valor Inicial</h4>
                   <strong>
-                    <p>$ {{formatearValor(dataCajaDiv[0].valor_inicial)}}</p>
+                    <p>${{formatearValor(dataCajaDiv[0].valor_inicial)}}</p>
                   </strong>
                 </div>
                 <div class="col-md-4 text-center">
                   <h4>Valor Producido</h4>
                   <strong>
-                    <p>$ {{formatearValor(dataCajaDiv[0].valor_producido)}}</p>
+                    <p>${{formatearValor(dataCajaDiv[0].valor_producido)}}</p>
                   </strong>
                 </div>
                 <div class="col-md-4 text-center">
                   <h4>Valor Gastos</h4>
                   <strong>
-                    <p>$ {{formatearValor(dataCajaDiv[0].valor_gastos)}}</p>
+                    <p>${{formatearValor(dataCajaDiv[0].valor_gastos)}}</p>
                   </strong>
                 </div>
               </div>
@@ -50,7 +50,7 @@
                 <div class="col-md-12 text-center">
                   <h4>Valor Actual Caja</h4>
                   <strong>
-                    <p>$ {{formatearValor(((parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido)) - parseInt(dataCajaDiv[0].valor_gastos) ))}}</p>
+                    <p>${{formatearValor(((parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido)) - parseInt(dataCajaDiv[0].valor_gastos) ))}}</p>
                   </strong>
                 </div>
               </div>
@@ -415,7 +415,7 @@ export default {
       money: {
         decimal: ",",
         thousands: ".",
-        prefix: "$ ",
+        prefix: "$",
         suffix: "",
         precision: 0,
         masked: false
@@ -487,15 +487,15 @@ export default {
             { data: "nombre_caja" },
             {
               data: "valor_inicial",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               data: "valor_producido",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               data: "valor_gastos",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
               render: function(data, type, row) {
@@ -595,7 +595,7 @@ export default {
             { data: "nombre_cajaDestino" },
             {
               data: "valor",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$ ")
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             { data: "notas" },
             { data: "fecha_transferencia" },
