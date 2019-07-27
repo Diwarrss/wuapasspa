@@ -524,7 +524,7 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (me.roles_roles_id === 1) {
+                if (me.roles_roles_id == 1) {
                   return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>
                   <button class="btn btn-success transferencia btn-sm" title="Hacer Transferencia" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
                 } else if (me.roles_roles_id == 4) {
@@ -641,7 +641,7 @@ export default {
               render: function(data, type, row) {
                 if (
                   row.estado_transferencia === "Pendiente" &&
-                  me.roles_roles_id === 1
+                  me.roles_roles_id == 1
                 ) {
                   return '<button class="btn btn-success confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
                 } else if (
@@ -846,20 +846,6 @@ export default {
               jQuery.noConflict(); // para evitar errores al mostrar la modal
               $("#modalEmpleado").modal("show");
               this.tipoAccionModal = 1; //para registrar
-              //reseteamos variables
-              this.roles_roles_id = 2;
-              this.empresas_empresas_id = 1;
-              this.nombre_usuario = "";
-              this.apellido_usuario = "";
-              this.usuario = "";
-              this.email = "";
-              this.password = "";
-              this.password2 = "";
-              this.celular = "";
-              this.fecha_cumple = "";
-              this.imagen = "";
-              this.estado_usuario = 1;
-              this.arrayErrors = [];
               break;
             }
           }
