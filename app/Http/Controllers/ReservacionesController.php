@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Reservacione; //se importa el modelo de las reservaciones
 use App\Solicitude; //se importa el modelo de las solicitudes
 use App\Anonimo;
+use App\User;
 use Illuminate\Support\Facades\Auth; // para obtener el id del cliente que hace la solicitud
 use Illuminate\Support\Facades\DB; // para hacer transacciones seguras a la db
 
@@ -487,6 +488,73 @@ class ReservacionesController extends Controller
 
         return $anonimos;
     }
+
+    public function listarTodoHorarios(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        //trae las que sean diferentes al estado 5 osea al cancelado
+        $empleados = User::select('id', DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"), DB::raw('"" as reservas'))
+            ->where([
+                ['estado_usuario', '1'],
+                ['roles_roles_id', '2'],
+            ])->get();
+
+        foreach ($empleados as $empleado) {
+            $reservaciones =  DB::table('reservaciones')->join('users', 'reservaciones.users_users_id', '=', 'users.id')
+                ->join('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
+                ->join('users as cliente', 'solicitudes.users_users_id', '=', 'cliente.id')
+                ->select(
+                    'reservaciones.id',
+                    'reservaciones.estado_reservacion',
+                    DB::raw("CONCAT(cliente.nombre_usuario, ' ',cliente.apellido_usuario) as nombre_completo_cliente"),
+                    DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_completo_empleado"),
+                    DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%Y-%m-%d') as date"),
+                    DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%H:%i') as startTime"),
+                    DB::raw("DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%H:%i') as endTime"),
+                    DB::raw("(CASE reservaciones.estado_reservacion
+                                                        WHEN 1 THEN 'Por Confirmar'
+                                                        WHEN 2 THEN 'Atendido'
+                                                        WHEN 3 THEN 'No Asistió'
+                                                        WHEN 4 THEN 'En Espera'
+                                                        ELSE 'Cancelo' END) AS estado_reservacion_nombre")
+                )
+                ->where([
+                    ['reservaciones.estado_reservacion', '<>', '5'],
+                    ['users.id', '=', $empleado->id]
+                ]);
+
+
+            $anonimos =  DB::table('anonimos')->join('reservaciones', 'reservaciones.id', '=', 'anonimos.reservaciones_id')
+                ->join('users', 'reservaciones.users_users_id', '=', 'users.id')
+                ->select(
+                    'reservaciones.id',
+                    'reservaciones.estado_reservacion',
+                    'nombre_anonimo as nombre_completo_cliente',
+                    DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_completo_empleado"),
+                    DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%Y-%m-%d') as date"),
+                    DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%H:%i') as startTime"),
+                    DB::raw("DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%H:%i') as endTime"),
+                    DB::raw("(CASE reservaciones.estado_reservacion
+                                                        WHEN 1 THEN 'Por Confirmar'
+                                                        WHEN 2 THEN 'Atendido'
+                                                        WHEN 3 THEN 'No Asistió'
+                                                        WHEN 4 THEN 'En Espera'
+                                                        ELSE 'Cancelo' END) AS estado_reservacion_nombre")
+                )
+                ->where([
+                    ['reservaciones.estado_reservacion', '<>', '5'],
+                    ['users.id', '=', $empleado->id] //$request->empleadoID
+                ])
+                ->unionAll($reservaciones)
+                ->get();
+
+            $empleado->reservas = $anonimos;
+        }
+
+
+        return $empleados;
+    }
+
 
     public function listarAnonimas(Request $request)
     {

@@ -167,6 +167,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/showBuzon', 'SugerenciaController@showBuzon')->name('showBuzon');
         //agenda anonima
         Route::get('/listarTodo', 'ReservacionesController@listarTodo')->name('listarTodo');
+        Route::get('/listarTodoHorarios', 'ReservacionesController@listarTodoHorarios')->name('listarTodoHorarios');
         Route::get('/listarAnonimas', 'ReservacionesController@listarAnonimas')->name('listarAnonimas');
         Route::post('/storeReservacionesA', 'ReservacionesController@storeAnonimo')->name('storeReservacionesA');
     });
