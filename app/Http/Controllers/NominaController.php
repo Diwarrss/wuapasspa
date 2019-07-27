@@ -45,6 +45,7 @@ class NominaController extends Controller
             $newMovimiento->valor_movimiento = $request->valor_pagado;
             $newMovimiento->valor_pendiente = 0;
             $newMovimiento->tipo_movimiento = 2; //para q sea un egreso gasto
+            $newMovimiento->estado = 1;
             $newMovimiento->save();
 
             //obtenemos el valor producido y de gastos de la caja por el ID con first
@@ -68,8 +69,13 @@ class NominaController extends Controller
             $newNomina->estado_nomina = 1;
             $newNomina->save();
 
+            //actualizamos los detalles de las factruras que estan activas y al usuario q les corresponde
             DB::table('detalle_facturas')
-                ->where([['empleado_id', $request->empleado_id], ['nomina_id', null]])
+                ->join('facturas', 'detalle_facturas.facturas_id', '=', 'facturas.id')
+                ->where([
+                    ['facturas.estado_factura', 1], ['detalle_facturas.empleado_id', $request->empleado_id],
+                    ['detalle_facturas.nomina_id', null]
+                ])
                 ->update(['nomina_id' => $newNomina->id]);
 
             DB::commit(); //se ahce el commit pa update base datos
@@ -81,11 +87,54 @@ class NominaController extends Controller
     public function listarPagosNomina(Request $request)
     {
         //if (!$request->ajax()) return redirect('/');
-
-        $empleadosNomina = Nomina::join('detalle_facturas', 'detalle_facturas.nomina_id', '=', 'nominas.id')
-            ->groupBy('nominas.id')
+        $listarPagosNomina = Nomina::join('users as empleado', 'nominas.pagado_a', '=', 'empleado.id')
+            ->select(
+                'nominas.id',
+                'nominas.movimientos_id',
+                DB::raw("DATE_FORMAT(nominas.created_at, '%d/%m/%Y %h:%i %p') as fecha_pago"),
+                'nominas.porcentaje_pagado',
+                'nominas.valor_pagado',
+                DB::raw("CONCAT(empleado.nombre_usuario, ' ',empleado.apellido_usuario) as nombre_empleado"),
+                'nominas.estado_nomina'
+            )
             ->get();
 
-        return datatables($empleadosNomina)->toJson();
+        return datatables($listarPagosNomina)->toJson();
+    }
+
+    public function cancelarPago(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        try {
+            DB::beginTransaction();
+
+            $cancelNomina = Nomina::find($request->id_nomina);
+            $cancelNomina->estado_nomina = 2;
+            $cancelNomina->save();
+
+            $cancelMovimiento = Movimiento::find($request->id_movimiento);
+            $cancelMovimiento->estado = 2;
+            $cancelMovimiento->save();
+
+            //obtenemos el valor producido y de gastos de la caja por el ID con first
+            //$valorProducido = Caja::select('valor_producido')->where('id', $request->id_caja)->first();
+            $valorGastos = Caja::select('valor_gastos')->where('id', $request->id_caja)->first();
+            //actualizar el valor de gastos y producido caja
+            $updateCaja = Caja::find($request->id_caja);
+            //restamos el valor consultado menos el valor de la factura
+            //$updateCaja->valor_producido = $valorProducido->valor_producido - $request->valor_pagado;
+            $updateCaja->valor_gastos = $valorGastos->valor_gastos - $request->valor_pagado;
+            $updateCaja->save();
+
+            //actualizamos los detalles_facturas x q son unicamente los que corresponden al id de la nomina
+            DB::table('detalle_facturas')
+                ->where([['nomina_id', $request->id_nomina]])
+                ->update(['nomina_id' => null]);
+
+            DB::commit(); //se ahce el commit pa update base datos
+        } catch (Exception $e) {
+            DB::rollBack();
+        }
     }
 }

@@ -172,7 +172,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [[0, "asc"]],
-          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/historialFacturas",
           columns: [
             { data: "num_factura" },
@@ -190,13 +190,8 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (row.estado_factura === "1" && row.nomina_id === null) {
+                if (row.estado_factura === "1") {
                   return '<span class="label label-success">Pagada</span>';
-                } else if (
-                  row.estado_factura === "1" &&
-                  row.nomina_id != null
-                ) {
-                  return '<span class="label label-success">Pagada</span> <span class="label label-info">En Nómina</span>';
                 } else if (row.estado_factura === "2") {
                   return '<span class="label label-info">Pago Parcial</span>';
                 } else if (row.estado_factura === "3") {
@@ -226,7 +221,8 @@ export default {
                 ) {
                   return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
-                        </button>`;
+                        </button>  
+                        <span class="label label-info">En Nómina</span>`;
                 } else if (row.estado_factura === "2") {
                   return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>

@@ -60,19 +60,16 @@
           <table id="tablaTotalNominas" class="table table-bordered table-hover" style="width:100%">
             <thead>
               <tr>
-                <th>Empleado</th>
-                <th>Cant. Servicios</th>
-                <th>Valor Total Servicios</th>
+                <th>#Pago</th>
+                <th>Fecha de Pago</th>
+                <th>% Pagado</th>
+                <th>Valor Pagado</th>
+                <th>Pagado A</th>
+                <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody style="font-weight: normal;"></tbody>
-            <tfoot>
-              <tr>
-                <th colspan="2" class="text-right">Total:</th>
-                <th colspan="2"></th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>
@@ -193,7 +190,8 @@ export default {
         suffix: " %",
         precision: 0,
         masked: false
-      }
+      },
+      id_nomina: ""
     };
   },
   watch: {},
@@ -219,7 +217,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [[0, "asc"]],
-          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ////serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarEmpleadosNomina",
           columns: [
             { data: "nombre_empleado" },
@@ -294,51 +292,56 @@ export default {
           //processing: true,
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
-          order: [[0, "asc"]],
+          order: [[0, "desc"]],
           //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarPagosNomina",
           columns: [
-            { data: "nombre_empleado" },
-            { data: "cantidad_servicios" },
+            { data: "id" },
+            { data: "fecha_pago" },
             {
-              data: "valor_total_servicios",
-              className: "sum",
+              data: "porcentaje_pagado",
+              render: jQuery.fn.dataTable.render.number(",", ".", 0, "", "%")
+            },
+            {
+              data: "valor_pagado",
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
+            },
+            { data: "nombre_empleado" },
+            {
+              render: function(data, type, row) {
+                if (row.estado_nomina == 1) {
+                  return '<span class="label label-success"> Pagado</span></a>';
+                } else {
+                  return '<span class="label label-danger"> Cancelado</span></a>';
+                }
+              }
             },
             {
               render: function(data, type, row) {
-                return `<button style="margin: 1px" type="button" class="btn btn-success pagarNomina" title="Pagar a Cliente">
-                            <i class="fas fa-money-check-alt"></i> Liquidar
+                if (row.estado_nomina == 1) {
+                  return `<button style="margin: 1px" type="button" class="btn btn-info verPago" title="Ver Pago">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Pago">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-danger cancelar" title="Cancelar Pago">
+                            <i class="fas fa-ban"></i>
                         </button>`;
+                } else {
+                  return `<button style="margin: 1px" type="button" class="btn btn-info verPago" title="Ver Pago">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Pago">
+                            <i class="fas fa-print"></i>
+                        </button>`;
+                }
               }
             }
-          ],
-          footerCallback: function(row, data, start, end, display) {
-            var api = this.api();
-            var numberFormat = jQuery.fn.dataTable.render.number(
-              ".",
-              ",",
-              2,
-              "$"
-            ).display;
-            //sumeme el data que tenga la clase sum
-            api.columns(".sum", { page: "current" }).every(function() {
-              var sum = this.data().reduce(function(a, b) {
-                var x = parseFloat(a) || 0;
-                var y = parseFloat(b) || 0;
-                return x + y;
-              }, 0);
-              /* console.log(sum); */
-              // Update footer
-              $(this.footer()).html(numberFormat(sum));
-            });
-          }
+          ]
         });
-
         //Metodo para llamar modal pagar Nomina
-        tablaTotalNominas.on("click", ".pagarNomina", function() {
-          jQuery.noConflict(); // para evitar errores
-          $("#modalPagarNomina").modal("show"); //mostramos la modal
+        tablaTotalNominas.on("click", ".cancelar", function() {
           //para si es responsivo obtenemos la data
           var current_row = $(this).parents("tr"); //Get the current row
           if (current_row.hasClass("child")) {
@@ -347,15 +350,49 @@ export default {
           }
           var datos = tablaTotalNominas.row(current_row).data();
 
-          me.nombre_empleado = datos["nombre_empleado"];
-          me.empleado_id = datos["empleado_id"];
-          me.valor_total_servicios = datos["valor_total_servicios"];
-          me.minFecha = moment(datos["minFecha"]).format("DD/MM/YYYY hh:mm a");
-          me.maxFecha = moment(datos["maxFecha"]).format("DD/MM/YYYY hh:mm a");
-
-          //para enviar el focus al input del porcentaje
-          $("#modalPagarNomina").on("shown.bs.modal", function() {
-            $("#valorPorcentaje").focus();
+          me.id_nomina = datos["id"];
+          var id_movimiento = datos["movimientos_id"];
+          var valor_pagado = datos["valor_pagado"];
+          Swal.fire({
+            title: "¿Seguro de Cancelar el Pago?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "green",
+            cancelButtonColor: "red",
+            confirmButtonText: '<i class="fas fa-check"></i> Si',
+            cancelButtonText: '<i class="fas fa-times"></i> No'
+          }).then(result => {
+            if (result.value) {
+              axios
+                .post("/cancelarPago", {
+                  id_nomina: me.id_nomina,
+                  id_movimiento: id_movimiento,
+                  id_caja: me.id_caja,
+                  valor_pagado: valor_pagado
+                }) //le envio el parametro completo
+                .then(function(response) {
+                  Swal.fire({
+                    position: "top-end",
+                    type: "success",
+                    title: "Pago Cancelado con éxito!",
+                    showConfirmButton: false,
+                    timer: 1500
+                  }).then(function() {
+                    //actualizamos las tablas
+                    jQuery("#tablaNomina")
+                      .DataTable()
+                      .ajax.reload();
+                    me.cerrarModalNomina();
+                    jQuery("#tablaTotalNominas")
+                      .DataTable()
+                      .ajax.reload(null, false);
+                  });
+                  //console.log(response);
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            }
           });
         });
       });
@@ -399,6 +436,9 @@ export default {
                   .DataTable()
                   .ajax.reload(null, false);
                 me.cerrarModalNomina();
+                jQuery("#tablaTotalNominas")
+                  .DataTable()
+                  .ajax.reload();
               });
               //console.log(response);
             })
@@ -463,6 +503,7 @@ export default {
     this.listarEmpleadosNomina();
     this.infoRealizadoPor();
     this.infoCajaDiv();
+    this.listarPagosNomina();
   }
 };
 </script>

@@ -50,10 +50,10 @@ import "vue-datetime/dist/vue-datetime.css";
 import "v-calendar-scheduler/lib/main.css"; //jpara vue sheluder
 
 //importando v-money
-import money from 'v-money'
+import money from "v-money";
 Vue.use(money, {
     precision: 2
-})
+});
 
 //importamos el componente de datepicker
 /*import Datepicker from 'vuejs-datepicker';
@@ -136,7 +136,8 @@ const AgendaCumple = require("./components/Admin/AgendaCumple.vue").default;
 const Clientes = require("./components/Admin/Clientes.vue").default;
 const Empleados = require("./components/Admin/Empleados.vue").default;
 const Roles = require("./components/Admin/Roles.vue").default;
-const ReportAgendalibre = require("./components/Admin/ReportAgendalibre.vue").default;
+const ReportAgendalibre = require("./components/Admin/ReportAgendalibre.vue")
+    .default;
 const ReportCitas = require("./components/Admin/ReportCitas.vue").default;
 const ReportEmpleados = require("./components/Admin/ReportEmpleados.vue")
     .default;
@@ -162,7 +163,8 @@ const HistorialFacturas = require("./components/Admin/HistorialFacturas.vue")
 // either be an actual component constructor created via
 // `Vue.extend()`, or just a component options object.
 // We'll talk about nested routes later.
-const routes = [{
+const routes = [
+    {
         path: "*",
         component: Error404
     },

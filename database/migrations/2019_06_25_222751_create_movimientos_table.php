@@ -25,6 +25,10 @@ class CreateMovimientosTable extends Migration
                 \App\Movimiento::INGRESO, \App\Movimiento::EGRESO
             ])
                 ->default(\App\Movimiento::INGRESO);
+            $table->enum('estado', [
+                \App\Movimiento::ACTIVO, \App\Movimiento::CANCELADO
+            ])
+                ->default(\App\Movimiento::ACTIVO);
             $table->timestamps();
         });
     }

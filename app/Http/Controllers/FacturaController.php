@@ -66,7 +66,7 @@ class FacturaController extends Controller
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 'facturas.valor_total',
                 'facturas.estado_factura',
-                'detalle_facturas.nomina_id'
+                DB::raw("MAX(detalle_facturas.nomina_id) as nomina_id")
             )
             ->where([['facturas.created_at', 'like', '%' . $fechahoy . '%']])
             ->groupBy('detalle_facturas.facturas_id')
@@ -98,7 +98,7 @@ class FacturaController extends Controller
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 'facturas.valor_total',
                 'facturas.estado_factura',
-                'detalle_facturas.nomina_id'
+                DB::raw("MAX(detalle_facturas.nomina_id) as nomina_id")
             )
             ->groupBy('detalle_facturas.facturas_id')
             ->get();
@@ -178,6 +178,7 @@ class FacturaController extends Controller
             $movimiento->valor_movimiento = $request->valor_total;
             $movimiento->valor_pendiente = 0;
             $movimiento->tipo_movimiento = 1; //para q sea un ingreso
+            $movimiento->estado = 1;
             $movimiento->save();
 
             //actualizamos la caja asociada del usuario obtenemos el valor producido Actual de la caja por el ID con first
@@ -244,6 +245,7 @@ class FacturaController extends Controller
             $movimiento->valor_movimiento = $request->valor_total;
             $movimiento->valor_pendiente = 0;
             $movimiento->tipo_movimiento = 2; //para q sea un egreso anulacion
+            $movimiento->estado = 1;
             $movimiento->save();
 
             //obtenemos el valor producido de la caja por el ID con first

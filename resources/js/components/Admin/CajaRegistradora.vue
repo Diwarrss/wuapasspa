@@ -480,7 +480,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [], //no colocar ordenamiento
-          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ////serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarCajar",
           columns: [
             { data: "nombre_usuario" },
@@ -588,7 +588,7 @@ export default {
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
           order: [[4, "desc"]], //no colocar ordenamiento
-          serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarTransferencia",
           columns: [
             { data: "nombre_cajaOrigen" },

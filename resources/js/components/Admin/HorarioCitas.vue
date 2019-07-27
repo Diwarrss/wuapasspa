@@ -20,19 +20,18 @@
     <section class="content" v-if="objetodeCitas.length >= 0">
       <div class="row">
         <div v-for="objetoCita of objetodeCitas" :key="objetoCita.id">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="box box-success">
-              <div class="box-header">
-                <form class="form-horizontal">
-                  <div class="form-group">
-                    <label for="empleado" class="col-sm-3 control-label hidden-xs">
-                      <i class="fas fa-user-tie"></i> Empleado:
-                    </label>
-                    <div class="col-sm-6">
-                      <input class="form-control" type="text" v-model="objetoCita.nombre" readonly />
-                    </div>
-                  </div>
-                </form>
+              <div class="box-header text-center">
+                <label for="empleado">
+                  <i class="fas fa-user-tie"></i> Empleado:
+                  <input
+                    class="form-control"
+                    type="text"
+                    v-model="objetoCita.nombre"
+                    readonly
+                  />
+                </label>
               </div>
             </div>
             <div>

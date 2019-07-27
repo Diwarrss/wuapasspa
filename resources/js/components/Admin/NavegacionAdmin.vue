@@ -45,9 +45,9 @@
               </span>
             </a>
             <ul class="treeview-menu">
-                <li>
+              <li>
                 <router-link to="/horarioCitas" data-toggle="push-menu">
-                  <i class="fas fa-user-clock  text-green"></i> Horarios
+                  <i class="fas fa-user-clock text-green"></i> Horarios
                 </router-link>
               </li>
               <li>
@@ -216,7 +216,8 @@ export default {
       email: "",
       imagen: "",
       nombres: "",
-      estado_usuario: 1
+      estado_usuario: 1,
+      rol_user: ""
     };
   },
   methods: {
@@ -245,6 +246,7 @@ export default {
           me.email = response.data[0].email;
           me.nombres = response.data[0].nombre_usuario;
           me.estado_usuario = response.data[0].estado_usuario;
+          me.rol_user = response.data[0].roles_roles_id;
         })
         .catch(function(error) {
           // handle error
