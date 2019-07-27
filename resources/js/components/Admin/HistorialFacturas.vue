@@ -127,6 +127,7 @@
 export default {
   data() {
     return {
+      roles_roles_id: 0,
       id_facturadopor: "",
       nombre_facturador: "",
       id_caja: 0,
@@ -140,6 +141,14 @@ export default {
     };
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     //listar la caja del Usuario
     infoCajaDiv() {
       let me = this;
@@ -373,6 +382,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     this.historialFacturas();
     this.infoFacturador();
     this.infoCajaDiv();

@@ -106,6 +106,9 @@ Vue.component(
     require("./components/Agendador/NavegacionAgendador.vue").default
 );
 
+//componente de Navegacion
+Vue.component("navegacion", require("./components/Navegacion.vue").default);
+
 //componentes para optimizar todo
 Vue.component(
     "imagenperfil",

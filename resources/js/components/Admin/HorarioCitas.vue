@@ -3,8 +3,24 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        <i class="fas fa-calendar-check-o"></i> Agendar Libre
-        <small>Información</small>
+        <i class="fas fa-user-clock"></i> Horarios Agendas
+        <small>Empleados</small>
+        <a
+          href="/admin#/agendaLibre"
+          type="button"
+          class="btn btn-info btn-lg"
+          title="Agendar Citas"
+        >
+          <i class="far fa-calendar-plus"></i> Agendar
+        </a>
+        <a
+          href="/admin#/agendaEnEspera"
+          type="button"
+          class="btn btn-primary btn-lg"
+          title="Agendar Citas"
+        >
+          <i class="fas fa-hourglass-half"></i> Clientes En Espera
+        </a>
       </h1>
       <ol class="breadcrumb">
         <li>
@@ -13,25 +29,21 @@
           </a>
         </li>
         <li class="active">
-          <i class="fas fa-calendar-check-o"></i> Agendar Libre
+          <i class="fas fa-user-clock"></i> Horarios Agendas
         </li>
       </ol>
     </section>
     <section class="content" v-if="objetodeCitas.length >= 0">
       <div class="row">
         <div v-for="objetoCita of objetodeCitas" :key="objetoCita.id">
-          <div class="col-md-3">
+          <div class="col-md-4 col-sm-6 col-lg-4">
             <div class="box box-success">
               <div class="box-header text-center">
                 <label for="empleado">
-                  <i class="fas fa-user-tie"></i> Empleado:
-                  <input
-                    class="form-control"
-                    type="text"
-                    v-model="objetoCita.nombre"
-                    readonly
-                  />
+                  <i class="fas fa-user-tie"></i>
+                  <strong>Empleado:</strong>
                 </label>
+                <h4>{{objetoCita.nombre}}</h4>
               </div>
             </div>
             <div>
@@ -48,7 +60,7 @@
                                 day: 'Día',
                                 all_day: 'Todo el día'
                             }"
-                :time-range="[5,22]"
+                :time-range="[7,21]"
                 :available-views="['month', 'week', 'day']"
                 :initial-date="dateInit"
                 initial-view="day"
@@ -75,6 +87,7 @@ import moment from "moment";
 export default {
   data() {
     return {
+      roles_roles_id: 0,
       idReserva: 0,
       dateInit: moment(),
       showMarker: false,
@@ -106,6 +119,14 @@ export default {
     };
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     listarReservaciones() {
       var data = this;
       axios
@@ -130,7 +151,7 @@ export default {
       return (
         "Cliente: " +
         objetoCitaEvento.nombre_completo_cliente +
-        "   " +
+        ", " +
         objetoCitaEvento.estado_reservacion_nombre
       );
     },
@@ -188,7 +209,12 @@ export default {
         Swal.fire({
           type: "info",
           title: "Información",
-          text: "Cita Atendida o No Asistió",
+          html:
+            "<strong>Horario: </strong>" +
+            event.startTime +
+            " a " +
+            event.endTime +
+            "",
           confirmButtonText: '<i class="fas fa-check"></i> Entendido'
         });
       } else {
@@ -232,6 +258,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     //this.listarReservaciones();
     this.listarReservaciones();
   }

@@ -172,6 +172,7 @@ import moment from "moment";
 export default {
   data() {
     return {
+      roles_roles_id: 0,
       realizado_por: 0,
       nombre_realizado: "",
       nombre_empleado: "",
@@ -205,6 +206,14 @@ export default {
     }
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     //listar todas las facturas realizadas FacturaController
     listarEmpleadosNomina() {
       let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
@@ -500,6 +509,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     this.listarEmpleadosNomina();
     this.infoRealizadoPor();
     this.infoCajaDiv();

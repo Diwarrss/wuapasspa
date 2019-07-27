@@ -58,23 +58,22 @@
             <div class="icon">
               <i class="fas fa-cash-register"></i>
             </div>
-            <a
-              href="admin#/cajaRegistradora"
-              @click="abrirModal('empleado','crear')"
-              class="small-box-footer"
-            >
-              Acciones
-              <i class="fas fa-wrench"></i>
-            </a>
+            <button class="small-box-footer btn btn-block" @click="abrirModalTransferencia()">
+              <h4>
+                Transferir Dinero
+                <i class="fas fa-exchange-alt"></i>
+              </h4>
+            </button>
           </div>
           <!-- elemtno cajita -->
         </div>
         <div class="col-md-8">
-          <div>
+          <div v-if="roles_roles_id == 1">
             <button type="button" class="btn btn-primary" @click="abrirModal('empleado','crear')">
               <i class="fas fa-plus-circle"></i> Nueva Caja
             </button>
           </div>
+
           <br />
           <div class="box box-primary">
             <div class="box-header">
@@ -384,6 +383,7 @@ import moment from "moment";
 export default {
   data() {
     return {
+      roles_roles_id: 0,
       idCaja: "", //id de la caja ya listada
       rol_user: "", //empleado Rol
       arrayCaja: [],
@@ -423,6 +423,14 @@ export default {
     };
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     EmpleadoListaCrear() {
       var data = this;
       axios
@@ -516,8 +524,14 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>
-                  <button class="btn btn-success transferencia btn-sm" title="Desactivar Empleado" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
+                if (me.roles_roles_id === 1) {
+                  return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>
+                  <button class="btn btn-success transferencia btn-sm" title="Hacer Transferencia" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
+                } else if (me.roles_roles_id == 4) {
+                  return `<button class="btn btn-success transferencia btn-sm" title="Hacer Transferencia" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
+                } else {
+                  return '<span class="label label-danger"> SIN ACCIONES</span>';
+                }
               }
             }
           ]
@@ -577,6 +591,13 @@ export default {
         });
       });
     },
+    abrirModalTransferencia() {
+      let me = this;
+      jQuery.noConflict(); // para evitar errores
+      $("#modalTransferencia").modal("show");
+      me.IdCajaOrigenTrans = me.dataCajaDiv[0].id;
+      me.NomCajaOrigenTrans = me.dataCajaDiv[0].nombre_caja;
+    },
     listarTransferencias() {
       let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
       jQuery(document).ready(function() {
@@ -618,10 +639,18 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (row.estado_transferencia === "Pendiente") {
-                  return '<button class="btn btn-warning confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
+                if (
+                  row.estado_transferencia === "Pendiente" &&
+                  me.roles_roles_id === 1
+                ) {
+                  return '<button class="btn btn-success confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
+                } else if (
+                  row.estado_transferencia === "Pendiente" &&
+                  me.roles_roles_id != 1
+                ) {
+                  return '<button class="btn btn-warning btn-sm" title="Esperando Confirmación" disabled><i class="fas fa-ban"></i> Esperando</button>';
                 } else {
-                  return '<button class="btn btn-success btn-sm" title="Confirmar Transferencia" disabled><i class="fas fa-ban"></i>  Confirmada</button>';
+                  return '<button class="btn btn-success btn-sm" title="Transferencia COnfirmada" disabled><i class="fas fa-ban"></i> Confirmada</button>';
                 }
               }
             }
@@ -858,6 +887,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     this.listarEmpleados();
     this.infoCajaDiv();
     this.EmpleadoListaCrear();

@@ -491,6 +491,7 @@
     export default {
         data() {
             return {
+                roles_roles_id: 0,
                 arrayEmpresa:[],
                 arrayErrors:[],
                 urlLogotipo:'/img/perfiles/',
@@ -520,6 +521,14 @@
             }
         },
         methods: {
+            //obtener Rol del User Logeado
+            rol() {
+            let me = this;
+            // Obtener el id que se envia desde ruta especifica
+            axios.get("/enviarRol").then(function(response) {
+                me.roles_roles_id = response.data[0].roles_roles_id;
+            });
+            },
             verPerfil(){
                 //creamos variable q corresponde a this de mis variables de data()
                 let data=this;
@@ -1097,6 +1106,7 @@
             }
         },
         mounted() {
+            this.rol();
             this.verPerfil();
             this.listarServicios();
             this.listarImagenes();

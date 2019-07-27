@@ -36,6 +36,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/actualizarPerfil', 'UserController@actualizarPerfil')->name('actualizarPerfil');
     Route::put('/actualizarPassword', 'UserController@actualizarPassword')->name('actualizarPassword');
     Route::post('/updateImagen', 'UserController@updateImagen')->name('updateImagen');
+    //enviar el rol a cualquier vue
+    Route::get('/enviarRol', 'UserController@enviarRol')->name('enviarRol');
 
     //middleware que solo permite acceso a admin
     Route::group(['middleware' => ['admin']], function () {

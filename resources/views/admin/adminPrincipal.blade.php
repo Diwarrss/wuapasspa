@@ -41,6 +41,9 @@
 
             <!-- Se llamara el panel de navegacion izquierdo dependiendo del rol -->
             <!-- validar auth sesion -->
+            {{-- @if(Auth::check())
+                <navegacion></navegacion>
+            @endif --}}
             @if(Auth::check())<!-- si esta autenticado el usuario actual-->
                 @if(Auth::user()->roles_roles_id == 1)<!-- si es administrador-->
                     <navegacionadmin></navegacionadmin>

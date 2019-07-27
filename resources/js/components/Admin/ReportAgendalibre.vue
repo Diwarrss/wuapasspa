@@ -24,7 +24,6 @@
             <i class="far fa-list-alt"></i> Agendas Libres
           </h3>
         </div>
-
         <div class="table-responsive container-fluid">
           <table id="tablaAgendasL" class="table table-bordered table-hover" style="width:100%">
             <thead>
@@ -51,7 +50,6 @@ export default {
   methods: {
     listarAgeAnonima() {
       let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
-      var data = this;
       jQuery(document).ready(function() {
         var tablaAgendasL = jQuery("#tablaAgendasL").DataTable({
           language: {
@@ -100,6 +98,12 @@ export default {
                 } else if (row.estado_reservacion_nombre === "Atendido") {
                   return (
                     '<span class="label label-success">' +
+                    row.estado_reservacion_nombre +
+                    "</span>"
+                  );
+                } else if (row.estado_reservacion_nombre === "Cancelo") {
+                  return (
+                    '<span class="label label-default">' +
                     row.estado_reservacion_nombre +
                     "</span>"
                   );

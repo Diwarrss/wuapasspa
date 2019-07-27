@@ -5,6 +5,14 @@
       <h1>
         <i class="fas fa-calendar-check-o"></i> Agendar Libre
         <small>Información</small>
+        <a
+          href="/admin#/horarioCitas"
+          type="button"
+          class="btn btn-success btn-lg"
+          title="Ver Horarios de Empleados"
+        >
+          <i class="fas fa-user-clock"></i> Horarios
+        </a>
       </h1>
       <ol class="breadcrumb">
         <li>
@@ -19,36 +27,43 @@
     </section>
     <section class="content">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-5">
           <div class="box box-success">
-            <div class="box-header">
-              <form class="form-horizontal">
-                <div class="form-group">
-                  <label for="empleado" class="col-sm-3 control-label hidden-xs">
-                    <i class="fas fa-user-tie"></i> Empleado:
-                  </label>
-                  <div class="col-sm-6">
-                    <!-- <select class="form-control" id="empleado" v-model="idEmpleadoElegido">
+            <div class="box-header text-center">
+              <h4 class="box-title">
+                <i class="fas fa-user-tie"></i> Seleccione Empleado:
+              </h4>
+              <div class="form-group">
+                <div class="container-fluid">
+                  <!-- <select class="form-control" id="empleado" v-model="idEmpleadoElegido">
                                             <option disabled value="999">Escoge tu Empleado</option>
                                             <option v-for="empleado in empleados" :key="empleado.id" v-bind:value="empleado.id">
                                                 {{ empleado.nombre}}
                                             </option>
-                    </select>-->
-                    <button
-                      class="btn btn-primary"
-                      type="button"
-                      v-for="empleado in empleados"
-                      :key="empleado.id"
-                      v-bind:value="empleado.id"
-                      @click="idEmpleadoElegido = empleado.id"
-                      v-text="empleado.nombre"
-                    ></button>
-                  </div>
+                  </select>-->
+                  <button
+                    style="margin: 3px"
+                    class="btn btn-primary"
+                    type="button"
+                    v-for="empleado in empleados"
+                    :key="empleado.id"
+                    v-bind:value="empleado.id"
+                    @click="idEmpleadoElegido = empleado.id, nombreEmpleado= empleado.nombre"
+                  >
+                    <i class="fas fa-user-check"></i>
+                    {{empleado.nombre}}
+                  </button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
           <div>
+            <div class="col-md-12 text-center" v-if="nombreEmpleado != ''">
+              <h3>
+                <strong>Horario de:</strong>
+                {{nombreEmpleado}}
+              </h3>
+            </div>
             <vue-scheduler
               v-if="idEmpleadoElegido!='999'"
               :event-dialog-config="dialogConfig"
@@ -63,7 +78,7 @@
                                 day: 'Día',
                                 all_day: 'Todo el día'
                             }"
-              :time-range="[5,22]"
+              :time-range="[7,21]"
               :available-views="['month', 'week', 'day']"
               :initial-date="dateInit"
               initial-view="day"
@@ -79,7 +94,7 @@
             <br />
           </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-7">
           <div class="box box-success">
             <div class="box-header">
               <h3 class="box-title">
@@ -113,12 +128,14 @@ import moment from "moment";
 export default {
   data() {
     return {
+      roles_roles_id: 0,
       idReserva: 0,
       dateInit: moment(),
       showMarker: false,
       objetodeCitas: [],
       empleados: [],
       idEmpleadoElegido: "999",
+      nombreEmpleado: "",
       dialogConfig: {
         fields: [
           {
@@ -146,6 +163,14 @@ export default {
     };
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     listarReservaciones(sheluderXEmpelado) {
       var data = this;
       axios
@@ -169,7 +194,7 @@ export default {
       return (
         "Cliente: " +
         objetoCitaEvento.nombre_completo_cliente +
-        "   " +
+        ", " +
         objetoCitaEvento.estado_reservacion_nombre
       );
     },
@@ -502,7 +527,12 @@ export default {
         Swal.fire({
           type: "info",
           title: "Información",
-          text: "Cita Atendida o No Asistió",
+          html:
+            "<strong>Horario: </strong>" +
+            event.startTime +
+            " a " +
+            event.endTime +
+            "",
           confirmButtonText: '<i class="fas fa-check"></i> Entendido'
         });
       } else {
@@ -553,6 +583,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     //this.listarReservaciones();
     this.listarEmpleados();
     this.listarAgeAnonima();

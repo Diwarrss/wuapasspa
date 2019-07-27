@@ -18,11 +18,11 @@
       </ol>
     </section>
     <section v-if="mostrarDiv == 1" class="content">
-      <div>
+      <!-- <div>
         <button type="button" class="btn btn-primary">
           <i class="fas fa-plus-circle"></i> Nueva Factura
         </button>
-      </div>
+      </div>-->
       <br />
       <div class="box box-primary">
         <div class="box-header">
@@ -300,115 +300,113 @@
       <div class="modal fade in" id="modalPagos">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
-            <form class="form-horizontal" content-type="multipart/form-data">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title">
-                  <i class="fas fa-money"></i> Pagar Factura
-                </h4>
-              </div>
-              <div class="modal-body">
-                <div class="box-body">
-                  <div class>
-                    <ul class="nav nav-tabs">
-                      <li class="active">
-                        <a data-toggle="tab" href="#pagoEfectivo">
-                          <i class="fas fa-money-bill-wave-alt"></i> Pago Efectivo
-                        </a>
-                      </li>
-                      <li>
-                        <a data-toggle="tab" href="#pagoTarjeta">
-                          <i class="far fa-credit-card"></i> Pago Tarjeta
-                        </a>
-                      </li>
-                    </ul>
-                    <div class="tab-content row">
-                      <div id="pagoEfectivo" class="tab-pane fade in active">
-                        <div class="box-body">
-                          <div class="col-md-6">
-                            <div class="box box-primary">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button>
+              <h4 class="modal-title">
+                <i class="fas fa-money"></i> Pagar Factura
+              </h4>
+            </div>
+            <div class="modal-body">
+              <div class="box-body">
+                <div class>
+                  <ul class="nav nav-tabs">
+                    <li class="active">
+                      <a data-toggle="tab" href="#pagoEfectivo">
+                        <i class="fas fa-money-bill-wave-alt"></i> Pago Efectivo
+                      </a>
+                    </li>
+                    <li>
+                      <a data-toggle="tab" href="#pagoTarjeta">
+                        <i class="far fa-credit-card"></i> Pago Tarjeta
+                      </a>
+                    </li>
+                  </ul>
+                  <div class="tab-content row">
+                    <div id="pagoEfectivo" class="tab-pane fade in active">
+                      <div class="box-body">
+                        <div class="col-md-6">
+                          <div class="box box-primary">
+                            <div
+                              class="box-body row text-center"
+                              style="font-weight: normal; font-size: 22px;"
+                            >
+                              <div class="col-md-6 col-sm-6">
+                                <strong>Subtotal:</strong>
+                              </div>
                               <div
-                                class="box-body row text-center"
-                                style="font-weight: normal; font-size: 22px;"
-                              >
-                                <div class="col-md-6 col-sm-6">
-                                  <strong>Subtotal:</strong>
-                                </div>
-                                <div
-                                  class="col-md-6 col-sm-6"
-                                >${{formatearValor(subtotal = calcularSubtotal)}}</div>
-                                <div class="col-md-6 col-sm-6">
-                                  <strong>Descuento:</strong>
-                                </div>
-                                <div class="col-md-6 col-sm-6">${{formatearValor(descuento)}}</div>
-                                <div class="col-md-6 col-sm-6">
-                                  <strong>Total Neto:</strong>
-                                </div>
-                                <div
-                                  class="col-md-6 col-sm-6"
-                                >${{formatearValor(valorNeto = calcularNeto)}}</div>
+                                class="col-md-6 col-sm-6"
+                              >${{formatearValor(subtotal = calcularSubtotal)}}</div>
+                              <div class="col-md-6 col-sm-6">
+                                <strong>Descuento:</strong>
                               </div>
-                            </div>
-                          </div>
-                          <div class="col-md-6">
-                            <div class="box box-primary">
-                              <div class="box-body" style="font-weight: normal; font-size: 22px;">
-                                <div class="text-center">
-                                  <strong>
-                                    <p>Valor Recibido</p>
-                                  </strong>
-                                  <money
-                                    class="form-control input-lg"
-                                    v-bind="money"
-                                    id="valorR"
-                                    v-model="valorRecibido"
-                                  >{{valorRecibido}}</money>
-                                </div>
-                                <div class="text-center">
-                                  <strong>
-                                    <p>Valor Cambio</p>
-                                  </strong>
-                                  <p>${{formatearValor(valorRecibido - valorNeto)}}</p>
-                                </div>
+                              <div class="col-md-6 col-sm-6">${{formatearValor(descuento)}}</div>
+                              <div class="col-md-6 col-sm-6">
+                                <strong>Total Neto:</strong>
                               </div>
+                              <div
+                                class="col-md-6 col-sm-6"
+                              >${{formatearValor(valorNeto = calcularNeto)}}</div>
                             </div>
-                          </div>
-                          <div
-                            class="col-md-12 callout callout-danger text-center"
-                            v-if="id_caja == 0"
-                          >
-                            <h4>¡Alerta!</h4>
-                            <p>El Usuario Actual no tiene Caja Registradora Asociada, porfavor verificar.</p>
                           </div>
                         </div>
+                        <div class="col-md-6">
+                          <div class="box box-primary">
+                            <div class="box-body" style="font-weight: normal; font-size: 22px;">
+                              <div class="text-center">
+                                <strong>
+                                  <p>Valor Recibido</p>
+                                </strong>
+                                <money
+                                  class="form-control input-lg"
+                                  v-bind="money"
+                                  id="valorR"
+                                  v-model="valorRecibido"
+                                >{{valorRecibido}}</money>
+                              </div>
+                              <div class="text-center">
+                                <strong>
+                                  <p>Valor Cambio</p>
+                                </strong>
+                                <p>${{formatearValor(valorRecibido - valorNeto)}}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          class="col-md-12 callout callout-danger text-center"
+                          v-if="id_caja == 0"
+                        >
+                          <h4>¡Alerta!</h4>
+                          <p>El Usuario Actual no tiene Caja Registradora Asociada, porfavor verificar.</p>
+                        </div>
                       </div>
-                      <div id="pagoTarjeta" class="tab-pane fade">
-                        <div class="box-header"></div>
-                        <div class="box-body"></div>
-                      </div>
+                    </div>
+                    <div id="pagoTarjeta" class="tab-pane fade">
+                      <div class="box-header"></div>
+                      <div class="box-body"></div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" @click="cerrarModalPago()">
-                  <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button type="button" class="btn btn-default" @click="limpiarPago()">
-                  <i class="fas fa-eraser"></i> Limpiar
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-success"
-                  @click="facturarCargos();"
-                  :disabled="valorRecibido < valorNeto || descuento > subtotal || id_caja == 0"
-                >
-                  <i class="fas fa-shopping-cart"></i> Facturar
-                </button>
-              </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" @click="cerrarModalPago()">
+                <i class="fas fa-times"></i> Cancelar
+              </button>
+              <button type="button" class="btn btn-default" @click="limpiarPago()">
+                <i class="fas fa-eraser"></i> Limpiar
+              </button>
+              <button
+                type="button"
+                class="btn btn-success"
+                @click="facturarCargos();"
+                :disabled="valorRecibido < valorNeto || descuento > subtotal || id_caja == 0"
+              >
+                <i class="fas fa-shopping-cart"></i> Facturar
+              </button>
+            </div>
           </div>
           <!-- /.modal-content -->
         </div>
@@ -484,6 +482,7 @@
 export default {
   data() {
     return {
+      roles_roles_id: 0,
       mostrarDiv: 1,
       id_reserva: "",
       informacionFacturar: [],
@@ -552,6 +551,14 @@ export default {
     }
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     //listar todas las facturas realizadas en el dia FacturaController
     listarFacturacionDiaria() {
       let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
@@ -1077,6 +1084,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     this.listarFacturacion();
     this.listarFacturacionDiaria();
     this.infoFacturador();

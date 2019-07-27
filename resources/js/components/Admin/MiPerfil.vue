@@ -315,7 +315,7 @@ import moment from "moment";
 export default {
   data() {
     return {
-      roles_roles_id: "",
+      roles_roles_id: 0,
       empresas_empresas_id: "",
       nombre_usuario: "",
       apellido_usuario: "",
@@ -334,6 +334,14 @@ export default {
     };
   },
   methods: {
+    //obtener Rol del User Logeado
+    rol() {
+      let me = this;
+      // Obtener el id que se envia desde ruta especifica
+      axios.get("/enviarRol").then(function(response) {
+        me.roles_roles_id = response.data[0].roles_roles_id;
+      });
+    },
     verPerfil() {
       //creamos variable q corresponde a this de mis variables de data()
       let me = this;
@@ -448,6 +456,7 @@ export default {
     }
   },
   mounted() {
+    this.rol();
     this.verPerfil();
   }
 };

@@ -15,6 +15,16 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    //enviamos el rol del usuario autenticado para parametrizar el sistema
+    public function enviarRol(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $rolUser = User::where('id', Auth::user()->id)
+            ->select('roles_roles_id')
+            ->get();
+
+        return $rolUser;
+    }
     public function showEmpleadosDT(Request $request)
     {
         if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax

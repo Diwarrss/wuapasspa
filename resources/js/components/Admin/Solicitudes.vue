@@ -5,6 +5,8 @@
             <h1>
                 <i class="fas fa-calendar-alt"></i> Solicitudes <small>Agendar</small>
                 <a href="/admin#/horarioCitas" type="button" class="btn btn-success btn-lg" title="Ver Horarios de Empleados"><i class="fas fa-user-clock"></i> Horarios</a>
+                <a href="/admin#/agendaLibre" type="button" class="btn btn-info btn-lg" title="Agendar Citas"><i class="far fa-calendar-plus"></i> Agendar</a>
+                <a href="/admin#/agendaEnEspera" type="button" class="btn btn-primary btn-lg" title="Agendar Citas"><i class="fas fa-hourglass-half"></i> Clientes En Espera</a>
             </h1>
             <ol class="breadcrumb">
                 <li>
@@ -27,7 +29,7 @@
                     <div id="pendientes" class="tab-pane fade in active">
                         <div class="box-header">
                             <button @click="actualizarPendientes()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
-                            <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a>
+                            <!-- <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a> -->
                         </div>
                         <div class="table-responsive container-fluid">
                             <table id="tablaPendientes" class="table table-bordered table-hover" style="width:100%">
@@ -49,7 +51,7 @@
                     <div id="agendadas" class="tab-pane fade">
                         <div class="box-header">
                             <button @click="actualizarAgendadas()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
-                            <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a>
+                            <!-- <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a> -->
                         </div>
                         <div class="table-responsive container-fluid">
                             <table id="tablaAgendadas" class="table table-bordered table-hover" style="width:100%">
@@ -125,6 +127,7 @@
     export default {
         data() {
             return {
+                roles_roles_id: 0,
                 id: '',
                 solicitudId: '',
                 cantidad: 0,
@@ -145,6 +148,14 @@
             }
         },
         methods: {
+            //obtener Rol del User Logeado
+            rol() {
+            let me = this;
+            // Obtener el id que se envia desde ruta especifica
+            axios.get("/enviarRol").then(function(response) {
+                me.roles_roles_id = response.data[0].roles_roles_id;
+            });
+            },
             //metodo para saber la cantidad de solicitudes nuevas
             cantidadSolicitudes(){
                 let me = this;
@@ -705,6 +716,7 @@
             }
         },
         mounted() {
+            this.rol();
             this.listarPendientes();
             this.listarAgendadas();
             this.cantidadSolicitudes();
