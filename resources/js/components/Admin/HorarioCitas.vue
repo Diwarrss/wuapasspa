@@ -57,7 +57,7 @@
                 :show-today-button="false"
                 :events="objetoCita.reservas"
                 :event-display="mostrarComentariosAgenda"
-                :disable-dialog="false"
+                :disable-dialog="true"
                 @event-created="guardarReservacion"
                 @event-clicked="cancelarReservacion"
                 @time-clicked="timeClicked"
