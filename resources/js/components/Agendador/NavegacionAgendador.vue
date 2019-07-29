@@ -112,6 +112,12 @@
                   <span>Historial Facturas</span>
                 </router-link>
               </li>
+              <li>
+                <router-link to="/nomina" data-toggle="push-menu">
+                  <i class="fas fa-university text-green"></i>
+                  <span>Nómina</span>
+                </router-link>
+              </li>
             </ul>
           </li>
           <li class="treeview">

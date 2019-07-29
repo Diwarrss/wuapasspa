@@ -112,31 +112,29 @@
                   </div>
                   <div class="box-body">
                     <div class="box-body text-center" style="font-weight: normal; font-size: 22px;">
-                      <form class="form-inline">
-                        <div class="form-group col-md-12">
-                          <label>
-                            <strong>Valor Servicios:</strong>
-                          </label>
-                          ${{formatearValor(valor_total_servicios)}}
-                        </div>
-                        <div class="form-group col-md-12">
-                          <label>
-                            <strong>% A Pagar:</strong>
-                          </label>
-                          <money
-                            class="form-control input-lg"
-                            v-bind="money"
-                            id="valorPorcentaje"
-                            v-model="porcentaje_pagado"
-                          >{{porcentaje_pagado}}</money>
-                        </div>
-                        <div class="form-group col-md-12">
-                          <label>
-                            <strong>Valor A Pagar:</strong>
-                          </label>
-                          ${{formatearValor(valor_pagado = calcularValorPagar)}}
-                        </div>
-                      </form>
+                      <div class="form-group col-md-12">
+                        <label>
+                          <strong>Valor Servicios:</strong>
+                        </label>
+                        ${{formatearValor(valor_total_servicios)}}
+                      </div>
+                      <div class="form-inline form-group col-md-12">
+                        <label>
+                          <strong>% A Pagar:</strong>
+                        </label>
+                        <money
+                          class="form-control input-lg"
+                          v-bind="money"
+                          id="valorPorcentaje"
+                          v-model="porcentaje_pagado"
+                        >{{porcentaje_pagado}}</money>
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label>
+                          <strong>Valor A Pagar:</strong>
+                        </label>
+                        ${{formatearValor(valor_pagado = calcularValorPagar)}}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -156,6 +154,141 @@
                   :disabled="valor_pagado > valor_total_servicios || valor_pagado == 0"
                 >
                   <i class="fas fa-check"></i> Pagar Nómina
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
+    <!-- MODAL PARA MOSTRAR LOS SERVICIOS QUE HIZO EL EMPLEADO -->
+    <section>
+      <div class="modal fade in" id="modalServiciosHechos">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <form class="form-horizontal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-list-ul"></i> Lista de Servicios Hechos
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box box-success">
+                  <div class="box-body">
+                    <table class="table table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <!-- <th>Fecha</th> -->
+                          <th>Servicio</th>
+                          <th>Cantidad</th>
+                          <th>Descuento</th>
+                          <th>Valor Total</th>
+                        </tr>
+                      </thead>
+                      <tbody style="font-weight: normal;">
+                        <tr v-for="listaServices in listaServicioNomina" :key="listaServices.id">
+                          <!-- <td>
+                            <span>{{listaServices.fecha_servicio}}</span>
+                          </td>-->
+                          <td>
+                            <span>{{listaServices.nombre_servicio}}</span>
+                          </td>
+                          <td>
+                            <span>{{listaServices.cantidad_servicios}}</span>
+                          </td>
+                          <td>
+                            <span>${{formatearValor(listaServices.valor_descuento)}}</span>
+                          </td>
+                          <td>
+                            <span>${{formatearValor(listaServices.valor_total_servicios)}}</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="1" align="right">
+                            <strong>Totales:</strong>
+                          </td>
+                          <td>
+                            <strong>{{totalCantidades}}</strong>
+                          </td>
+                          <td>
+                            <strong>${{formatearValor(totalDescuentos)}}</strong>
+                          </td>
+                          <td>
+                            <strong>${{formatearValor(totalServicios)}}</strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger pull-left"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <i class="fas fa-times"></i> Cerrar
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
+    <!-- modal para anular factura -->
+    <section>
+      <div class="modal fade in" id="modalAnularPago">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form class="form-horizontal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-plus-circle"></i> Anular Pagos
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box-body">
+                  <div class="container-fluid">
+                    <div class="form-group">
+                      <h4>Motivo de Anulación:</h4>
+                      <textarea
+                        class="form-control"
+                        rows="3"
+                        placeholder="Escribe aquí porque anulas la factura"
+                        v-model="motivo_anulacion"
+                      ></textarea>
+                      <p
+                        class="text-red"
+                        v-if="arrayErrors.motivo_anulacion"
+                        v-text="arrayErrors.motivo_anulacion[0]"
+                      ></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger pull-left"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" @click="anularPago();">
+                  <i class="fas fa-check"></i> Anular
                 </button>
               </div>
             </form>
@@ -192,7 +325,12 @@ export default {
         precision: 0,
         masked: false
       },
-      id_nomina: ""
+      id_nomina: "",
+      listaServicioNomina: [],
+      motivo_anulacion: "",
+      arrayErrors: [],
+      id_movimiento: 0,
+      valor_pagado: 0
     };
   },
   watch: {},
@@ -202,6 +340,34 @@ export default {
       var resultado = 0.0;
       resultado = (this.porcentaje_pagado * this.valor_total_servicios) / 100;
 
+      return resultado;
+    },
+    //calcular los totales de los servicios
+    totalCantidades: function() {
+      var resultado = 0;
+      for (var i = 0; i < this.listaServicioNomina.length; i++) {
+        resultado =
+          resultado + parseInt(this.listaServicioNomina[i].cantidad_servicios);
+      }
+      return resultado;
+    },
+    //calcular los totales de los servicios
+    totalDescuentos: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.listaServicioNomina.length; i++) {
+        resultado =
+          resultado + parseInt(this.listaServicioNomina[i].valor_descuento);
+      }
+      return resultado;
+    },
+    //calcular los totales de los servicios
+    totalServicios: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.listaServicioNomina.length; i++) {
+        resultado =
+          resultado +
+          parseInt(this.listaServicioNomina[i].valor_total_servicios);
+      }
       return resultado;
     }
   },
@@ -239,7 +405,10 @@ export default {
             {
               render: function(data, type, row) {
                 return `<button style="margin: 1px" type="button" class="btn btn-success pagarNomina" title="Pagar a Cliente">
-                            <i class="fas fa-money-check-alt"></i> Liquidar
+                          <i class="fas fa-money-check-alt"></i> Liquidar
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-info verServicios" title="Ver Información">
+                          <i class="far fa-eye"></i> Ver
                         </button>`;
               }
             }
@@ -289,6 +458,36 @@ export default {
             $("#valorPorcentaje").focus();
           });
         });
+
+        //para mostrar los servicios del empleado que realizo
+        //Metodo para llamar modal pagar Nomina
+        tablaNomina.on("click", ".verServicios", function() {
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaNomina.row(current_row).data();
+
+          //abrimos la modal de ver los servicios del empleado
+          jQuery.noConflict();
+          $("#modalServiciosHechos").modal("show");
+
+          me.empleado_id = datos["empleado_id"];
+          //envio por axios el id para q me muestre la info de ese empleado
+          axios
+            .get("/verServiciosLiquidar", {
+              params: { empleado_id: me.empleado_id }
+            })
+            .then(function(response) {
+              me.listaServicioNomina = response.data;
+            })
+            .catch(function(error) {
+              // handle error
+              console.log(error);
+            });
+        });
       });
     },
     listarPagosNomina() {
@@ -334,7 +533,7 @@ export default {
                         <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Pago">
                             <i class="fas fa-print"></i>
                         </button>
-                        <button style="margin: 1px" type="button" class="btn btn-danger cancelar" title="Cancelar Pago">
+                        <button style="margin: 1px" type="button" class="btn btn-danger cancelar" title="Anular Pago">
                             <i class="fas fa-ban"></i>
                         </button>`;
                 } else {
@@ -360,50 +559,63 @@ export default {
           var datos = tablaTotalNominas.row(current_row).data();
 
           me.id_nomina = datos["id"];
-          var id_movimiento = datos["movimientos_id"];
-          var valor_pagado = datos["valor_pagado"];
-          Swal.fire({
-            title: "¿Seguro de Cancelar el Pago?",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "green",
-            cancelButtonColor: "red",
-            confirmButtonText: '<i class="fas fa-check"></i> Si',
-            cancelButtonText: '<i class="fas fa-times"></i> No'
-          }).then(result => {
-            if (result.value) {
-              axios
-                .post("/cancelarPago", {
-                  id_nomina: me.id_nomina,
-                  id_movimiento: id_movimiento,
-                  id_caja: me.id_caja,
-                  valor_pagado: valor_pagado
-                }) //le envio el parametro completo
-                .then(function(response) {
-                  Swal.fire({
-                    position: "top-end",
-                    type: "success",
-                    title: "Pago Cancelado con éxito!",
-                    showConfirmButton: false,
-                    timer: 1500
-                  }).then(function() {
-                    //actualizamos las tablas
-                    jQuery("#tablaNomina")
-                      .DataTable()
-                      .ajax.reload();
-                    me.cerrarModalNomina();
-                    jQuery("#tablaTotalNominas")
-                      .DataTable()
-                      .ajax.reload(null, false);
-                  });
-                  //console.log(response);
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-            }
-          });
+          me.id_movimiento = datos["movimientos_id"];
+          me.valor_pagado = datos["valor_pagado"];
+
+          //abrimos la modal para anular el pago que se hizo
+          jQuery.noConflict(); // para evitar errores
+          $("#modalAnularPago").modal("show"); //mostramos la modal
         });
+      });
+    },
+    //realiar anulacion del pago
+    anularPago() {
+      let me = this;
+      Swal.fire({
+        title: "¿Seguro de Anular el Pago?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "green",
+        cancelButtonColor: "red",
+        confirmButtonText: '<i class="fas fa-check"></i> Si',
+        cancelButtonText: '<i class="fas fa-times"></i> No'
+      }).then(result => {
+        if (result.value) {
+          axios
+            .post("/cancelarPago", {
+              id_nomina: me.id_nomina,
+              id_movimiento: me.id_movimiento,
+              id_caja: me.id_caja,
+              valor_pagado: me.valor_pagado,
+              motivo_anulacion: me.motivo_anulacion
+            }) //le envio el parametro completo
+            .then(function(response) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: "Pago Anulado con éxito!",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(function() {
+                //actualizamos las tablas
+                jQuery("#tablaNomina")
+                  .DataTable()
+                  .ajax.reload();
+                me.cerrarModalNomina();
+                jQuery("#tablaTotalNominas")
+                  .DataTable()
+                  .ajax.reload(null, false);
+                me.motivo_anulacion = "";
+              });
+              //console.log(response);
+            })
+            .catch(function(error) {
+              if (error.response.status == 422) {
+                //preguntamos si el error es 422
+                me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+              }
+            });
+        }
       });
     },
     //realizar pago de nomina del empleado
@@ -506,6 +718,10 @@ export default {
     cerrarModalNomina() {
       $("[data-dismiss=modal]").trigger({ type: "click" });
       this.porcentaje_pagado = 0;
+    },
+    formatearValor(value) {
+      let val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
   },
   mounted() {

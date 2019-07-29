@@ -13,6 +13,14 @@
         >
           <i class="fas fa-user-clock"></i> Horarios
         </a>
+        <a
+          href="/admin#/facturarAtencion"
+          type="button"
+          class="btn btn-primary btn-lg"
+          title="Facturar Citas"
+        >
+          <i class="fas fa-user-clock"></i> Facturación
+        </a>
       </h1>
       <ol class="breadcrumb">
         <li>

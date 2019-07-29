@@ -32,6 +32,33 @@ class NominaController extends Controller
         return datatables($empleadosNomina)->toJson();
     }
 
+    public function verServiciosLiquidar(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $empleado_id = $request->empleado_id;
+
+        $listaLiquidar = DetalleFactura::join('users as empleado', 'detalle_facturas.empleado_id', '=', 'empleado.id')
+            ->join('facturas', 'facturas.id', '=', 'detalle_facturas.facturas_id')
+            ->join('servicios', 'servicios.id', '=', 'detalle_facturas.servicios_servicios_id')
+            ->select(
+                'servicios.nombre_servicio',
+                DB::raw('SUM(detalle_facturas.valor_descuento) as valor_descuento'),
+                'detalle_facturas.empleado_id',
+                DB::raw("DATE_FORMAT(detalle_facturas.created_at, '%d/%m/%Y') as fecha_servicio, SUM(detalle_facturas.cantidad_facturada) as cantidad_servicios,
+                SUM((detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada)-detalle_facturas.valor_descuento) as valor_total_servicios")
+            )
+            ->where([
+                ['facturas.estado_factura', 1],
+                ['detalle_facturas.empleado_id', $empleado_id],
+                ['detalle_facturas.nomina_id', null]
+            ])
+            ->groupBy('servicios.nombre_servicio')
+            ->get();
+
+        return $listaLiquidar;
+    }
+
     //realizar el pago de la nomina a Empleado
     public function pagarNomina(Request $request)
     {
@@ -106,11 +133,18 @@ class NominaController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
 
+        //para validar
+        $request->validate([
+            'motivo_anulacion' => 'required|max:255'
+        ]);
+
         try {
             DB::beginTransaction();
 
             $cancelNomina = Nomina::find($request->id_nomina);
             $cancelNomina->estado_nomina = 2;
+            $cancelNomina->anulado_por = Auth::user()->id;
+            $cancelNomina->motivo_anulacion = $request->motivo_anulacion;
             $cancelNomina->save();
 
             $cancelMovimiento = Movimiento::find($request->id_movimiento);

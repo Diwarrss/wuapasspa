@@ -127,6 +127,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         //Controlador de Nomina
         Route::get('/listarEmpleadosNomina', 'NominaController@listarEmpleadosNomina')->name('listarEmpleadosNomina');
+        Route::get('/verServiciosLiquidar', 'NominaController@verServiciosLiquidar')->name('verServiciosLiquidar');
         Route::post('/pagarNomina', 'NominaController@pagarNomina')->name('pagarNomina');
         Route::get('/listarPagosNomina', 'NominaController@listarPagosNomina')->name('listarPagosNomina');
         Route::post('/cancelarPago', 'NominaController@cancelarPago')->name('cancelarPago');

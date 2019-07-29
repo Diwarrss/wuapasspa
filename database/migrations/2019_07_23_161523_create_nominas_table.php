@@ -25,6 +25,8 @@ class CreateNominasTable extends Migration
             $table->decimal('valor_pagado', 12, 2);
             $table->decimal('valor_total', 12, 2);
             $table->enum('estado_nomina', [\App\Nomina::PAGADA, \App\Nomina::ANULADA])->default(\App\Nomina::PAGADA);
+            $table->integer('anulado_por')->nullable();
+            $table->string('motivo_anulacion', 255)->nullable();
             $table->timestamps();
         });
     }
