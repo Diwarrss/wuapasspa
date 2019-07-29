@@ -230,7 +230,7 @@ export default {
                 ) {
                   return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
-                        </button>  
+                        </button>
                         <span class="label label-info">En Nómina</span>`;
                 } else if (row.estado_factura === "2") {
                   return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">

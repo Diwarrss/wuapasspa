@@ -5,6 +5,7 @@
       <h1>
         <i class="fas fa-file-invoice-dollar"></i> Facturar Atención
         <small>Facturación</small>
+        <a href="/admin#/agendaLibre" type="button" title="Agendar Citas" class="btn btn-info btn-lg"><i class="far fa-calendar-plus"></i> Agendar</a>
       </h1>
       <ol class="breadcrumb">
         <li>
