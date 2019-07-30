@@ -14,6 +14,7 @@ use App\Movimiento;
 use Carbon\Carbon as CarbonCarbon;
 use App\Caja;
 use App\FacturaAnulada;
+use Barryvdh\DomPDF\PDF;
 
 class FacturaController extends Controller
 {
@@ -260,5 +261,16 @@ class FacturaController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
         }
+    }
+
+    //Funcion para generar informacion factura pdf
+    public function pdfFacturaServicios(Request $request, $id)
+    {
+        $factura = Factura::all();
+
+        $pdf = PDF::loadView('pdf.factura', ['factura' => $factura]);
+        $pdf->setPaper(array(0, 0, 250, 700)); //SE PERSONALIZA EL TAMAÑO DEL PAPEL
+        //retornamos el pdf en view del navegador
+        return $pdf->stream('ticketVenta  -' . $factura[0]->numero_factura . '.pdf');
     }
 }
