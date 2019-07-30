@@ -3,15 +3,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    @foreach ($factura as $v)
-    <title>Ticket de venta {{$v->numero_factura}}-{{$v->numero_factura}}</title>
+    @foreach ($empresa as $v)
+    {{$v->nombre_empresa}}
+    <title>Ticket de venta {{$v->nombre_empresa}}-{{$v->nombre_empresa}}</title>
     @endforeach
     <style>
         body {
-        font-family: Arial, sans-serif; 
+        font-family: Arial, sans-serif;
         font-size: 13px;
         }
-        
+
         td,
         th,
         tr,
@@ -19,32 +20,32 @@
         border-top: 1px solid black;
         border-collapse: collapse;
         }
-        
+
         td.producto,
         th.producto {
         width: 75px;
         max-width: 75px;
         }
-        
+
         td.cantidad,
         th.cantidad {
         width: 40px;
         max-width: 40px;
         word-break: break-all;
         }
-        
+
         td.precio,
         th.precio {
         width: 40px;
         max-width: 40px;
         word-break: break-all;
         }
-        
+
         .centrado {
         text-align: center;
         align-content: center;
         }
-        
+
         .ticket {
         width: 250px;
         max-width: 250px;
@@ -58,7 +59,7 @@
         #watermark {/*imagen de fondo marca de agua*/
                 position: fixed;
 
-                /** 
+                /**
                     Set a position in the page for your image
                     This should center it vertically
                 **/
@@ -80,25 +81,25 @@
             {{-- @if ($v->estado == 'Anulado')
                 <div id="watermark">
                     <img src="img/anulado.png" height="100%" width="100%" />
-                </div>          
+                </div>
             @else --}}
                 <!--<div id="watermark">
                     <img src="img/registrado.png" height="100%" width="100%" />
-                </div>--> 
+                </div>-->
             {{-- @endif --}}
             <p class="centrado">
                 <b>GRIDSOFT</b>
                 <br>Diego Vargas, San Gil - Santander
                 <br>Celular: 313 245 8975
-                <br>Email: dialvaro30@gmail.com 
+                <br>Email: dialvaro30@gmail.com
             </p>
             <p><b>Tipo: </b>{{$v->numero_factura}}
             <br><b>Número Venta: </b>{{$v->numero_factura}} {{$v->numero_factura}}
             <br><b>Impresión: </b>{{DATE_FORMAT(now(), 'd/m/Y - h:i:s a')}}</p>
             <table>
-                <thead>                        
+                <thead>
                     <tr>
-                        <th id="fac">Cliente</th>                      
+                        <th id="fac">Cliente</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,28 +123,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($factura as $det)
+                    @foreach ($detalleFactura as $det)
                     <tr>
-                        <td class="cantidad">{{$det->numero_factura}}</td>
-                        <td class="producto">{{$det->numero_factura}}</td>
-                        <td >{{$det->numero_factura}}</td>
-                        <td >{{$det->numero_factura*$det->numero_factura-$det->numero_factura}}</td>
+                        <td class="cantidad">{{$det->cantidad_facturada}}</td>
+                        <td class="producto">{{$det->nombre_servicio}}</td>
+                        <td >{{$det->created_at}}</td>
+                        <td ></td>
                     </tr>
                     @endforeach
                 </tbody>
                 <tfoot>
-                        @foreach ($venta as $v)
+                        @foreach ($factura as $v)
                         <tr>
                             <th></th>
                             <th></th>
                             <th>SUBTOTAL</th>
-                            <td>$ {{round($v->numero_factura-($v->numero_factura*$v->numero_factura),2)}}</td>
+                            <td>$ </td>
                         </tr>
                         <tr>
                             <th></th>
                             <th></th>
                             <th>IVA</th>
-                            <td>$ {{round($v->numero_factura*$v->numero_factura,2)}}</td>
+                            <td>$ </td>
                         </tr>
                         <tr>
                             <th></th>
@@ -160,6 +161,6 @@
             <p class="centrado"><b>¡GRACIAS POR TU COMPRA!</b>
             <br>gridsoft.co</p>
         </div>
-        
+
     </body>
 </html>

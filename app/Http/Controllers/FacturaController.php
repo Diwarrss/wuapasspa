@@ -15,6 +15,7 @@ use Carbon\Carbon as CarbonCarbon;
 use App\Caja;
 use App\FacturaAnulada;
 use Barryvdh\DomPDF\PDF;
+use App\Empresa;
 
 class FacturaController extends Controller
 {
@@ -264,11 +265,42 @@ class FacturaController extends Controller
     }
 
     //Funcion para generar informacion factura pdf
-    public function pdfFacturaServicios(Request $request, $id)
+    public function pdfFacturaServicios(Request $request, $id_factura)
     {
-        $factura = Factura::all();
+        $factura = Factura::join('reservaciones', 'reservaciones.facturas_id', '=', 'facturas.id')
+            ->join('users as cliente', 'cliente.id', '=', 'reservaciones.users_users_id')
+            ->join('users as facturador', 'facturador.id', '=', 'facturas.creado_por')
+            ->select(
+                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as numero_factura"),
+                DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
+                DB::raw("CONCAT(cliente.nombre_usuario, ' ',cliente.apellido_usuario) as nombre_cliente"),
+                DB::raw("CONCAT(facturador.nombre_usuario, ' ',facturador.apellido_usuario) as nombre_facturador"),
+                'facturas.valor_descuento',
+                'facturas.valor_total',
+                'facturas.estado_factura',
+                'facturas.created_at'
+            )
+            ->where('facturas.id', $id_factura)->get();
 
-        $pdf = PDF::loadView('pdf.factura', ['factura' => $factura]);
+        $detalleFactura = DetalleFactura::join("servicios", 'servicios.id', '=', 'detalle_facturas.servicios_servicios_id')
+            ->select(
+                'servicios.nombre_servicio',
+                DB::raw('SUM(detalle_facturas.valor_descuento) as valor_descuento, SUM(detalle_facturas.cantidad_facturada) as cantidad_facturada,
+                SUM(detalle_facturas.valor_servicio) as valor_servicios')
+            )
+            ->groupBy('servicios.nombre_servicio')
+            ->where("detalle_facturas.facturas_id", $id_factura)->get();
+
+        //informacion empresa
+        $empresa = Empresa::all();
+
+        /* $cantServicios = DetalleFactura::select(
+            DB::raw("SUM(cantidad_facturada) as cant_facturada")
+        )
+            ->groupBy('facturas_id')
+            ->where("facturas_id", $id_factura)->get(); */
+
+        $pdf = \PDF::loadView('dompdf.factura', ['factura' => $factura, 'detalleFactura' => $detalleFactura, 'empresa' => $empresa]);
         $pdf->setPaper(array(0, 0, 250, 700)); //SE PERSONALIZA EL TAMAÑO DEL PAPEL
         //retornamos el pdf en view del navegador
         return $pdf->stream('ticketVenta  -' . $factura[0]->numero_factura . '.pdf');

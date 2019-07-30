@@ -5,7 +5,14 @@
       <h1>
         <i class="fas fa-file-invoice-dollar"></i> Facturar Atención
         <small>Facturación</small>
-        <a href="/admin#/agendaLibre" type="button" title="Agendar Citas" class="btn btn-info btn-lg"><i class="far fa-calendar-plus"></i> Agendar</a>
+        <a
+          href="/admin#/agendaLibre"
+          type="button"
+          title="Agendar Citas"
+          class="btn btn-info btn-lg"
+        >
+          <i class="far fa-calendar-plus"></i> Agendar
+        </a>
       </h1>
       <ol class="breadcrumb">
         <li>
@@ -691,6 +698,19 @@ export default {
           } else {
             me.nombre_cliente = datos["nombre_cliente"];
           }
+        });
+
+        //metodo para imprimir la factura
+        tablaFacturasDiarias.on("click", ".imprimir", function() {
+          //para que sea estable al ser responsive
+          var current_row = $(this).parents("tr");
+          if (current_row.hasClass("child")) {
+            current_row = current_row.prev();
+          }
+          var datos = tablaFacturasDiarias.row(current_row).data();
+          let id_factura = datos["id_factura"];
+
+          window.open("/pdfFacturaServicios/" + id_factura + "," + "_blank");
         });
       });
     },
