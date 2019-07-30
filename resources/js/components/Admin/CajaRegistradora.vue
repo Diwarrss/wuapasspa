@@ -376,6 +376,58 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
+    <!-- Modal para Cancelar Tranfererencias Hechas por El Perfil -->
+    <div class="modal fade in" id="modalAnularTransferencia">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form class="form-horizontal">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button>
+              <h4 class="modal-title">
+                <i class="fas fa-plus-circle"></i> Anular Transferencias
+              </h4>
+            </div>
+            <div class="modal-body">
+              <div class="box-body">
+                <div class="container-fluid">
+                  <div class="form-group">
+                    <h4>Motivo de Anulación:</h4>
+                    <textarea
+                      class="form-control"
+                      rows="3"
+                      placeholder="Escribe aquí porque anulas la Transferencia"
+                      v-model="motivo_anulacion"
+                    ></textarea>
+                    <p
+                      class="text-red"
+                      v-if="arrayErrors.motivo_anulacion"
+                      v-text="arrayErrors.motivo_anulacion[0]"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-danger pull-left"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <i class="fas fa-times"></i> Cancelar
+              </button>
+              <button type="button" class="btn btn-success" @click="anularTransferencia();">
+                <i class="fas fa-check"></i> Anular
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
   </div>
 </template>
 <script>
@@ -384,6 +436,7 @@ export default {
   data() {
     return {
       roles_roles_id: 0,
+      id_user: "",
       idCaja: "", //id de la caja ya listada
       rol_user: "", //empleado Rol
       arrayCaja: [],
@@ -399,6 +452,8 @@ export default {
       NomCajaOrigenTrans: "",
       IdCajaDestinoTrans: "",
       valorATransferir: "",
+      id_Transferencia_Anular: "",
+      motivo_anulacion: "",
       usuario: "",
       valor_producido: "",
       valor_gastos: "",
@@ -423,12 +478,14 @@ export default {
     };
   },
   methods: {
-    //obtener Rol del User Logeado
+    //obtener Rol del User Logeado y el ID del mismo
     rol() {
       let me = this;
       // Obtener el id que se envia desde ruta especifica
       axios.get("/enviarRol").then(function(response) {
         me.roles_roles_id = response.data[0].roles_roles_id;
+        me.id_user = response.data[0].id_user; //se usa especialmente para Identificar al usuario que esta logueado
+        //que solo pueda cancelar las Tranferencias que el Mismo que  Crea.
       });
     },
     EmpleadoListaCrear() {
@@ -628,6 +685,12 @@ export default {
                     row.estado_transferencia +
                     "</span>"
                   );
+                } else if (row.estado_transferencia === "Pendiente") {
+                  return (
+                    '<span class="label label-warning">' +
+                    row.estado_transferencia +
+                    "</span>"
+                  );
                 } else {
                   return (
                     '<span class="label label-danger">' +
@@ -639,18 +702,18 @@ export default {
             },
             {
               render: function(data, type, row) {
-                if (
-                  row.estado_transferencia === "Pendiente" &&
-                  me.roles_roles_id == 1
-                ) {
-                  return '<button class="btn btn-success confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
-                } else if (
-                  row.estado_transferencia === "Pendiente" &&
-                  me.roles_roles_id != 1
-                ) {
-                  return '<button class="btn btn-warning btn-sm" title="Esperando Confirmación" disabled><i class="fas fa-ban"></i> Esperando</button>';
-                } else {
+                if (row.estado_transferencia === "Pendiente") {
+                  if (row.EmpCreadorTrans == me.id_user) {
+                    return '<button class="btn btn-danger AnularTranferencia btn-sm" title="Cancelar Transferencia" ><i class="fas fa-ban"></i> Anular</button>';
+                  } else if (row.EmpRecibeTrans == me.id_user) {
+                    return '<button class="btn btn-success confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
+                  } else {
+                    return "";
+                  }
+                } else if (row.estado_transferencia === "Recibida") {
                   return '<button class="btn btn-success btn-sm" title="Transferencia COnfirmada" disabled><i class="fas fa-ban"></i> Confirmada</button>';
+                } else {
+                  return "";
                 }
               }
             }
@@ -711,10 +774,87 @@ export default {
                     title: "El valor a transferir ya no esta disponible",
                     showConfirmButton: true
                   });
+                  jQuery("#tablaTransferencias")
+                    .DataTable()
+                    .ajax.reload(null, false);
                 });
             }
           });
         });
+
+        //Metodo para llamar modal de Anular Tranferencia
+        tablaTransferencias.on("click", ".AnularTranferencia", function() {
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaTransferencias.row(current_row).data();
+
+          me.id_Transferencia_Anular = datos["id"];
+
+          //abrimos la modal para anular la Transferencia.
+          jQuery.noConflict(); // para evitar errores
+          $("#modalAnularTransferencia").modal("show"); //mostramos la modal
+        });
+      });
+    },
+    //Accion de Anular Transferencias, solo las puede anular el usuario que crea la Transferencia
+    anularTransferencia() {
+      let data = this;
+      Swal.fire({
+        title: "¿Seguro de Anular la Transferencia?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "green",
+        cancelButtonColor: "red",
+        confirmButtonText: '<i class="fas fa-check"></i> Si',
+        cancelButtonText: '<i class="fas fa-times"></i> No'
+      }).then(result => {
+        if (result.value) {
+          axios
+            .post("/anularTransferencia", {
+              id_Transferencia_Anular: data.id_Transferencia_Anular,
+              motivo_anulacion: data.motivo_anulacion
+            }) //le envio el parametro completo
+            .then(function(response) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: "Transferencia Anulada con éxito!",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(function() {
+                //actualizamos las tablas
+                jQuery("#tablaTransferencias")
+                  .DataTable()
+                  .ajax.reload(null, false);
+                jQuery("[data-dismiss=modal]").trigger({ type: "click" });
+                data.motivo_anulacion = "";
+              });
+              //console.log(response);
+            })
+            .catch(function(error) {
+              if (error.response.status == 422) {
+                //preguntamos si el error es 422
+                me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+              } else {
+                Swal.fire({
+                  position: "top-end",
+                  type: "error",
+                  title:
+                    "NO es Posible anular, La Transferencia ya Fue Confirmada",
+                  showConfirmButton: true
+                });
+                jQuery("#tablaTransferencias")
+                  .DataTable()
+                  .ajax.reload(null, false);
+                jQuery("[data-dismiss=modal]").trigger({ type: "click" });
+                data.motivo_anulacion = "";
+              }
+            });
+        }
       });
     },
     crearCaja() {
@@ -777,7 +917,7 @@ export default {
           Swal.fire({
             position: "top-end",
             type: "success",
-            title: "Transferencia Realizada con Exito",
+            title: "Transferencia Solicitada con Exito",
             showConfirmButton: false,
             timer: 1500
           });

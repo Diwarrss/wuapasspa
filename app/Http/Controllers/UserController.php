@@ -20,7 +20,7 @@ class UserController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
         $rolUser = User::where('id', Auth::user()->id)
-            ->select('roles_roles_id')
+            ->select('roles_roles_id', 'id as id_user')
             ->get();
 
         return $rolUser;

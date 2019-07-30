@@ -9,6 +9,7 @@ class Transferencia extends Model
     //creamos las constantes de los usuarios del sistema
     const PENDIENTE = 1;
     const RECIBIDA = 2;
+    const ANULADA = 3;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,8 @@ class Transferencia extends Model
         'caja_destino',
         'valor',
         'notas',
+        'anulado_por',
+        'motivo_anulacion',
         'estado_transferencia'
     ];
 }

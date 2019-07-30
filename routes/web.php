@@ -115,6 +115,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/cajasListTranferencias', 'CajaController@cajasListTranferencias')->name('cajasListTranferencias');
         Route::post('/crearTransferencia', 'TransferenciaController@crearTransferencia')->name('crearTransferencia');
         Route::put('/confirmarTransferencia', 'TransferenciaController@confirmarTransferencia')->name('confirmarTransferencia');
+        Route::post('/anularTransferencia', 'TransferenciaController@anularTransferencia')->name('anularTransferencia');
 
         //Controlador de Facturacion
         Route::get('/listarFacturacion', 'FacturaController@listarFacturacion')->name('listarFacturacion');

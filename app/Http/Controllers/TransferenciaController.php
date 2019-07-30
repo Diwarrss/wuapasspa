@@ -80,8 +80,9 @@ class TransferenciaController extends Controller
             $cajaDestino = Caja::find($Transferencia->caja_destino);
 
             $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido - $cajaOrigen->valor_gastos;
-
-            if ($Transferencia->valor <= $cajaOrigenNeto) {
+            //solo se pueden hacer tranferencias si el dinero esta disponible y si aun sigue pendiente la tranferencia, es decir
+            //que no haya sido anulada
+            if ($Transferencia->valor <= $cajaOrigenNeto && $Transferencia->estado_transferencia == 1) {
                 $cajaOrigen->valor_producido =  $cajaOrigen->valor_producido -  $Transferencia->valor;
                 $cajaOrigen->save();
                 $cajaDestino->valor_producido =  $cajaDestino->valor_producido +  $Transferencia->valor;
@@ -115,7 +116,12 @@ class TransferenciaController extends Controller
                 'transferencias.valor',
                 'transferencias.notas',
                 DB::raw("DATE_FORMAT(transferencias.created_at, '%d/%m/%Y %h:%i %p') as fecha_transferencia"),
-                DB::raw("IF(transferencias.estado_transferencia=1, 'Pendiente', 'Recibida') as estado_transferencia")
+                DB::raw("(CASE transferencias.estado_transferencia
+                WHEN 1 THEN 'Pendiente'
+                WHEN 2 THEN 'Recibida'
+                ELSE 'Anulada' END) AS estado_transferencia"),
+                'cajaOrigen.empleado_id as EmpCreadorTrans',
+                'cajaDestino.empleado_id as EmpRecibeTrans'
             )
             ->get();
 
@@ -126,6 +132,36 @@ class TransferenciaController extends Controller
                 return $transferencia->id;
             })
             ->toJson();
+    }
+
+    public function anularTransferencia(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        //para validar
+        $request->validate([
+            'motivo_anulacion' => 'required|max:255'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $cancelarTranferencia = Transferencia::find($request->id_Transferencia_Anular);
+            //si la transferencia esta en estado pendiente se puede anular de resto NO
+            if ($cancelarTranferencia->estado_transferencia == 1) {
+                $cancelarTranferencia->estado_transferencia = 3; //es el estado de ANULADA
+                $cancelarTranferencia->anulado_por = Auth::user()->id;
+                $cancelarTranferencia->motivo_anulacion = $request->motivo_anulacion;
+                $cancelarTranferencia->save();
+            } else {
+                throw new Exception('NO es Posible anular La Transferencia ya Fue Confirmada');
+            }
+
+
+            DB::commit(); //se Hace el commit a la Base de Datos
+        } catch (Exception $e) {
+            DB::rollBack();
+        }
     }
     /**
      * Show the form for creating a new resource.
