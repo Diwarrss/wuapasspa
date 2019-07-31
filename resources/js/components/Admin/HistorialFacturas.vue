@@ -253,7 +253,7 @@ export default {
                             <i class="fas fa-money-bill-alt"></i>
                         </button>`;
                 } else {
-                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimirAnulada" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>`;
                 }
@@ -303,6 +303,34 @@ export default {
           } else {
             me.nombre_cliente = datos["nombre_cliente"];
           }
+        });
+
+        //metodo para imprimir la factura
+        tablaHistorialFacturas.on("click", ".imprimir", function() {
+          //para que sea estable al ser responsive
+          var current_row = $(this).parents("tr");
+          if (current_row.hasClass("child")) {
+            current_row = current_row.prev();
+          }
+          var datos = tablaHistorialFacturas.row(current_row).data();
+          let id_factura = datos["id_factura"];
+
+          window.open("/pdfFacturaServicios/" + id_factura + "," + "_blank");
+        });
+
+        //metodo para imprimir la factura
+        tablaHistorialFacturas.on("click", ".imprimirAnulada", function() {
+          //para que sea estable al ser responsive
+          var current_row = $(this).parents("tr");
+          if (current_row.hasClass("child")) {
+            current_row = current_row.prev();
+          }
+          var datos = tablaHistorialFacturas.row(current_row).data();
+          let id_factura = datos["id_factura"];
+
+          window.open(
+            "/pdfFacturaAnulServicios/" + id_factura + "," + "_blank"
+          );
         });
       });
     },

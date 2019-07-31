@@ -62,7 +62,7 @@
                     Set a position in the page for your image
                     This should center it vertically
                 **/
-                bottom:   8cm;
+                bottom:   14cm;
                 left:     0cm;
 
                 /** Change image dimensions**/
@@ -77,11 +77,9 @@
         <div class="ticket">
         @foreach ($factura as $fact)
             <center> <img src="img/logo/Logotipo2.png" alt="AgendaGrid" id="imagen"></center>
-            {{-- @if ($fact->estado_factura == 2)
-                <div id="watermark">
-                    <img src="img/facture/anulado.png" height="100%" width="100%" />
-                </div>
-            @endif --}}
+            <div id="watermark">
+                <img src="img/facture/anulado.png" height="100%" width="100%" />
+            </div>
             <p class="centrado">
                 @foreach ($empresa as $em)
                 <b>{{$em->nombre_empresa}}</b>
@@ -91,18 +89,7 @@
             </p>
             <b>Número Factura: </b>{{$fact->numero_factura}}
             <br><b>Impresión: </b>{{DATE_FORMAT(now(), 'd/m/Y - h:i:s a')}}</p>
-            <br><b>Cliente: </b>
-            @if ($fact->nombre_cliente == '')
-            {{$fact->nombre_anonimo}}
-            @else
-            {{$fact->nombre_cliente}}
-            @endif
-            <br><b>Celular: </b>@if ($fact->nombre_cliente == '')
-            {{$fact->celular_anonimo}}
-            @else
-            {{$fact->celular}}
-            @endif
-            </p>
+            <br><b>Cliente: </b>{{$fact->nombre_cliente}}
         @endforeach
             <table>
                 <thead>
@@ -142,6 +129,7 @@
                     </tfoot>
             </table>
             <br><b>Vendido por: </b>{{$v->nombre_facturador}}
+            <br><b>Anulado por: </b>{{$v->nombre_anuladopor}}
             <br><b>Fecha Venta: </b>{{DATE_FORMAT($v->created_at, 'd/m/Y - h:i:s a')}}
             <br>
             <p class="centrado"><b>¡GRACIAS POR TU COMPRA!</b>

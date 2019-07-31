@@ -127,6 +127,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/anularFactura', 'FacturaController@anularFactura')->name('anularFactura');
         //pdf de factura servicios
         Route::get('/pdfFacturaServicios/{id}', 'FacturaController@pdfFacturaServicios');
+        Route::get('/pdfFacturaAnulServicios/{id}', 'FacturaController@pdfFacturaAnulServicios');
 
         //Controlador de Nomina
         Route::get('/listarEmpleadosNomina', 'NominaController@listarEmpleadosNomina')->name('listarEmpleadosNomina');

@@ -281,7 +281,9 @@ class FacturaController extends Controller
                 'facturas.valor_total',
                 'facturas.estado_factura',
                 'facturas.created_at',
-                'anonimos.nombre_anonimo'
+                'users.celular',
+                'anonimos.nombre_anonimo',
+                'anonimos.celular_anonimo'
             )
             ->where('facturas.id', $id_factura)->get();
 
@@ -304,6 +306,48 @@ class FacturaController extends Controller
             ->where("facturas_id", $id_factura)->get(); */
 
         $pdf = \PDF::loadView('dompdf.factura', ['factura' => $factura, 'detalleFactura' => $detalleFactura, 'empresa' => $empresa]);
+        $pdf->setPaper(array(0, 0, 250, 700)); //SE PERSONALIZA EL TAMAÑO DEL PAPEL
+        //retornamos el pdf en view del navegador
+        return $pdf->stream('ticketVenta  -' . $factura[0]->numero_factura . '.pdf');
+    }
+
+    public function pdfFacturaAnulServicios(Request $request, $id_factura)
+    {
+        $factura = Factura::join('factura_anuladas', 'facturas.id', '=', 'factura_anuladas.facturas_id')
+            ->join('users as anuladopor', 'anuladopor.id', '=', 'factura_anuladas.anulado_por')
+            ->join('users as facturador', 'facturador.id', '=', 'facturas.creado_por')
+            ->select(
+                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as numero_factura"),
+                DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
+                DB::raw("CONCAT(facturador.nombre_usuario, ' ',facturador.apellido_usuario) as nombre_facturador"),
+                DB::raw("CONCAT(anuladopor.nombre_usuario, ' ',anuladopor.apellido_usuario) as nombre_anuladopor"),
+                'facturas.valor_descuento',
+                'facturas.valor_total',
+                'facturas.estado_factura',
+                'facturas.created_at',
+                'factura_anuladas.nombre_cliente'
+            )
+            ->where('facturas.id', $id_factura)->get();
+
+        $detalleFactura = DetalleFactura::join("servicios", 'servicios.id', '=', 'detalle_facturas.servicios_servicios_id')
+            ->select(
+                'servicios.nombre_servicio',
+                DB::raw('SUM(detalle_facturas.valor_descuento) as valor_descuento, SUM(detalle_facturas.cantidad_facturada) as cantidad_facturada,
+                SUM(detalle_facturas.valor_servicio) as valor_servicios')
+            )
+            ->groupBy('servicios.nombre_servicio')
+            ->where("detalle_facturas.facturas_id", $id_factura)->get();
+
+        //informacion empresa
+        $empresa = Empresa::all();
+
+        /* $cantServicios = DetalleFactura::select(
+            DB::raw("SUM(cantidad_facturada) as cant_facturada")
+        )
+            ->groupBy('facturas_id')
+            ->where("facturas_id", $id_factura)->get(); */
+
+        $pdf = \PDF::loadView('dompdf.facturaAnulada', ['factura' => $factura, 'detalleFactura' => $detalleFactura, 'empresa' => $empresa]);
         $pdf->setPaper(array(0, 0, 250, 700)); //SE PERSONALIZA EL TAMAÑO DEL PAPEL
         //retornamos el pdf en view del navegador
         return $pdf->stream('ticketVenta  -' . $factura[0]->numero_factura . '.pdf');
