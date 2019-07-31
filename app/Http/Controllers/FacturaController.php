@@ -267,18 +267,21 @@ class FacturaController extends Controller
     //Funcion para generar informacion factura pdf
     public function pdfFacturaServicios(Request $request, $id_factura)
     {
-        $factura = Factura::join('reservaciones', 'reservaciones.facturas_id', '=', 'facturas.id')
-            ->join('users as cliente', 'cliente.id', '=', 'reservaciones.users_users_id')
+        $factura = Factura::join('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
+            ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
+            ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
+            ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
             ->join('users as facturador', 'facturador.id', '=', 'facturas.creado_por')
             ->select(
                 DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as numero_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
-                DB::raw("CONCAT(cliente.nombre_usuario, ' ',cliente.apellido_usuario) as nombre_cliente"),
+                DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 DB::raw("CONCAT(facturador.nombre_usuario, ' ',facturador.apellido_usuario) as nombre_facturador"),
                 'facturas.valor_descuento',
                 'facturas.valor_total',
                 'facturas.estado_factura',
-                'facturas.created_at'
+                'facturas.created_at',
+                'anonimos.nombre_anonimo'
             )
             ->where('facturas.id', $id_factura)->get();
 

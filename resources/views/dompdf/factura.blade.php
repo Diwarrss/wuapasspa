@@ -3,9 +3,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    @foreach ($empresa as $v)
-    {{$v->nombre_empresa}}
-    <title>Ticket de venta {{$v->nombre_empresa}}-{{$v->nombre_empresa}}</title>
+    @foreach ($factura as $v)
+    <title>Ticket de venta {{$v->numero_factura}}</title>
     @endforeach
     <style>
         body {
@@ -76,9 +75,9 @@
     </style>
     <body>
         <div class="ticket">
-        @foreach ($factura as $v)
-            <center> <img src="img/favicon.png" alt="GridSoft" id="imagen"></center>
-            {{-- @if ($v->estado == 'Anulado')
+        @foreach ($factura as $fact)
+            <center> <img src="img/logo/Logotipo2.png" alt="AgendaGrid" id="imagen"></center>
+            {{-- @if ($fact->estado == 'Anulado')
                 <div id="watermark">
                     <img src="img/anulado.png" height="100%" width="100%" />
                 </div>
@@ -88,14 +87,21 @@
                 </div>-->
             {{-- @endif --}}
             <p class="centrado">
-                <b>GRIDSOFT</b>
-                <br>Diego Vargas, San Gil - Santander
-                <br>Celular: 313 245 8975
-                <br>Email: dialvaro30@gmail.com
+                @foreach ($empresa as $em)
+                <b>{{$em->nombre_empresa}}</b>
+                <br>{{$em->direccion_empresa}}
+                <br>{{$em->celular_empresa}} - {{$em->telefono_empresa}}
+                @endforeach
             </p>
-            <p><b>Tipo: </b>{{$v->numero_factura}}
-            <br><b>Número Venta: </b>{{$v->numero_factura}} {{$v->numero_factura}}
+            <br><b>Número Factura: </b>{{$fact->numero_factura}}
             <br><b>Impresión: </b>{{DATE_FORMAT(now(), 'd/m/Y - h:i:s a')}}</p>
+            <br><b>Cliente: </b>
+            @if ($fact->nombre_cliente == '')
+            {{$fact->nombre_anonimo}}
+            @else
+            {{$fact->nombre_cliente}}
+            @endif
+            </p>
             <table>
                 <thead>
                     <tr>
@@ -104,10 +110,10 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Sr(a). {{$v->numero_factura}}<br>
-                        {{$v->numero_factura}}: {{$v->numero_factura}}<br>
-                        Dirección: {{$v->numero_factura}}<br>
-                        Teléfono: {{$v->numero_factura}}<br>
+                        <td>Sr(a). {{$fact->numero_factura}}<br>
+                        {{$fact->numero_factura}}: {{$fact->numero_factura}}<br>
+                        Dirección: {{$fact->numero_factura}}<br>
+                        Teléfono: {{$fact->numero_factura}}<br>
                         </td>
                     </tr>
                 </tbody>
