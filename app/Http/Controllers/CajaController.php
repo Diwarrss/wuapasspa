@@ -53,7 +53,6 @@ class CajaController extends Controller
                 'nombre_caja' => 'required|min:3|max:150',
                 'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                 'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
-                'valor_gastos' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                 'estado_caja' => 'required'
             ]);
 
@@ -62,7 +61,6 @@ class CajaController extends Controller
             $caja->nombre_caja = $request->nombre_caja;;
             $caja->valor_inicial = $request->valor_inicial;
             $caja->valor_producido = $request->valor_producido;
-            $caja->valor_gastos = $request->valor_gastos;
             $caja->estado_caja = $request->estado_caja;
             $caja->save();
             DB::commit();
@@ -98,7 +96,6 @@ class CajaController extends Controller
                     'nombre_caja' => 'required|min:3|max:150',
                     'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                     'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
-                    'valor_gastos' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                     'estado_caja' => 'required'
                 ]);
             } else {
@@ -107,7 +104,6 @@ class CajaController extends Controller
                     'nombre_caja' => 'required|min:3|max:150',
                     'valor_inicial' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                     'valor_producido' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
-                    'valor_gastos' => 'max:10|regex:/^\d+(\.\d{1,2})?$/',
                     'estado_caja' => 'required'
                 ]);
             }
@@ -117,7 +113,6 @@ class CajaController extends Controller
             $caja->nombre_caja = $request->nombre_caja;;
             $caja->valor_inicial = $request->valor_inicial;
             $caja->valor_producido = $request->valor_producido;
-            $caja->valor_gastos = $request->valor_gastos;
             $caja->estado_caja = $request->estado_caja;
             $caja->save(); //guardamos en la tabla users con el metodo save en la BD
 
@@ -139,7 +134,6 @@ class CajaController extends Controller
                 'cajas.nombre_caja',
                 'cajas.valor_inicial',
                 'cajas.valor_producido',
-                'cajas.valor_gastos',
                 'cajas.estado_caja as estado_cajaNum',
                 'cajas.empleado_id',
                 DB::raw("IF(cajas.estado_caja=1, 'Activo', 'Desactivado') as estado_caja"),

@@ -27,22 +27,16 @@
                 <h3 class="text-center" v-text="dataCajaDiv[0].nombre_caja"></h3>
               </strong>
               <div class="row">
-                <div class="col-md-4 text-center">
+                <div class="col-md-6 text-center">
                   <h4>Valor Inicial</h4>
                   <strong>
                     <p>${{formatearValor(dataCajaDiv[0].valor_inicial)}}</p>
                   </strong>
                 </div>
-                <div class="col-md-4 text-center">
+                <div class="col-md-6 text-center">
                   <h4>Valor Producido</h4>
                   <strong>
                     <p>${{formatearValor(dataCajaDiv[0].valor_producido)}}</p>
-                  </strong>
-                </div>
-                <div class="col-md-4 text-center">
-                  <h4>Valor Gastos</h4>
-                  <strong>
-                    <p>${{formatearValor(dataCajaDiv[0].valor_gastos)}}</p>
                   </strong>
                 </div>
               </div>
@@ -50,7 +44,7 @@
                 <div class="col-md-12 text-center">
                   <h4>Valor Actual Caja</h4>
                   <strong>
-                    <p>${{formatearValor(((parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido)) - parseInt(dataCajaDiv[0].valor_gastos) ))}}</p>
+                    <p>${{formatearValor(parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido) )}}</p>
                   </strong>
                 </div>
               </div>
@@ -93,7 +87,6 @@
                     <th>Nombre Caja</th>
                     <th>Valor Inicial</th>
                     <th>Valor Producido</th>
-                    <th>Valor Gastos</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
@@ -207,27 +200,6 @@
                       class="text-red"
                       v-if="arrayErrors.valor_producido"
                       v-text="arrayErrors.valor_producido[0]"
-                    ></p>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label
-                    for="valor_producido"
-                    class="col-sm-4 control-label hidden-xs"
-                  >Valor Gastado</label>
-
-                  <div class="col-sm-8 col-xs-12">
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="valor_producido"
-                      v-model="valor_gastos"
-                      placeholder="Valor Gastos"
-                    />
-                    <p
-                      class="text-red"
-                      v-if="arrayErrors.valor_gastos"
-                      v-text="arrayErrors.valor_gastos[0]"
                     ></p>
                   </div>
                 </div>
@@ -456,7 +428,6 @@ export default {
       motivo_anulacion: "",
       usuario: "",
       valor_producido: "",
-      valor_gastos: "",
       password: "",
       password2: "",
       celular: "",
@@ -559,10 +530,6 @@ export default {
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
             },
             {
-              data: "valor_gastos",
-              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
-            },
-            {
               render: function(data, type, row) {
                 if (row.estado_caja === "Activo") {
                   return (
@@ -619,7 +586,6 @@ export default {
             (me.nombre_caja = data["nombre_caja"]),
             (me.valor_inicial = data["valor_inicial"]),
             (me.valor_producido = data["valor_producido"]),
-            (me.valor_gastos = data["valor_gastos"]),
             (me.estado_caja = data["estado_cajaNum"]);
         });
 
@@ -703,7 +669,13 @@ export default {
             {
               render: function(data, type, row) {
                 if (row.estado_transferencia === "Pendiente") {
-                  if (row.EmpCreadorTrans == me.id_user) {
+                  if (
+                    row.EmpCreadorTrans == me.id_user &&
+                    row.EmpRecibeTrans == me.id_user
+                  ) {
+                    return `<button class="btn btn-danger AnularTranferencia btn-sm" title="Cancelar Transferencia" ><i class="fas fa-ban"></i> Anular</button>
+                             <button class="btn btn-success confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>`;
+                  } else if (row.EmpCreadorTrans == me.id_user) {
                     return '<button class="btn btn-danger AnularTranferencia btn-sm" title="Cancelar Transferencia" ><i class="fas fa-ban"></i> Anular</button>';
                   } else if (row.EmpRecibeTrans == me.id_user) {
                     return '<button class="btn btn-success confirmar btn-sm" title="Confirmar Transferencia"><i class="fas fa-check-circle"></i>  Confirmar</button>';
@@ -867,7 +839,6 @@ export default {
           nombre_caja: data.nombre_caja,
           valor_inicial: data.valor_inicial,
           valor_producido: data.valor_producido,
-          valor_gastos: data.valor_gastos,
           estado_caja: data.estado_caja
         })
         .then(function(response) {
@@ -950,7 +921,6 @@ export default {
           nombre_caja: me.nombre_caja,
           valor_inicial: me.valor_inicial,
           valor_producido: me.valor_producido,
-          valor_gastos: me.valor_gastos,
           estado_caja: me.estado_caja
         })
         .then(function(response) {
@@ -1003,7 +973,6 @@ export default {
         (this.valor_inicial = ""),
         (this.idEmpleadoElegido = ""),
         (this.valor_producido = ""),
-        (this.valor_gastos = ""),
         (this.estado_caja = ""),
         (this.arrayErrors = []),
         (this.IdCajaOrigenTrans = ""),

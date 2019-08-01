@@ -27,7 +27,7 @@ class TransferenciaController extends Controller
 
             $cajaOrigen = Caja::find($request->caja_origen);
             $cajaDestino = Caja::find($request->caja_destino);
-            $cajaOrigenNeto = ($cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido) - $cajaOrigen->valor_gastos;
+            $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido;
 
             if ($request->valor <= $cajaOrigenNeto) {
                 $request->validate([
@@ -79,7 +79,7 @@ class TransferenciaController extends Controller
             $cajaOrigen = Caja::find($Transferencia->caja_origen);
             $cajaDestino = Caja::find($Transferencia->caja_destino);
 
-            $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido - $cajaOrigen->valor_gastos;
+            $cajaOrigenNeto = $cajaOrigen->valor_inicial +  $cajaOrigen->valor_producido ;
             //solo se pueden hacer tranferencias si el dinero esta disponible y si aun sigue pendiente la tranferencia, es decir
             //que no haya sido anulada
             if ($Transferencia->valor <= $cajaOrigenNeto && $Transferencia->estado_transferencia == 1) {
