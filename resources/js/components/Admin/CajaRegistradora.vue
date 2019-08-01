@@ -147,7 +147,7 @@
             </div>
             <div class="modal-body">
               <div class="box-body">
-                <div class="form-group" v>
+                <div class="form-group">
                   <label for="nombre_usuario" class="col-sm-4 control-label hidden-xs">Nombre Caja</label>
                   <div class="col-sm-8 col-xs-12">
                     <input
@@ -552,9 +552,9 @@ export default {
                   return `<button class="btn btn-warning edit btn-sm" title="Editar Caja" style="margin: 1px"><i class="fas fa-edit"></i> Editar</button>
                   <button class="btn btn-success transferencia btn-sm" title="Hacer Transferencia" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
                 } else if (me.roles_roles_id == 4) {
-                  return `<button class="btn btn-success transferencia btn-sm" title="Hacer Transferencia" style="margin: 1px"><i class="fas fa-exchange-alt"></i> Transferir</button>`;
+                  return `<span class="label label-default"> Sin Acción</span>`;
                 } else {
-                  return '<span class="label label-danger"> SIN ACCIONES</span>';
+                  return '<span class="label label-default"> Sin Acción</span>';
                 }
               }
             }
@@ -822,8 +822,10 @@ export default {
                 jQuery("#tablaTransferencias")
                   .DataTable()
                   .ajax.reload(null, false);
+
                 jQuery("[data-dismiss=modal]").trigger({ type: "click" });
                 data.motivo_anulacion = "";
+                data.infoCajaDiv();
               }
             });
         }

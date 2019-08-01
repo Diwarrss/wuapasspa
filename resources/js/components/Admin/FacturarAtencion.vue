@@ -13,6 +13,13 @@
         >
           <i class="far fa-calendar-plus"></i> Agendar
         </a>
+        <button
+          title="Crear Factura Gastos"
+          class="btn btn-primary btn-lg"
+          @click="abrirModalFactura()"
+        >
+          <i class="fas fa-plus-circle"></i> Factura Gasto
+        </button>
       </h1>
       <ol class="breadcrumb">
         <li>
@@ -240,6 +247,39 @@
                 <th># Factura</th>
                 <th>Fecha Factura</th>
                 <th>Cliente</th>
+                <th>Estado Factura</th>
+                <th>Valor Total</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody style="font-weight: normal;"></tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" class="text-right">Total:</th>
+                <th colspan="2"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="box box-danger">
+        <div class="box-header">
+          <h3 class="box-title">
+            <i class="far fa-list-alt"></i> Gastos Diarios
+          </h3>
+        </div>
+
+        <div class="table-responsive container-fluid">
+          <table
+            id="tablaGastosDiarios"
+            class="table table-bordered table-hover"
+            style="width:100%"
+          >
+            <thead>
+              <tr>
+                <th># Factura</th>
+                <th>Fecha Factura</th>
+                <th>Descripción</th>
                 <th>Estado Factura</th>
                 <th>Valor Total</th>
                 <th>Acciones</th>
@@ -484,6 +524,75 @@
         <!-- /.modal-dialog -->
       </div>
     </section>
+    <!--Modal facturar gastos-->
+    <section>
+      <div class="modal fade in" id="modalFacturaGastos">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form class="form-horizontal" content-type="multipart/form-data">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-list"></i> Factura de gastos
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box-body">
+                  <div class="form-group">
+                    <label
+                      for="valorgasto"
+                      class="col-sm-4 control-label hidden-xs"
+                    >Valor del Gasto:</label>
+                    <div class="col-sm-8 col-xs-12">
+                      <money
+                        class="form-control"
+                        v-bind="money"
+                        v-model="valor_gasto"
+                        placeholder="Valor del Gasto"
+                      >{{valor_gasto}}</money>
+                      <p
+                        class="text-red"
+                        v-if="arrayErrors.valor_gasto"
+                        v-text="arrayErrors.valor_gasto[0]"
+                      ></p>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="descripcion" class="col-sm-4 control-label hidden-xs">Descripción:</label>
+
+                    <div class="col-sm-8 col-xs-12">
+                      <textarea
+                        class="form-control"
+                        rows="3"
+                        placeholder="Describe aquí el detalle del gasto"
+                        v-model="descripcion_gasto"
+                      ></textarea>
+                      <p
+                        class="text-red"
+                        v-if="arrayErrors.descripcion_gasto"
+                        v-text="arrayErrors.descripcion_gasto[0]"
+                      ></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" @click="facturarGastos();">
+                  <i class="fas fa-check"></i> Facturar
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
   </div>
 </template>
 <script>
@@ -514,6 +623,7 @@ export default {
       num_factura: "",
       motivo_anulacion: "",
       valor_total: 0,
+      id_movimiento: 0,
       //para usar el vue componente de moneyConcurrente
       money: {
         decimal: ",",
@@ -522,7 +632,10 @@ export default {
         suffix: "",
         precision: 0,
         masked: false
-      }
+      },
+      //gastos
+      valor_gasto: 0,
+      descripcion_gasto: ""
     };
   },
   watch: {},
@@ -693,6 +806,7 @@ export default {
           me.num_factura = datos["num_factura"];
           me.valor_total = datos["valor_total"];
           me.id_reserva = datos["id_reserva"];
+          me.id_movimiento = datos["id_movimiento"];
           if (datos["nombre_cliente"] == null) {
             me.nombre_cliente = datos["nombre_anonimo"];
           } else {
@@ -1068,7 +1182,8 @@ export default {
               valor_total: me.valor_total,
               id_facturadopor: me.id_facturadopor,
               id_reserva: me.id_reserva,
-              nombre_cliente: me.nombre_cliente
+              nombre_cliente: me.nombre_cliente,
+              id_movimiento: me.id_movimiento
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({
@@ -1102,6 +1217,10 @@ export default {
       this.id_factura = "";
       this.motivo_anulacion = "";
       this.arrayErrors = [];
+    },
+    abrirModalFactura() {
+      jQuery.noConflict();
+      $("#modalFacturaGastos").modal("show");
     }
   },
   mounted() {

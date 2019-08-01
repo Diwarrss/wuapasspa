@@ -56,11 +56,13 @@ class FacturaController extends Controller
         $listarFacturar = DB::table('facturas')
             ->join('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
             ->join('detalle_facturas', 'detalle_facturas.facturas_id', '=', 'facturas.id')
+            ->join('movimientos', 'movimientos.factura_id', '=', 'factura.id')
             ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
             ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
             ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
             ->select(
                 'facturas.id as id_factura',
+                'movimientos.id as id_movimiento',
                 'reservaciones.id as id_reserva',
                 DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as num_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
@@ -70,7 +72,10 @@ class FacturaController extends Controller
                 'facturas.estado_factura',
                 DB::raw("MAX(detalle_facturas.nomina_id) as nomina_id")
             )
-            ->where([['facturas.created_at', 'like', '%' . $fechahoy . '%']])
+            ->where([
+                ['movimientos.estado', 1],
+                ['facturas.created_at', 'like', '%' . $fechahoy . '%']
+            ])
             ->groupBy('detalle_facturas.facturas_id')
             //->orderByDesc('facturas.id')
             ->get();
@@ -239,6 +244,11 @@ class FacturaController extends Controller
             $facturaAnulada->descripcion = $request->motivo_anulacion;
             $facturaAnulada->nombre_cliente = $request->nombre_cliente;
             $facturaAnulada->save();
+
+            //Hay que anular el movimiento anterior
+            $anularMovimiento = Movimiento::find($request->id_movimiento);
+            $anularMovimiento->estado = 2;
+            $anularMovimiento->save();
 
             //creamos el registro del movimiento tipo egreso al anular
             $movimiento = new Movimiento();

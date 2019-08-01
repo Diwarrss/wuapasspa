@@ -76,7 +76,7 @@
     <body style="margin:0;padding:0">
         <div class="ticket">
         @foreach ($factura as $fact)
-            <center> <img src="img/logo/Logotipo2.png" alt="AgendaGrid" id="imagen"></center>
+            {{-- <center> <img src="img/logo/Logotipo2.png" alt="AgendaGrid" id="imagen"></center> --}}
             <div id="watermark">
                 <img src="img/facture/anulado.png" height="100%" width="100%" />
             </div>
