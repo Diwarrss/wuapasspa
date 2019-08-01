@@ -279,6 +279,7 @@
               <tr>
                 <th># Factura</th>
                 <th>Fecha Factura</th>
+                <th>Creado Por</th>
                 <th>Descripción</th>
                 <th>Estado Factura</th>
                 <th>Valor Total</th>
@@ -288,7 +289,7 @@
             <tbody style="font-weight: normal;"></tbody>
             <tfoot>
               <tr>
-                <th colspan="4" class="text-right">Total:</th>
+                <th colspan="5" class="text-right">Total:</th>
                 <th colspan="2"></th>
               </tr>
             </tfoot>
@@ -576,13 +577,22 @@
                       ></p>
                     </div>
                   </div>
+                  <div class="col-md-12 callout callout-danger text-center" v-if="id_caja == 0">
+                    <h4>¡Alerta!</h4>
+                    <p>El Usuario Actual no tiene Caja Registradora Asociada, porfavor verificar.</p>
+                  </div>
                 </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">
                   <i class="fas fa-times"></i> Cancelar
                 </button>
-                <button type="button" class="btn btn-success" @click="facturarGastos();">
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  @click="facturarGastos();"
+                  :disabled="id_caja == 0"
+                >
                   <i class="fas fa-check"></i> Facturar
                 </button>
               </div>
@@ -825,6 +835,106 @@ export default {
           let id_factura = datos["id_factura"];
 
           window.open("/pdfFacturaServicios/" + id_factura + "," + "_blank");
+        });
+      });
+    },
+    listarFactGastosDiarios() {
+      let me = this; //creamos esta variable para q nos reconozca los atributos de vuejs
+      jQuery(document).ready(function() {
+        var tablaGastosDiarios = jQuery("#tablaGastosDiarios").DataTable({
+          language: {
+            url: "/jsonDTIdioma.json"
+          },
+          //processing: true,
+          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          responsive: true,
+          order: [[0, "asc"]],
+          //serverSide: true, //Lado servidor activar o no mas de 20000 registros
+          ajax: "/listarGastosDiarios",
+          columns: [
+            { data: "num_factura" },
+            { data: "fecha_factura" },
+            { data: "nombre_creadopor" },
+            { data: "descripcion" },
+            {
+              render: function(data, type, row) {
+                if (row.estado_fact == 1) {
+                  return '<span class="label label-success">Activa</span>';
+                } else {
+                  return '<span class="label label-danger">Anulada</span>';
+                }
+              }
+            },
+            {
+              data: "valor_neto",
+              className: "sum",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
+            },
+            {
+              render: function(data, type, row) {
+                if (row.estado_fact == 1) {
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimirGastos" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-danger anularGastos" title="Anular Factura">
+                            <i class="fas fa-close"></i>
+                        </button>`;
+                } else {
+                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimirGastos" title="Imprimir Factura">
+                            <i class="fas fa-print"></i>
+                        </button>`;
+                }
+              }
+            }
+          ],
+          footerCallback: function(row, data, start, end, display) {
+            var api = this.api();
+            var numberFormat = jQuery.fn.dataTable.render.number(
+              ".",
+              ",",
+              2,
+              "$"
+            ).display;
+            //sumeme el data que tenga la clase sum
+            api.columns(".sum", { page: "current" }).every(function() {
+              var sum = this.data().reduce(function(a, b) {
+                var x = parseFloat(a) || 0;
+                var y = parseFloat(b) || 0;
+                return x + y;
+              }, 0);
+              /* console.log(sum); */
+              // Update footer
+              $(this.footer()).html(numberFormat(sum));
+            });
+          }
+        });
+
+        //Metodo para anular factura
+        tablaGastosDiarios.on("click", ".anularGastos", function() {
+          jQuery.noConflict(); // para evitar errores
+          $("#modalAnularGastos").modal("show"); //mostramos la modal
+          //para si es responsivo obtenemos la data
+          var current_row = $(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaGastosDiarios.row(current_row).data();
+
+          /* me.id_factura = datos["id_factura"]; */
+        });
+
+        //metodo para imprimir la factura
+        tablaGastosDiarios.on("click", ".imprimirGastos", function() {
+          //para que sea estable al ser responsive
+          var current_row = $(this).parents("tr");
+          if (current_row.hasClass("child")) {
+            current_row = current_row.prev();
+          }
+          var datos = tablaGastosDiarios.row(current_row).data();
+          /* let id_factura = datos["id_factura"];
+
+          window.open("/pdfFacturaServicios/" + id_factura + "," + "_blank"); */
         });
       });
     },
@@ -1221,12 +1331,62 @@ export default {
     abrirModalFactura() {
       jQuery.noConflict();
       $("#modalFacturaGastos").modal("show");
+    },
+    facturarGastos() {
+      let me = this;
+      Swal.fire({
+        title: "¿Seguro de crear Factura de gastos?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "green",
+        cancelButtonColor: "red",
+        confirmButtonText: '<i class="fas fa-check"></i> Si',
+        cancelButtonText: '<i class="fas fa-times"></i> No'
+      }).then(result => {
+        if (result.value) {
+          axios
+            .post("/crearFacturaGastos", {
+              id_caja: me.id_caja,
+              valor_gasto: me.valor_gasto,
+              prefijo: "FG ",
+              descripcion_gasto: me.descripcion_gasto
+            }) //le envio el parametro completo
+            .then(function(response) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: "Factura generada con éxito!",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(function() {
+                jQuery("#tablaGastosDiarios")
+                  .DataTable()
+                  .ajax.reload();
+                me.cerrarModalFactGastos();
+              });
+              //console.log(response);
+            })
+            .catch(function(error) {
+              if (error.response.status == 422) {
+                //preguntamos si el error es 422
+                me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
+              }
+            });
+        }
+      });
+    },
+    cerrarModalFactGastos() {
+      $("[data-dismiss=modal]").trigger({ type: "click" });
+      this.valor_gasto = 0;
+      this.descripcion_gasto = "";
+      this.arrayErrors = [];
     }
   },
   mounted() {
     this.rol();
     this.listarFacturacion();
     this.listarFacturacionDiaria();
+    this.listarFactGastosDiarios();
     this.infoFacturador();
     this.infoEmpresa();
     this.listaEmpleados();

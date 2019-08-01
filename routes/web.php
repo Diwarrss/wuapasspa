@@ -125,6 +125,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/serviciosFaturables', 'ServiciosController@serviciosFaturables')->name('serviciosFaturables');
         Route::post('/facturarCargos', 'FacturaController@facturarCargos')->name('facturarCargos');
         Route::post('/anularFactura', 'FacturaController@anularFactura')->name('anularFactura');
+        Route::post('/crearFacturaGastos', 'FacturaController@crearFacturaGastos')->name('crearFacturaGastos');
+        Route::get('/listarGastosDiarios', 'FacturaController@listarGastosDiarios')->name('listarGastosDiarios');
         //pdf de factura servicios
         Route::get('/pdfFacturaServicios/{id}', 'FacturaController@pdfFacturaServicios');
         Route::get('/pdfFacturaAnulServicios/{id}', 'FacturaController@pdfFacturaAnulServicios');

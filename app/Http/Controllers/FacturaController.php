@@ -16,6 +16,7 @@ use App\Caja;
 use App\FacturaAnulada;
 use Barryvdh\DomPDF\PDF;
 use App\Empresa;
+use App\FacturaGastos;
 
 class FacturaController extends Controller
 {
@@ -47,16 +48,16 @@ class FacturaController extends Controller
         return datatables($listarFacturar)->toJson();
     }
 
-    public function listarFacturacionDiaria()
+    public function listarFacturacionDiaria(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $fechahoy = Carbon::now()->format('Y-m-d');
 
         $listarFacturar = DB::table('facturas')
             ->join('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
             ->join('detalle_facturas', 'detalle_facturas.facturas_id', '=', 'facturas.id')
-            ->join('movimientos', 'movimientos.factura_id', '=', 'factura.id')
+            ->join('movimientos', 'movimientos.factura_id', '=', 'facturas.id')
             ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
             ->leftJoin('users', 'solicitudes.users_users_id', '=', 'users.id')
             ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
@@ -89,6 +90,7 @@ class FacturaController extends Controller
 
         $listarFacturar = DB::table('facturas')
             ->join('detalle_facturas', 'detalle_facturas.facturas_id', '=', 'facturas.id')
+            ->join('movimientos', 'movimientos.factura_id', '=', 'facturas.id')
             ->leftjoin('reservaciones', 'facturas.id', '=', 'reservaciones.facturas_id')
             ->leftjoin('factura_anuladas', 'factura_anuladas.facturas_id', '=', 'facturas.id')
             ->leftJoin('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
@@ -96,6 +98,7 @@ class FacturaController extends Controller
             ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
             ->select(
                 'facturas.id as id_factura',
+                'movimientos.id as id_movimiento',
                 'factura_anuladas.nombre_cliente as nomCliente_anulada',
                 DB::raw("DATE_FORMAT(factura_anuladas.created_at, '%d/%m/%Y %h:%i %p') as fecha_anulacion"),
                 'reservaciones.id as id_reserva',
@@ -250,7 +253,7 @@ class FacturaController extends Controller
             $anularMovimiento->estado = 2;
             $anularMovimiento->save();
 
-            //creamos el registro del movimiento tipo egreso al anular
+            /* //creamos el registro del movimiento tipo egreso al anular
             $movimiento = new Movimiento();
             $movimiento->factura_id = $request->id_factura;
             $movimiento->caja_id = $request->id_caja;
@@ -258,7 +261,7 @@ class FacturaController extends Controller
             $movimiento->valor_pendiente = 0;
             $movimiento->tipo_movimiento = 2; //para q sea un egreso anulacion
             $movimiento->estado = 1;
-            $movimiento->save();
+            $movimiento->save(); */
 
             //obtenemos el valor producido de la caja por el ID con first
             $valorProducido = Caja::select('valor_producido')->where('id', $request->id_caja)->first();
@@ -361,5 +364,84 @@ class FacturaController extends Controller
         $pdf->setPaper(array(0, 0, 250, 700)); //SE PERSONALIZA EL TAMAÑO DEL PAPEL
         //retornamos el pdf en view del navegador
         return $pdf->stream('ticketVenta  -' . $factura[0]->numero_factura . '.pdf');
+    }
+
+    //crear factura de gastos
+    public function crearFacturaGastos(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        //para validar
+        $request->validate([
+            'valor_gasto' => 'required|max:12|regex:/^\d+(\.\d{1,2})?$/',
+            'descripcion_gasto' => 'required|max:350'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            //creamos el registro del movimiento tipo egreso al Registrar gasto
+            $movimiento = new Movimiento();
+            $movimiento->caja_id = $request->id_caja;
+            $movimiento->valor_movimiento = $request->valor_gasto;
+            $movimiento->valor_pendiente = 0;
+            $movimiento->tipo_movimiento = 2; //para q sea un egreso al ser gasto
+            $movimiento->estado = 1;
+            $movimiento->save();
+
+            // Obtenemos el la ultima factura por fecha de creacion
+            $lastOrder = FacturaGastos::orderBy('created_at', 'desc')->first();
+            if (!$lastOrder) {
+                //si no hay ningun order pos dejamos  number en 0 al final sera 1
+                $number = 0;
+            } else {
+                //obtenemos el ultimo numero de la factura y le sumamos 1
+                $number = $lastOrder->numero_factura;
+            }
+            $numFactura = $number + 1;
+
+            //creamos la factura de gastos
+            $crearFact = new FacturaGastos();
+            $crearFact->prefijo = $request->prefijo;
+            $crearFact->numero_factura = $numFactura;
+            $crearFact->creado_por = Auth::user()->id;
+            $crearFact->movimiento_id = $movimiento->id;
+            $crearFact->valor_neto = $request->valor_gasto;
+            $crearFact->descripcion = $request->descripcion_gasto;
+            $crearFact->estado_fact = 1;
+            $crearFact->save();
+
+            //obtenemos el valor producido de la caja por el ID con first
+            $valorProducido = Caja::select('valor_producido')->where('id', $request->id_caja)->first();
+            //actualizar valor de la caja actual menos el que anulo
+            $updateCaja = Caja::find($request->id_caja);
+            //restamos el valor consultado menos el valor de la factura
+            $updateCaja->valor_producido = $valorProducido->valor_producido - $request->valor_gasto;
+            $updateCaja->save();
+
+            DB::commit(); //se ahce el commit pa update base datos
+        } catch (Exception $e) {
+            DB::rollBack();
+        }
+    }
+
+    public function listarGastosDiarios(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+        $fechahoy = Carbon::now()->format('Y-m-d');
+
+        $listarGastosD = FacturaGastos::join('users as creadopor', 'creadopor.id', '=', 'factura_gastos.creado_por')
+            ->select(
+                'factura_gastos.estado_fact',
+                'factura_gastos.movimiento_id',
+                'factura_gastos.valor_neto',
+                'factura_gastos.descripcion',
+                DB::raw("CONCAT(factura_gastos.prefijo,' ',factura_gastos.numero_factura) as num_factura"),
+                DB::raw("CONCAT(creadopor.nombre_usuario, ' ',creadopor.apellido_usuario) as nombre_creadopor"),
+                DB::raw("DATE_FORMAT(factura_gastos.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura")
+            )
+            ->where([['factura_gastos.estado_fact', 1], ['factura_gastos.created_at', 'like', '%' . $fechahoy . '%']])->get();
+
+        return datatables($listarGastosD)->toJson();
     }
 }

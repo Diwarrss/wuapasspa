@@ -11,10 +11,10 @@ class FacturaGastos extends Model
     const ANULADA = 2;
 
     protected $fillable = [
-        'creado_por',
         'prefijo',
         'numero_factura',
         'creado_por',
+        'movimiento_id',
         'valor_neto',
         'descripcion',
         'estado_fact',

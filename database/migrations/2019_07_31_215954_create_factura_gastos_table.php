@@ -19,6 +19,8 @@ class CreateFacturaGastosTable extends Migration
             $table->integer('numero_factura');
             $table->unsignedInteger('creado_por');
             $table->foreign('creado_por')->references('id')->on('users');
+            $table->unsignedInteger('movimiento_id');
+            $table->foreign('movimiento_id')->references('id')->on('movimientos');
             $table->decimal('valor_neto', 12, 2);
             $table->string('descripcion', 350);
             $table->enum('estado_fact', [\App\FacturaGastos::ACTIVA, \App\FacturaGastos::ANULADA])->default(\App\FacturaGastos::ACTIVA);

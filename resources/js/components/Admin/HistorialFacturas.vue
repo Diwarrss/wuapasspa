@@ -137,7 +137,8 @@ export default {
       valor_total: 0,
       id_reserva: "",
       arrayErrors: [],
-      nombre_cliente: ""
+      nombre_cliente: "",
+      id_movimiento: 0
     };
   },
   methods: {
@@ -298,6 +299,7 @@ export default {
           me.num_factura = datos["num_factura"];
           me.valor_total = datos["valor_total"];
           me.id_reserva = datos["id_reserva"];
+          me.id_movimiento = datos["id_movimiento"];
           if (datos["nombre_cliente"] == null) {
             me.nombre_cliente = datos["nombre_anonimo"];
           } else {
@@ -376,7 +378,8 @@ export default {
               valor_total: me.valor_total,
               id_facturadopor: me.id_facturadopor,
               id_reserva: me.id_reserva,
-              nombre_cliente: me.nombre_cliente
+              nombre_cliente: me.nombre_cliente,
+              id_movimiento: me.id_movimiento
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({
