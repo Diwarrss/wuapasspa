@@ -126,7 +126,7 @@
                         <tr>
                             <th></th>
                             <th>Subtotal</th>
-                            <td>${{number_format($fact->valor_total - $fact->valor_descuento,0, ',', '.' ) }}</td>
+                            <td>${{number_format($fact->valor_total + $fact->valor_descuento,0, ',', '.' ) }}</td>
                         </tr>
                         <tr>
                             <th></th>

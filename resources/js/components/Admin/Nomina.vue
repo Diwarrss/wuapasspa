@@ -32,15 +32,16 @@
               <tr>
                 <th>Empleado</th>
                 <th>Cant. Servicios</th>
-                <th>Valor Total Descuentos</th>
-                <th>Valor Total Servicios</th>
+                <th>Subtotal Facturado</th>
+                <th>Total Descuentos</th>
+                <th>Total Realizado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody style="font-weight: normal;"></tbody>
             <tfoot>
               <tr>
-                <th colspan="3" class="text-right">Total:</th>
+                <th colspan="4" class="text-right">Total:</th>
                 <th colspan="2"></th>
               </tr>
             </tfoot>
@@ -180,13 +181,14 @@
               </div>
               <div class="modal-body">
                 <div class="box box-success">
-                  <div class="box-body">
+                  <div class="box-body table-responsive">
                     <table class="table table-bordered table-hover">
                       <thead>
                         <tr>
                           <!-- <th>Fecha</th> -->
                           <th>Servicio</th>
                           <th>Cantidad</th>
+                          <th>Precio</th>
                           <th>Descuento</th>
                           <th>Valor Total</th>
                         </tr>
@@ -203,10 +205,13 @@
                             <span>{{listaServices.cantidad_servicios}}</span>
                           </td>
                           <td>
+                            <span>${{formatearValor(listaServices.valor_total_servicios)}}</span>
+                          </td>
+                          <td>
                             <span>${{formatearValor(listaServices.valor_descuento)}}</span>
                           </td>
                           <td>
-                            <span>${{formatearValor(listaServices.valor_total_servicios)}}</span>
+                            <span>${{formatearValor(listaServices.valor_total_servicios - listaServices.valor_descuento)}}</span>
                           </td>
                         </tr>
                         <tr>
@@ -217,10 +222,13 @@
                             <strong>{{totalCantidades}}</strong>
                           </td>
                           <td>
+                            <strong>${{formatearValor(totalServicios)}}</strong>
+                          </td>
+                          <td>
                             <strong>${{formatearValor(totalDescuentos)}}</strong>
                           </td>
                           <td>
-                            <strong>${{formatearValor(totalServicios)}}</strong>
+                            <strong>${{formatearValor(totalRealizado)}}</strong>
                           </td>
                         </tr>
                       </tbody>
@@ -370,6 +378,19 @@ export default {
           parseInt(this.listaServicioNomina[i].valor_total_servicios);
       }
       return resultado;
+    },
+    //calcular los totales de los servicios menos el descuento
+    totalRealizado: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.listaServicioNomina.length; i++) {
+        resultado =
+          resultado +
+          parseInt(
+            this.listaServicioNomina[i].valor_total_servicios -
+              this.listaServicioNomina[i].valor_descuento
+          );
+      }
+      return resultado;
     }
   },
   methods: {
@@ -398,6 +419,10 @@ export default {
           columns: [
             { data: "nombre_empleado" },
             { data: "cantidad_servicios" },
+            {
+              data: "subtotal_servicios",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
+            },
             {
               data: "valor_total_descuentos",
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")

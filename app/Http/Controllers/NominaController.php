@@ -20,6 +20,7 @@ class NominaController extends Controller
             ->select(
                 'detalle_facturas.empleado_id',
                 DB::raw("CONCAT(empleado.nombre_usuario, ' ',empleado.apellido_usuario) as nombre_empleado,
+                    SUM(detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada) as subtotal_servicios,
                     SUM((detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada)-detalle_facturas.valor_descuento) as valor_total_servicios,
                     SUM(detalle_facturas.valor_descuento) as valor_total_descuentos,
                     SUM(detalle_facturas.cantidad_facturada) as cantidad_servicios, min(detalle_facturas.created_at) as minFecha,max(detalle_facturas.created_at) as maxFecha")
@@ -35,7 +36,7 @@ class NominaController extends Controller
 
     public function verServiciosLiquidar(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        //if (!$request->ajax()) return redirect('/');
 
         $empleado_id = $request->empleado_id;
 
@@ -47,7 +48,7 @@ class NominaController extends Controller
                 DB::raw('SUM(detalle_facturas.valor_descuento) as valor_descuento'),
                 'detalle_facturas.empleado_id',
                 DB::raw("DATE_FORMAT(detalle_facturas.created_at, '%d/%m/%Y') as fecha_servicio, SUM(detalle_facturas.cantidad_facturada) as cantidad_servicios,
-                SUM((detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada)-detalle_facturas.valor_descuento) as valor_total_servicios")
+                SUM((detalle_facturas.valor_servicio * detalle_facturas.cantidad_facturada)) as valor_total_servicios")
             )
             ->where([
                 ['facturas.estado_factura', 1],

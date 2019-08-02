@@ -50,7 +50,7 @@ class FacturaController extends Controller
 
     public function listarFacturacionDiaria(Request $request)
     {
-        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $fechahoy = Carbon::now()->format('Y-m-d');
 
@@ -65,11 +65,12 @@ class FacturaController extends Controller
                 'facturas.id as id_factura',
                 'movimientos.id as id_movimiento',
                 'reservaciones.id as id_reserva',
-                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as num_factura"),
+                DB::raw("CONCAT(facturas.prefijo,facturas.numero_factura) as num_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
                 'anonimos.nombre_anonimo',
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 'facturas.valor_total',
+                'facturas.valor_descuento',
                 'facturas.estado_factura',
                 DB::raw("MAX(detalle_facturas.nomina_id) as nomina_id")
             )
@@ -102,7 +103,7 @@ class FacturaController extends Controller
                 'factura_anuladas.nombre_cliente as nomCliente_anulada',
                 DB::raw("DATE_FORMAT(factura_anuladas.created_at, '%d/%m/%Y %h:%i %p') as fecha_anulacion"),
                 'reservaciones.id as id_reserva',
-                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as num_factura"),
+                DB::raw("CONCAT(facturas.prefijo,facturas.numero_factura) as num_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
                 'anonimos.nombre_anonimo',
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
@@ -286,7 +287,7 @@ class FacturaController extends Controller
             ->leftJoin('anonimos', 'anonimos.reservaciones_id', '=', 'reservaciones.id')
             ->join('users as facturador', 'facturador.id', '=', 'facturas.creado_por')
             ->select(
-                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as numero_factura"),
+                DB::raw("CONCAT(facturas.prefijo,facturas.numero_factura) as numero_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
                 DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_cliente"),
                 DB::raw("CONCAT(facturador.nombre_usuario, ' ',facturador.apellido_usuario) as nombre_facturador"),
@@ -330,7 +331,7 @@ class FacturaController extends Controller
             ->join('users as anuladopor', 'anuladopor.id', '=', 'factura_anuladas.anulado_por')
             ->join('users as facturador', 'facturador.id', '=', 'facturas.creado_por')
             ->select(
-                DB::raw("CONCAT(facturas.prefijo,' ',facturas.numero_factura) as numero_factura"),
+                DB::raw("CONCAT(facturas.prefijo,facturas.numero_factura) as numero_factura"),
                 DB::raw("DATE_FORMAT(facturas.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura"),
                 DB::raw("CONCAT(facturador.nombre_usuario, ' ',facturador.apellido_usuario) as nombre_facturador"),
                 DB::raw("CONCAT(anuladopor.nombre_usuario, ' ',anuladopor.apellido_usuario) as nombre_anuladopor"),
@@ -436,12 +437,35 @@ class FacturaController extends Controller
                 'factura_gastos.movimiento_id',
                 'factura_gastos.valor_neto',
                 'factura_gastos.descripcion',
-                DB::raw("CONCAT(factura_gastos.prefijo,' ',factura_gastos.numero_factura) as num_factura"),
+                DB::raw("CONCAT(factura_gastos.prefijo,factura_gastos.numero_factura) as num_factura"),
                 DB::raw("CONCAT(creadopor.nombre_usuario, ' ',creadopor.apellido_usuario) as nombre_creadopor"),
                 DB::raw("DATE_FORMAT(factura_gastos.created_at, '%d/%m/%Y %h:%i %p') as fecha_factura")
             )
             ->where([['factura_gastos.estado_fact', 1], ['factura_gastos.created_at', 'like', '%' . $fechahoy . '%']])->get();
 
         return datatables($listarGastosD)->toJson();
+    }
+    //lista de servicios para mostrar como descripcion de la factura
+    public function verInfoFactura(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+
+        $id_factura = $request->id_factura;
+
+        $factura = Factura::join('detalle_facturas', 'facturas.id', '=', 'detalle_facturas.facturas_id')
+            ->join('servicios', 'servicios.id', '=', 'detalle_facturas.servicios_servicios_id')
+            ->join('users as empleado', 'empleado.id', '=', 'detalle_facturas.empleado_id')
+            ->select(
+                'servicios.nombre_servicio',
+                DB::raw("CONCAT(facturas.prefijo,facturas.numero_factura) as numero_factura"),
+                DB::raw("CONCAT(empleado.nombre_usuario, ' ',empleado.apellido_usuario) as empleado,
+                SUM(detalle_facturas.cantidad_facturada) as cantidad_facturada, SUM(detalle_facturas.valor_descuento) as valor_descuento,
+                SUM(detalle_facturas.valor_servicio) as valor_total")
+            )
+            ->where('facturas.id', $id_factura)
+            ->groupBy('servicios.nombre_servicio')
+            ->get();
+
+        return $factura;
     }
 }

@@ -604,6 +604,96 @@
         <!-- /.modal-dialog -->
       </div>
     </section>
+    <!-- MODAL PARA MOSTRAR LOS SERVICIOS QUE HIZO EL EMPLEADO -->
+    <section>
+      <div class="modal fade in" id="modalInfoFactura">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <form class="form-horizontal">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">
+                  <i class="fas fa-list-ul"></i> Descripción de la Factura:
+                  <strong>{{num_factura}}</strong>
+                </h4>
+              </div>
+              <div class="modal-body">
+                <div class="box box-success">
+                  <div class="box-body table-responsive">
+                    <table class="table table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <!-- <th>Fecha</th> -->
+                          <th>Servicio</th>
+                          <th>Realizado Por</th>
+                          <th>Cantidad</th>
+                          <th>Precio</th>
+                          <th>Descuento</th>
+                          <th>Valor Total</th>
+                        </tr>
+                      </thead>
+                      <tbody style="font-weight: normal;">
+                        <tr v-for="detalleFact in detallesFactura" :key="detalleFact.id">
+                          <td>
+                            <span>{{detalleFact.nombre_servicio}}</span>
+                          </td>
+                          <td>
+                            <span>{{detalleFact.empleado}}</span>
+                          </td>
+                          <td>
+                            <span>{{detalleFact.cantidad_facturada}}</span>
+                          </td>
+                          <td>
+                            <span>${{formatearValor(detalleFact.valor_total)}}</span>
+                          </td>
+                          <td>
+                            <span>${{formatearValor(detalleFact.valor_descuento)}}</span>
+                          </td>
+                          <td>
+                            <span>${{formatearValor(detalleFact.valor_total - detalleFact.valor_descuento)}}</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="2" align="right">
+                            <strong>Totales:</strong>
+                          </td>
+                          <td>
+                            <strong>{{totalCantidades}}</strong>
+                          </td>
+                          <td>
+                            <strong>${{formatearValor(totalServicios)}}</strong>
+                          </td>
+                          <td>
+                            <strong>${{formatearValor(totalDescuentos)}}</strong>
+                          </td>
+                          <td>
+                            <strong>${{formatearValor(valor_total)}}</strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-danger pull-left"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <i class="fas fa-times"></i> Cerrar
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+    </section>
   </div>
 </template>
 <script>
@@ -646,7 +736,8 @@ export default {
       },
       //gastos
       valor_gasto: 0,
-      descripcion_gasto: ""
+      descripcion_gasto: "",
+      detallesFactura: []
     };
   },
   watch: {},
@@ -680,6 +771,32 @@ export default {
             this.informacionFacturar[i].cantidad;
       }
       return resultado - this.descuento;
+    },
+    //calcular los totales de los servicios
+    totalCantidades: function() {
+      var resultado = 0;
+      for (var i = 0; i < this.detallesFactura.length; i++) {
+        resultado =
+          resultado + parseInt(this.detallesFactura[i].cantidad_facturada);
+      }
+      return resultado;
+    },
+    //calcular los totales de los servicios
+    totalDescuentos: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.detallesFactura.length; i++) {
+        resultado =
+          resultado + parseInt(this.detallesFactura[i].valor_descuento);
+      }
+      return resultado;
+    },
+    //calcular los totales de los servicios
+    totalServicios: function() {
+      var resultado = 0.0;
+      for (var i = 0; i < this.detallesFactura.length; i++) {
+        resultado = resultado + parseInt(this.detallesFactura[i].valor_total);
+      }
+      return resultado;
     }
   },
   methods: {
@@ -742,7 +859,10 @@ export default {
             {
               render: function(data, type, row) {
                 if (row.estado_factura === "1" && row.nomina_id === null) {
-                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-info verInformacion" title="Ver Información">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
                         <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
@@ -752,11 +872,17 @@ export default {
                   row.estado_factura === "1" &&
                   row.nomina_id != null
                 ) {
-                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-info verInformacion" title="Ver Información">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>  <span class="label label-info">En Nómina</span>`;
                 } else if (row.estado_factura === "2") {
-                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-info verInformacion" title="Ver Información">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
                         <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
@@ -766,7 +892,11 @@ export default {
                             <i class="fas fa-plus-circle"></i> <i class="fas fa-dollar-sign"></i>
                         </button>`;
                 } else if (row.estado_factura === "3") {
-                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `
+                        <button style="margin: 1px" type="button" class="btn btn-info verInformacion" title="Ver Información">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>
                         <button style="margin: 1px" type="button" class="btn btn-danger anular" title="Anular Factura">
@@ -776,7 +906,10 @@ export default {
                             <i class="fas fa-money-bill-alt"></i>
                         </button>`;
                 } else {
-                  return `<button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
+                  return `<button style="margin: 1px" type="button" class="btn btn-info verInformacion" title="Ver Información">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-default imprimir" title="Imprimir Factura">
                             <i class="fas fa-print"></i>
                         </button>`;
                 }
@@ -840,6 +973,37 @@ export default {
           let id_factura = datos["id_factura"];
 
           window.open("/pdfFacturaServicios/" + id_factura + "," + "_blank");
+        });
+        //metodo para imprimir la factura
+        tablaFacturasDiarias.on("click", ".verInformacion", function() {
+          jQuery.noConflict(); // para evitar errores
+          $("#modalInfoFactura").modal("show");
+          //para que sea estable al ser responsive
+          var current_row = $(this).parents("tr");
+          if (current_row.hasClass("child")) {
+            current_row = current_row.prev();
+          }
+          var datos = tablaFacturasDiarias.row(current_row).data();
+          let id_factura = datos["id_factura"];
+          me.num_factura = datos["num_factura"];
+          me.valor_total = datos["valor_total"];
+          if (datos["nombre_cliente"] == null) {
+            me.nombre_cliente = datos["nombre_anonimo"];
+          } else {
+            me.nombre_cliente = datos["nombre_cliente"];
+          }
+
+          axios
+            .get("/verInfoFactura", {
+              params: { id_factura: id_factura }
+            })
+            .then(function(response) {
+              me.detallesFactura = response.data;
+            })
+            .catch(function(error) {
+              // handle error
+              console.log(error);
+            });
         });
       });
     },
@@ -1035,7 +1199,7 @@ export default {
         axios
           .post("/facturarCargos", {
             informacionFacturar: me.informacionFacturar,
-            prefijo: "FV ",
+            prefijo: "FV",
             estado_factura: 1,
             tipo_comprobante: 1,
             tipo_pago: me.tipo_pago,
@@ -1461,7 +1625,7 @@ export default {
             .post("/crearFacturaGastos", {
               id_caja: me.id_caja,
               valor_gasto: me.valor_gasto,
-              prefijo: "FG ",
+              prefijo: "FG",
               descripcion_gasto: me.descripcion_gasto
             }) //le envio el parametro completo
             .then(function(response) {
