@@ -178,6 +178,16 @@ class UserController extends Controller
             DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
+    //contar la cantidad de clientes activos
+    public function contarClientes(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $cont = User::join('roles', 'users.roles_roles_id', '=', 'roles.id')
+            ->where([['users.roles_roles_id', 3], ['users.estado_usuario', 1]])
+            ->count();
+
+        return $cont;
+    }
 
     public function showClientesDT(Request $request)
     {

@@ -139,6 +139,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/pagarNomina', 'NominaController@pagarNomina')->name('pagarNomina');
         Route::get('/listarPagosNomina', 'NominaController@listarPagosNomina')->name('listarPagosNomina');
         Route::post('/cancelarPago', 'NominaController@cancelarPago')->name('cancelarPago');
+
+        //para todo lo del Dashboard
+        Route::get('/contarClientes', 'UserController@contarClientes')->name('contarClientes');
     });
 
     //middleware que solo permite acceso a agendador
