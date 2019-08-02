@@ -70,6 +70,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::put('/clienteAsistio', 'ReservacionesController@clienteAsistio')->name('clienteAsistio');
         Route::put('/clienteNoAsistio', 'ReservacionesController@clienteNoAsistio')->name('clienteNoAsistio');
         Route::put('/clienteConfirmar', 'ReservacionesController@clienteConfirmar')->name('clienteConfirmar');
+        Route::post('/cancelaSolReserva', 'ReservacionesController@cancelaSolReserva')->name('cancelaSolReserva');
         //Vista Admin menu Agenda
         Route::get('/showEnEspera', 'ReservacionesController@showEnEspera')->name('showEnEspera');
         Route::get('/showAtendidos', 'ReservacionesController@showAtendidos')->name('showAtendidos');

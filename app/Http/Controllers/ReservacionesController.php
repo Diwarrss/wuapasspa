@@ -631,6 +631,27 @@ class ReservacionesController extends Controller
             }
         });
     }
+
+    //cancelar reservacion o enemilar da igual a efecto visual
+    public function cancelaSolReserva(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+
+        return DB::transaction(function () use ($request) {
+            //actualiazar el estado del la reservacion a cancelada
+            //CANCELO = 5
+            $reservaciones = Reservacione::findOrFail($request->id_reserva);
+            $reservaciones->estado_reservacion = '5';
+            $reservaciones->save();
+            //Actualizar estado de la solicitud a agendada
+            //APENDIENTE = 1 es por si se equivocan en la solicitud la puedan volver a agendar(discutir en el grupo esto)
+            if ($reservaciones->solicitudes_solicitudes_id != null) {
+                $solicitudes = Solicitude::findOrFail($reservaciones->solicitudes_solicitudes_id);
+                $solicitudes->estado_solicitud = '3';
+                $solicitudes->save();
+            }
+        });
+    }
     //Marcar como cliente asistio a la cita
     public function clienteAsistio(Request $request)
     {

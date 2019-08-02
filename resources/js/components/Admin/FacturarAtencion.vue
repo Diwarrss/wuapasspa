@@ -248,6 +248,7 @@
                 <th>Fecha Factura</th>
                 <th>Cliente</th>
                 <th>Estado Factura</th>
+                <th>Valor Descuento</th>
                 <th>Valor Total</th>
                 <th>Acciones</th>
               </tr>
@@ -255,7 +256,7 @@
             <tbody style="font-weight: normal;"></tbody>
             <tfoot>
               <tr>
-                <th colspan="4" class="text-right">Total:</th>
+                <th colspan="5" class="text-right">Total:</th>
                 <th colspan="2"></th>
               </tr>
             </tfoot>
@@ -334,7 +335,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">
-                  <i class="fas fa-times"></i> Cancelar
+                  <i class="fas fa-times"></i> Cerrar
                 </button>
               </div>
             </form>
@@ -730,6 +731,10 @@ export default {
               }
             },
             {
+              data: "valor_descuento",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
+            },
+            {
               data: "valor_total",
               className: "sum",
               render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
@@ -1101,8 +1106,11 @@ export default {
             },
             {
               render: function(data, type, row) {
-                return `<button type="button" class="btn btn-success facturar" title="Facturar Servicio">
+                return `<button style="margin: 1px" type="button" class="btn btn-success facturar" title="Facturar Servicio">
                             <i class="fas fa-donate"></i> Facturar
+                        </button>
+                        <button style="margin: 1px" type="button" class="btn btn-danger noFacturar" title="No Facturar Atención">
+                            <i class="fas fa-close"></i> No Facturar
                         </button>`;
               }
             }
@@ -1150,6 +1158,111 @@ export default {
             .finally(function() {
               // always executed
             });
+        });
+        tablaFacturacion.on("click", ".noFacturar", function() {
+          jQuery.noConflict(); // para evitar errores
+          //para si es responsivo obtenemos la data
+          var current_row = jQuery(this).parents("tr"); //Get the current row
+          if (current_row.hasClass("child")) {
+            //Check if the current row is a child row
+            current_row = current_row.prev(); //If it is, then point to the row before it (its 'parent')
+          }
+          var datos = tablaFacturacion.row(current_row).data();
+          //console.log(datos);
+
+          var id_solicitud = datos["id_solicitud"]; //capturamos el id para enviarlo por put en el metodo
+          var id_reserva = datos["id_reserva"];
+
+          if (id_solicitud == null && id_reserva != null) {
+            Swal.fire({
+              title: "¿Esta Seguro de No Facturar Atención?",
+              text: "Al no facturar queda como cancelada la Reservación.",
+              type: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "green",
+              cancelButtonColor: "red",
+              confirmButtonText: '<i class="fas fa-check"></i> Si',
+              cancelButtonText: '<i class="fas fa-times"></i> No'
+            }).then(result => {
+              if (result.value) {
+                // /cancelarReservacion
+                axios
+                  .put("/cancelarReservaciones", {
+                    id: id_reserva
+                  })
+                  .then(function(response) {
+                    Swal.fire({
+                      position: "top-end",
+                      type: "success",
+                      title: "Facturación Cancelada!",
+                      showConfirmButton: false,
+                      timer: 1500
+                    });
+                    jQuery("#tablaFacturacion")
+                      .DataTable()
+                      .ajax.reload(null, false); //refrestcar la tablaFacturacion
+                  })
+                  .catch(function(error) {
+                    if (error.response.status == 422) {
+                      //preguntamos si el error es 422
+                      Swal.fire({
+                        position: "top-end",
+                        type: "error",
+                        title: "Se produjo un Error, Reintentar",
+                        showConfirmButton: false,
+                        timer: 1500
+                      });
+                    }
+                    console.log(error.response.data.errors);
+                  });
+              }
+            });
+          } else {
+            Swal.fire({
+              title: "¿Esta Seguro de No Facturar Atención?",
+              text: "Al no facturar queda como cancelada la Reservación.",
+              type: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "green",
+              cancelButtonColor: "red",
+              confirmButtonText: '<i class="fas fa-check"></i> Si',
+              cancelButtonText: '<i class="fas fa-times"></i> No'
+            }).then(result => {
+              if (result.value) {
+                // /cancelarReservacion
+                axios
+                  .post("/cancelaSolReserva", {
+                    id_solicitud: id_solicitud,
+                    id_reserva: id_reserva
+                  })
+                  .then(function(response) {
+                    Swal.fire({
+                      position: "top-end",
+                      type: "success",
+                      title: "Facturación Cancelada!",
+                      showConfirmButton: false,
+                      timer: 1500
+                    });
+                    jQuery("#tablaFacturacion")
+                      .DataTable()
+                      .ajax.reload(null, false); //refrestcar la tablaFacturacion
+                  })
+                  .catch(function(error) {
+                    if (error.response.status == 422) {
+                      //preguntamos si el error es 422
+                      Swal.fire({
+                        position: "top-end",
+                        type: "error",
+                        title: "Se produjo un Error, Reintentar",
+                        showConfirmButton: false,
+                        timer: 1500
+                      });
+                    }
+                    console.log(error.response.data.errors);
+                  });
+              }
+            });
+          }
         });
       });
     },

@@ -4,9 +4,9 @@
         <section class="content-header">
             <h1>
                 <i class="fas fa-calendar-alt"></i> Solicitudes <small>Agendar</small>
-                <a href="/admin#/horarioCitas" type="button" class="btn btn-success btn-lg" title="Ver Horarios de Empleados"><i class="fas fa-user-clock"></i> Horarios</a>
-                <a href="/admin#/agendaLibre" type="button" class="btn btn-info btn-lg" title="Agendar Citas"><i class="far fa-calendar-plus"></i> Agendar</a>
-                <a href="/admin#/agendaEnEspera" type="button" class="btn btn-primary btn-lg" title="Agendar Citas"><i class="fas fa-hourglass-half"></i> Clientes En Espera</a>
+                <a href="/admin#/horarioCitas" style="margin: 1px" type="button" class="btn btn-success btn-lg" title="Ver Horarios de Empleados"><i class="fas fa-user-clock"></i> Horarios</a>
+                <a href="/admin#/agendaLibre" style="margin: 1px" type="button" class="btn btn-info btn-lg" title="Agendar Citas"><i class="far fa-calendar-plus"></i> Agendar</a>
+                <a href="/admin#/agendaEnEspera" style="margin: 1px" type="button" class="btn btn-primary btn-lg" title="Agendar Citas"><i class="fas fa-hourglass-half"></i> Clientes En Espera</a>
             </h1>
             <ol class="breadcrumb">
                 <li>

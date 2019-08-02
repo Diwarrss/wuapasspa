@@ -32,6 +32,7 @@
               <tr>
                 <th>Empleado</th>
                 <th>Cant. Servicios</th>
+                <th>Valor Total Descuentos</th>
                 <th>Valor Total Servicios</th>
                 <th>Acciones</th>
               </tr>
@@ -39,7 +40,7 @@
             <tbody style="font-weight: normal;"></tbody>
             <tfoot>
               <tr>
-                <th colspan="2" class="text-right">Total:</th>
+                <th colspan="3" class="text-right">Total:</th>
                 <th colspan="2"></th>
               </tr>
             </tfoot>
@@ -397,6 +398,10 @@ export default {
           columns: [
             { data: "nombre_empleado" },
             { data: "cantidad_servicios" },
+            {
+              data: "valor_total_descuentos",
+              render: jQuery.fn.dataTable.render.number(".", ",", 2, "$")
+            },
             {
               data: "valor_total_servicios",
               className: "sum",
