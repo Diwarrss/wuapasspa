@@ -24,6 +24,12 @@
         <li role="separator" class="divider"></li>
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
+          <li>
+            <router-link to="/dashboard" data-toggle="push-menu">
+              <i class="fas fa-tachometer-alt text-red"></i>
+              <span>Escritorio</span>
+            </router-link>
+          </li>
           <li class="header text-center">
             <i class="fas fa-home"></i> Menú Principal
           </li>
@@ -110,6 +116,12 @@
                 <router-link to="/historialFacturas" data-toggle="push-menu">
                   <i class="fas fa-file-invoice text-green"></i>
                   <span>Historial Facturas</span>
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/historialGastos" data-toggle="push-menu">
+                  <i class="fas fa-history text-green"></i>
+                  <span>Historial Gastos</span>
                 </router-link>
               </li>
               <li>
