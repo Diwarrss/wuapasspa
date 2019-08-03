@@ -515,7 +515,7 @@ export default {
             url: "/jsonDTIdioma.json"
           },
           processing: true,
-          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
           responsive: true,
           order: [], //no colocar ordenamiento
           ////serverSide: true, //Lado servidor activar o no mas de 20000 registros
@@ -631,7 +631,7 @@ export default {
             url: "/jsonDTIdioma.json"
           },
           processing: true,
-          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
           responsive: true,
           order: [[4, "desc"]], //no colocar ordenamiento
           //serverSide: true, //Lado servidor activar o no mas de 20000 registros

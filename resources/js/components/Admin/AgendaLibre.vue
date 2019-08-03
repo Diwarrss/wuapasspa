@@ -232,7 +232,7 @@ export default {
             url: "/jsonDTIdioma.json"
           },
           processing: true,
-          lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+          lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
           responsive: true,
           order: [], //no colocar ordenamiento
           //"order": [[ 0, "asc" ]],
