@@ -208,6 +208,12 @@
               <span>Buzón</span>
             </router-link>
           </li>
+          <li>
+            <router-link to="/empleados" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
+              <i class="fas fa-user-tie text-white"></i>
+              <span>Empleados</span>
+            </router-link>
+          </li>
           <li class="header text-center">
             <i class="fas fa-wrench"></i> Configuración
           </li>

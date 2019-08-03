@@ -18,12 +18,15 @@
     </section>
     <div class="content">
       <div class="row">
-        <div class="col-md-6 col-lg-3 col-xs-12">
+        <div class="col-md-6 col-lg-3 col-xs-12" v-if="dataCajaDiv.length > 0">
           <div class="small-box bg-green">
-            <div class="inner" v-if="dataCajaDiv.length > 0">
+            <div class="inner">
               <h3>${{formatearValor(parseInt(dataCajaDiv[0].valor_inicial) + parseInt(dataCajaDiv[0].valor_producido) )}}</h3>
 
-              <p>Total Actual de la Caja = ${{formatearValor(totalFacturadoHoy)}} - (${{formatearValor(totalGastosFact)}} + ${{formatearValor(totalPagosNominahoy)}})</p>
+              <p>
+                Total Actual de la Caja
+                <!--  = ${{formatearValor(totalFacturadoHoy)}} - (${{formatearValor(totalGastosFact)}} + ${{formatearValor(totalPagosNominahoy)}}) -->
+              </p>
             </div>
             <div class="icon">
               <i class="fas fa-hand-holding-usd"></i>

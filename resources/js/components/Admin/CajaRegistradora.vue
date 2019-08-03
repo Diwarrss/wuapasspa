@@ -861,7 +861,7 @@ export default {
             toast: true,
             position: "top-end",
             type: "success",
-            title: "Empleado creado con éxito",
+            title: "Caja creada con éxito",
             showConfirmButton: false,
             timer: 2500
           });

@@ -1106,9 +1106,9 @@
             }
         },
         mounted() {
-            this.rol();
-            this.verPerfil();
             this.listarServicios();
+            this.rol();
+            this.verPerfil();            
             this.listarImagenes();
             this.listarCategorias();
             this.showCategoriaActivas();

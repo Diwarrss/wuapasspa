@@ -382,6 +382,10 @@ export default {
               id_movimiento: me.id_movimiento
             }) //le envio el parametro completo
             .then(function(response) {
+              jQuery("#tablaHistorialFacturas")
+                .DataTable()
+                .ajax.reload(null, false);
+              me.cerrarModalAnular();
               Swal.fire({
                 toast: true,
                 position: "top-end",
@@ -389,11 +393,6 @@ export default {
                 title: "Factura Anulada con éxito!",
                 showConfirmButton: false,
                 timer: 2500
-              }).then(function() {
-                jQuery("#tablaHistorialFacturas")
-                  .DataTable()
-                  .ajax.reload(null, false);
-                me.cerrarModalAnular();
               });
               //console.log(response);
             })
