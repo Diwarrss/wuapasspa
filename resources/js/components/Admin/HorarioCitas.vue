@@ -174,11 +174,12 @@ export default {
         .then(function(response) {
           //mesaje exito y lo redirecciona a la pagina de la solicitudes hechas
           Swal.fire({
+            toast: true,
             position: "top-end",
             title: "Solicitud Reservada con éxito!",
             type: "success",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           // .then(function(){
           //     window.location.href = "/admin";

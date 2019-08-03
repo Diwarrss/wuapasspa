@@ -9,12 +9,13 @@ use App\Nomina;
 use Illuminate\Support\Facades\Auth;
 use App\Movimiento;
 use App\Caja;
+use Carbon\Carbon;
 
 class NominaController extends Controller
 {
     public function listarEmpleadosNomina(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
         $empleadosNomina = DetalleFactura::join('users as empleado', 'detalle_facturas.empleado_id', '=', 'empleado.id')
             ->join('facturas', 'facturas.id', '=', 'detalle_facturas.facturas_id')
             ->select(
@@ -172,5 +173,17 @@ class NominaController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
         }
+    }
+
+    public function totalPagosDiario(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+
+        $fechahoy = Carbon::now()->format('Y-m-d');
+
+        $cont = Nomina::where([['estado_nomina', 1], ['created_at', 'like', '%' . $fechahoy . '%']])
+            ->sum('valor_pagado');
+
+        return $cont;
     }
 }

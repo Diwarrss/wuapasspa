@@ -1186,6 +1186,7 @@ export default {
       let me = this;
       if (me.id_caja == 0) {
         Swal.fire({
+          toast: true,
           position: "top-end",
           title: "El Usuario actual no tiene Caja Registradora!",
           type: "error",
@@ -1210,15 +1211,16 @@ export default {
             id_caja: me.id_caja
           })
           .then(function(response) {
+            me.cerrarModalPago();
+            me.regresar();
+
             Swal.fire({
+              toast: true,
               position: "top-end",
               title: "Cargos Facturados con éxito!",
               type: "success",
               showConfirmButton: false,
-              timer: 1500
-            }).then(function() {
-              me.cerrarModalPago();
-              me.regresar();
+              timer: 2000
             });
             //console.log(response);
           })
@@ -1356,11 +1358,12 @@ export default {
                   })
                   .then(function(response) {
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "success",
                       title: "Facturación Cancelada!",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                     jQuery("#tablaFacturacion")
                       .DataTable()
@@ -1370,11 +1373,12 @@ export default {
                     if (error.response.status == 422) {
                       //preguntamos si el error es 422
                       Swal.fire({
+                        toast: true,
                         position: "top-end",
                         type: "error",
                         title: "Se produjo un Error, Reintentar",
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 2500
                       });
                     }
                     console.log(error.response.data.errors);
@@ -1401,11 +1405,12 @@ export default {
                   })
                   .then(function(response) {
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "success",
                       title: "Facturación Cancelada!",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                     jQuery("#tablaFacturacion")
                       .DataTable()
@@ -1415,11 +1420,12 @@ export default {
                     if (error.response.status == 422) {
                       //preguntamos si el error es 422
                       Swal.fire({
+                        toast: true,
                         position: "top-end",
                         type: "error",
                         title: "Se produjo un Error, Reintentar",
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 2500
                       });
                     }
                     console.log(error.response.data.errors);
@@ -1487,11 +1493,12 @@ export default {
             valor_servicio: datos.valor_servicio
           });
           Swal.fire({
+            toast: true,
             position: "top-end",
             title: "Agregado con éxito!",
             type: "success",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
         });
       });
@@ -1510,11 +1517,12 @@ export default {
       let me = this;
       me.informacionFacturar.splice(index, 1); //se usa el metodo splice para borrar el index
       /*Swal.fire({
+        toast:true,
         position: "top-end",
         title: "Eliminado con éxito!",
         type: "success",
         showConfirmButton: false,
-        timer: 1500
+        timer: 2500
       });*/
     },
     eliminarDetalleAnonimo(index) {
@@ -1574,11 +1582,12 @@ export default {
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({
+                toast: true,
                 position: "top-end",
                 type: "success",
                 title: "Factura Anulada con éxito!",
                 showConfirmButton: false,
-                timer: 1500
+                timer: 2500
               }).then(function() {
                 jQuery("#tablaFacturasDiarias")
                   .DataTable()
@@ -1629,17 +1638,17 @@ export default {
               descripcion_gasto: me.descripcion_gasto
             }) //le envio el parametro completo
             .then(function(response) {
+              jQuery("#tablaGastosDiarios")
+                .DataTable()
+                .ajax.reload();
+              me.cerrarModalFactGastos();
               Swal.fire({
+                toast: true,
                 position: "top-end",
                 type: "success",
                 title: "Factura generada con éxito!",
                 showConfirmButton: false,
-                timer: 1500
-              }).then(function() {
-                jQuery("#tablaGastosDiarios")
-                  .DataTable()
-                  .ajax.reload();
-                me.cerrarModalFactGastos();
+                timer: 2500
               });
               //console.log(response);
             })

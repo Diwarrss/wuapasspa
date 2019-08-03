@@ -161,7 +161,7 @@ class CajaController extends Controller
 
     public function infoCajaDiv(Request $request)
     {
-        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         //creamos la consulta de traer la caja para el empleado que este logueado y que la caja este activa too
         $caja = Caja::where([

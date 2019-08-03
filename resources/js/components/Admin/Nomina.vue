@@ -620,23 +620,23 @@ export default {
               motivo_anulacion: me.motivo_anulacion
             }) //le envio el parametro completo
             .then(function(response) {
+              //actualizamos las tablas
+              jQuery("#tablaNomina")
+                .DataTable()
+                .ajax.reload();
+              me.cerrarModalNomina();
+              jQuery("#tablaTotalNominas")
+                .DataTable()
+                .ajax.reload(null, false);
+              me.motivo_anulacion = "";
               Swal.fire({
+                toast: true,
                 position: "top-end",
                 type: "success",
                 title: "Pago Anulado con éxito!",
                 showConfirmButton: false,
-                timer: 1500
-              }).then(function() {
-                //actualizamos las tablas
-                jQuery("#tablaNomina")
-                  .DataTable()
-                  .ajax.reload();
-                me.cerrarModalNomina();
-                jQuery("#tablaTotalNominas")
-                  .DataTable()
-                  .ajax.reload(null, false);
-                me.motivo_anulacion = "";
-              });
+                timer: 2500
+              }).then(function() {});
               //console.log(response);
             })
             .catch(function(error) {
@@ -676,20 +676,20 @@ export default {
               valor_total_servicios: me.valor_total_servicios
             }) //le envio el parametro completo
             .then(function(response) {
+              jQuery("#tablaNomina")
+                .DataTable()
+                .ajax.reload(null, false);
+              me.cerrarModalNomina();
+              jQuery("#tablaTotalNominas")
+                .DataTable()
+                .ajax.reload();
               Swal.fire({
+                toast: true,
                 position: "top-end",
                 type: "success",
                 title: "Pago registrado con éxito!",
                 showConfirmButton: false,
-                timer: 1500
-              }).then(function() {
-                jQuery("#tablaNomina")
-                  .DataTable()
-                  .ajax.reload(null, false);
-                me.cerrarModalNomina();
-                jQuery("#tablaTotalNominas")
-                  .DataTable()
-                  .ajax.reload();
+                timer: 2500
               });
               //console.log(response);
             })

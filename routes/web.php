@@ -142,6 +142,9 @@ Route::group(['middleware' => 'auth'], function () {
 
         //para todo lo del Dashboard
         Route::get('/contarClientes', 'UserController@contarClientes')->name('contarClientes');
+        Route::get('/totalGastosDiarios', 'MovimientosController@totalGastosDiarios')->name('totalGastosDiarios');
+        Route::get('/totalFacturadoDiario', 'FacturaController@totalFacturadoDiario')->name('totalFacturadoDiario');
+        Route::get('/totalPagosDiario', 'NominaController@totalPagosDiario')->name('totalPagosDiario');
     });
 
     //middleware que solo permite acceso a agendador

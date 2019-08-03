@@ -387,11 +387,12 @@ export default {
             .ajax.reload();
           me.cerrarModal();
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Cliente creado con éxito",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           //console.log(response);
         })
@@ -433,11 +434,12 @@ export default {
             .ajax.reload(null, false);
           me.cerrarModal();
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Cliente actualizado",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           console.log(response);
         })

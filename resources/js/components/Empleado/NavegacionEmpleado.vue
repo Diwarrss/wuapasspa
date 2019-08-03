@@ -26,20 +26,20 @@
         <ul class="sidebar-menu" data-widget="tree">
           <li class="header text-center">Menú Principal</li>
           <li>
-            <router-link to="/miAgenda" data-toggle="push-menu">
+            <router-link to="/miAgenda" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fas fa-hourglass-half"></i>
               <span>Mi Agenda</span>
             </router-link>
           </li>
           <li>
-            <router-link to="/misAtenciones" data-toggle="push-menu">
+            <router-link to="/misAtenciones" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="far fa-calendar-alt"></i>
               <span>Mis Atenciones</span>
             </router-link>
           </li>
           <li class="header text-center">Configuración</li>
           <li>
-            <router-link to="/miperfil" data-toggle="push-menu">
+            <router-link to="/miperfil" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fa fa-address-card text-white" aria-hidden="true"></i>
               <span>Mi Perfil</span>
             </router-link>
@@ -79,9 +79,24 @@ export default {
         .finally(function() {
           // always executed
         });
+    },
+    //optenemos el tamaño pantalla que nos envia this.$nextTick
+    getWindowWidth(event) {
+      this.windowWidth = document.documentElement.clientWidth;
+      /*  console.log(this.windowWidth); */
+    },
+    //destruir el objeto getWindowWidth
+    beforeDestroy() {
+      window.removeEventListener("resize", this.getWindowWidth);
     }
   },
   mounted() {
+    //lanza el evento
+    this.$nextTick(function() {
+      window.addEventListener("resize", this.getWindowWidth);
+      //Init
+      this.getWindowWidth();
+    });
     this.verPerfil();
   }
 };

@@ -295,7 +295,7 @@
                             title: 'Solicitud Reservada con éxito!',
                             type: 'success',
                             showConfirmButton: false,
-                            timer: 1500
+                            timer: 2500
                         });
                         // .then(function(){
                         //     window.location.href = "/admin";
@@ -400,7 +400,7 @@
                                         type: 'success',
                                         title: 'Solicitud Cancelada!',
                                         showConfirmButton: false,
-                                        timer: 1500
+                                        timer: 2500
                                     });
                                         data.cantidadSolicitudes();//refrescar datos de cantidad
                                         //data.cantidadAgendadas();
@@ -413,7 +413,7 @@
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);
@@ -491,18 +491,20 @@
                                 axios.put('/cancelarReservaciones', {
                                     id: me.id
                                 }).then(function (response) {
-                                    Swal.fire({
-                                        position: 'top-end',
-                                        type: 'success',
-                                        title: 'Cita Cancelada!',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                        data.listarReservaciones();//refrescar todos los datos
+                                    data.listarReservaciones();//refrescar todos los datos
                                         data.cantidadSolicitudes();//refrescar datos de cantidad
                                         //data.cantidadAgendadas();
                                         jQuery('#tablaPendientes').DataTable().ajax.reload();//refrestcar la tabla de pendientes
                                         jQuery('#tablaAgendadas').DataTable().ajax.reload();
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        type: 'success',
+                                        title: 'Cita Cancelada!',
+                                        showConfirmButton: false,
+                                        timer: 2500
+                                    });
+                                        
                                 })
                                 .catch(function (error) {
                                     if (error.response.status == 422) {//preguntamos si el error es 422
@@ -511,7 +513,7 @@
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);
@@ -554,7 +556,7 @@
                                         type: 'success',
                                         title: 'Atendido!',
                                         showConfirmButton: false,
-                                        timer: 1500
+                                        timer: 2500
                                     });
                                         data.listarReservaciones();//refrescar todos los datos
                                         data.cantidadSolicitudes();//refrescar datos de cantidad
@@ -569,7 +571,7 @@
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);
@@ -612,7 +614,7 @@
                                         type: 'success',
                                         title: 'No Asistió!',
                                         showConfirmButton: false,
-                                        timer: 1500
+                                        timer: 2500
                                     });
                                         //data.cantidadAgendadas();
                                         jQuery('#tablaAgendadas').DataTable().ajax.reload();
@@ -627,7 +629,7 @@
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);
@@ -670,7 +672,7 @@
                                         type: 'success',
                                         title: 'Confirmada!',
                                         showConfirmButton: false,
-                                        timer: 1500
+                                        timer: 2500
                                     });
                                         jQuery('#tablaPendientes').DataTable().ajax.reload();//refrestcar la tabla de pendientes
                                         jQuery('#tablaAgendadas').DataTable().ajax.reload(null,false);
@@ -685,7 +687,7 @@
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);

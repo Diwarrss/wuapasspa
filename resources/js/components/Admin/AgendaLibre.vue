@@ -216,6 +216,7 @@ export default {
           //console.log(response.data);
           data.empleados = response.data;
           data.idEmpleadoElegido = data.empleados[0].id;
+          data.nombreEmpleado = data.empleados[0].nombre;
         })
         .catch(function(error) {
           // handle error
@@ -336,11 +337,12 @@ export default {
                 })
                 .then(function(response) {
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "success",
                     title: "Atendido!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500
                   });
                   //codigo para solo actualizar la fila que se esta llamando
                   jQuery("#tablaAgendasL")
@@ -352,11 +354,12 @@ export default {
                   if (error.response.status == 422) {
                     //preguntamos si el error es 422
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "error",
                       title: "Se produjo un Error, Reintentar",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                   }
                   console.log(error.response.data.errors);
@@ -394,11 +397,12 @@ export default {
                 })
                 .then(function(response) {
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "success",
                     title: "No Asistió!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500
                   });
                   jQuery("#tablaAgendasL")
                     .DataTable()
@@ -409,11 +413,12 @@ export default {
                   if (error.response.status == 422) {
                     //preguntamos si el error es 422
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "error",
                       title: "Se produjo un Error, Reintentar",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                   }
                   console.log(error.response.data.errors);
@@ -452,11 +457,12 @@ export default {
                 })
                 .then(function(response) {
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "success",
                     title: "Cita Cancelada!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500
                   });
                   //data.cantidadAgendadas();
                   jQuery("#tablaAgendasL")
@@ -468,11 +474,12 @@ export default {
                   if (error.response.status == 422) {
                     //preguntamos si el error es 422
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "error",
                       title: "Se produjo un Error, Reintentar",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                   }
                   console.log(error.response.data.errors);
@@ -500,11 +507,12 @@ export default {
         .then(function(response) {
           //mesaje exito y lo redirecciona a la pagina de la solicitudes hechas
           Swal.fire({
+            toast: true,
             position: "top-end",
             title: "Solicitud Reservada con éxito!",
             type: "success",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           // .then(function(){
           //     window.location.href = "/admin";
@@ -561,7 +569,14 @@ export default {
                 id: event.id
               })
               .then(function(response) {
-                Swal.fire("Cita Cancelada!", "", "success");
+                Swal.fire({
+                  toast: true,
+                  position: "top-end",
+                  title: "Cita Cancelada!",
+                  type: "success",
+                  showConfirmButton: false,
+                  timer: 2500
+                });
                 jQuery("#tablaAgendasL")
                   .DataTable()
                   .ajax.reload();

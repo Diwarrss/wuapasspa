@@ -383,11 +383,12 @@ export default {
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({
+                toast: true,
                 position: "top-end",
                 type: "success",
                 title: "Factura Anulada con éxito!",
                 showConfirmButton: false,
-                timer: 1500
+                timer: 2500
               }).then(function() {
                 jQuery("#tablaHistorialFacturas")
                   .DataTable()

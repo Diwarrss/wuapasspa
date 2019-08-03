@@ -322,10 +322,12 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="valorATransferir" class="col-sm-4 control-label hidden-xs">Valor</label>
-                  <div class="col-sm-8 col-xs-12">
+                  <label for="valorATransferir" class="col-sm-4 control-label hidden-xs">
+                    <i class="far fa-money-bill-alt"></i> Valor
+                  </label>
+                  <div class="col-sm-6">
                     <money
-                      class="form-control input-md"
+                      class="form-control"
                       v-bind="money"
                       v-model="valorATransferir"
                     >{{valorATransferir}}</money>
@@ -732,15 +734,17 @@ export default {
                     .ajax.reload(null, false);
                   me.infoCajaDiv();
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "success",
                     title: "Transferencia Realizada y Confirmada!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500
                   });
                 })
                 .catch(function(error) {
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "error",
                     title: "El valor a transferir ya no esta disponible",
@@ -792,11 +796,12 @@ export default {
             }) //le envio el parametro completo
             .then(function(response) {
               Swal.fire({
+                toast: true,
                 position: "top-end",
                 type: "success",
                 title: "Transferencia Anulada con éxito!",
                 showConfirmButton: false,
-                timer: 1500
+                timer: 2500
               }).then(function() {
                 //actualizamos las tablas
                 jQuery("#tablaTransferencias")
@@ -813,6 +818,7 @@ export default {
                 me.arrayErrors = error.response.data.errors; //guardamos la respuesta del server de errores en el array arrayErrors
               } else {
                 Swal.fire({
+                  toast: true,
                   position: "top-end",
                   type: "error",
                   title:
@@ -852,11 +858,12 @@ export default {
           data.infoCajaDiv();
           data.cajasListTranferencias();
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Empleado creado con éxito",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           //console.log(response);
         })
@@ -888,11 +895,12 @@ export default {
           data.infoCajaDiv();
           data.cerrarModal();
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Transferencia Solicitada con Exito",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           //console.log(response);
         })
@@ -933,11 +941,12 @@ export default {
           me.infoCajaDiv();
           me.cerrarModal();
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Empleado actualizado",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2500
           });
           console.log(response);
         })

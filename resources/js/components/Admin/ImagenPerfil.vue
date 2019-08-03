@@ -92,11 +92,12 @@ export default {
         .post("/updateImagen", datosFormulario) //le envio el parametro completo
         .then(function(response) {
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Imagen Actualizada!",
             showConfirmButton: false,
-            timer: 1500
+            timer: 2000
           }).then(function() {
             document.location.reload(true);
           });

@@ -552,15 +552,15 @@
                     empresa : data.arrayEmpresa[0]
                     })
                     .then(function (response) {
+                        $("[data-dismiss=modal]").trigger({ type: "click" });
+                        data.arrayErrors = [];
                         Swal.fire({
+                            toast: true,
                             position: 'top-end',
                             type: 'success',
                             title: 'Perfil actualizado!',
                             showConfirmButton: false,
-                            timer: 1500
-                        }).then(function(){
-                            $("[data-dismiss=modal]").trigger({ type: "click" });
-                            data.arrayErrors = [];
+                            timer: 2500
                         });
                         //console.log(response);
                     })
@@ -602,15 +602,14 @@
 
                 axios.post('/updateImagenEmpresa', datosFormulario)//le envio el parametro completo
                     .then(function (response) {
+                        data.verPerfil();
                         Swal.fire({
+                            toast: true,
                             position: 'top-end',
                             type: 'success',
                             title: 'Imagen Actualizada!',
                             showConfirmButton: false,
-                            timer: 1500
-                        }).then(function(){
-                            data.verPerfil();//para solo taerme datos actualizados
-                            //document.location.reload(true);
+                            timer: 2500
                         });
                         //console.log(response);
                     })
@@ -630,15 +629,15 @@
 
                 axios.post('/saveImagen', fileCargada)//le envio el parametro completo
                     .then(function (response) {
+                        jQuery('#tablaImagenes').DataTable().ajax.reload();
+                            me.cerrarModalImagen();
                         Swal.fire({
+                            toast: true,
                             position: 'top-end',
                             type: 'success',
                             title: 'Imagen Cargada con éxito!',
                             showConfirmButton: false,
-                            timer: 1500
-                        }).then(function(){
-                            jQuery('#tablaImagenes').DataTable().ajax.reload();
-                            me.cerrarModalImagen();
+                            timer: 2500
                         });
                         //console.log(response);
                     })
@@ -660,16 +659,16 @@
 
                 axios.post('/crearCategoria', fileCargada)//le envio el parametro completo
                     .then(function (response) {
+                        jQuery('#tablaCategorias').DataTable().ajax.reload();
+                            me.cerrarModalCategorias();
+                            me.showCategoriaActivas();
                         Swal.fire({
+                            toast: true,
                             position: 'top-end',
                             type: 'success',
                             title: 'Categoria creada con éxito!',
                             showConfirmButton: false,
-                            timer: 1500
-                        }).then(function(){
-                            jQuery('#tablaCategorias').DataTable().ajax.reload();
-                            me.cerrarModalCategorias();
-                            me.showCategoriaActivas();
+                            timer: 2500
                         });
                         //console.log(response);
                     })
@@ -699,16 +698,15 @@
                 axios.post('/crearServicio', fileCargada)
                 .then(function (response) {
                     //para actualizar la tabla de datatables
-
+                        jQuery('#tablaServicios').DataTable().ajax.reload();
+                        me.cerrarModal();
                     Swal.fire({
+                        toast: true,
                         position: 'top-end',
                         type: 'success',
                         title: 'Servicio creado con éxito',
                         showConfirmButton: false,
-                        timer: 1500
-                    }).then(function(){
-                        jQuery('#tablaServicios').DataTable().ajax.reload();
-                        me.cerrarModal();
+                        timer: 2500
                     });
                     //console.log(response);
                 })
@@ -832,16 +830,16 @@
 
                 axios.post('/updateCategoria', fileCargada)//le envio el parametro completo
                     .then(function (response) {
+                        jQuery('#tablaCategorias').DataTable().ajax.reload(null,false);
+                            me.cerrarModalCategorias();
+                            me.showCategoriaActivas();
                         Swal.fire({
+                            toast: true,
                             position: 'top-end',
                             type: 'success',
                             title: 'Categoria actualizada!',
                             showConfirmButton: false,
-                            timer: 1500
-                        }).then(function(){
-                            jQuery('#tablaCategorias').DataTable().ajax.reload(null,false);
-                            me.cerrarModalCategorias();
-                            me.showCategoriaActivas();
+                            timer: 2500
                         });
                         //console.log(fileCargada);
                     })
@@ -971,15 +969,15 @@
                 axios.post('/actualizarServicio', fileCargada)
                 .then(function (response) {
                     //para actualizar la tabla de datatables
+                    jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
+                        me.cerrarModal();
                     Swal.fire({
+                        toast: true,
                         position: 'top-end',
                         type: 'success',
                         title: 'Servicio actualizado!',
                         showConfirmButton: false,
-                        timer: 1500
-                    }).then(function(){
-                        jQuery('#tablaServicios').DataTable().ajax.reload(null,false);
-                        me.cerrarModal();
+                        timer: 2500
                     });
                     console.log(response);
                 })
@@ -1044,23 +1042,25 @@
                                     id: me.idImagen,
                                     url_imagen: me.url_imagen
                                 }).then(function (response) {
+                                    jQuery('#tablaImagenes').DataTable().ajax.reload(null,false);
                                     Swal.fire({
+                                        toast: true,
                                         position: 'top-end',
                                         type: 'success',
                                         title: 'Imagen Eliminada!',
                                         showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                        jQuery('#tablaImagenes').DataTable().ajax.reload(null,false);
+                                        timer: 2500
+                                    });                                        
                                 })
                                 .catch(function (error) {
                                     if (error.response.status == 422) {//preguntamos si el error es 422
                                         Swal.fire({
+                                            toast: true,
                                             position: 'top-end',
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);

@@ -394,15 +394,15 @@ export default {
           estado_usuario: me.estado_usuario
         })
         .then(function(response) {
+          $("[data-dismiss=modal]").trigger({ type: "click" });
+          me.arrayErrors = [];
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Perfil actualizado!",
             showConfirmButton: false,
-            timer: 1500
-          }).then(function() {
-            $("[data-dismiss=modal]").trigger({ type: "click" });
-            me.arrayErrors = [];
+            timer: 2500
           });
           //console.log(response);
         })
@@ -433,16 +433,16 @@ export default {
           password2: me.password2
         })
         .then(function(response) {
+          me.password = "";
+          me.password2 = "";
+          me.arrayErrors = [];
           Swal.fire({
+            toast: true,
             position: "top-end",
             type: "success",
             title: "Contraseña actualizada!",
             showConfirmButton: false,
-            timer: 1500
-          }).then(function() {
-            me.password = "";
-            me.password2 = "";
-            me.arrayErrors = [];
+            timer: 2500
           });
           //console.log(response);
         })

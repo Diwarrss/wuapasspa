@@ -25,7 +25,7 @@
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu" data-widget="tree">
           <li>
-            <router-link to="/dashboard" data-toggle="push-menu">
+            <router-link to="/dashboard" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fas fa-tachometer-alt text-red"></i>
               <span>Escritorio</span>
             </router-link>
@@ -34,7 +34,7 @@
             <i class="fas fa-home"></i> Menú Principal
           </li>
           <li>
-            <router-link to="/" data-toggle="push-menu">
+            <router-link to="/" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fas fa-calendar-alt text-white"></i>
               <span>Solicitudes</span>
               <span class="pull-right-container">
@@ -52,17 +52,17 @@
             </a>
             <ul class="treeview-menu">
               <li>
-                <router-link to="/horarioCitas" data-toggle="push-menu">
+                <router-link to="/horarioCitas" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="fas fa-user-clock text-green"></i> Horarios
                 </router-link>
               </li>
               <li>
-                <router-link to="/agendaLibre" data-toggle="push-menu">
+                <router-link to="/agendaLibre" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="far fa-calendar-plus text-green"></i> Agendar Libre
                 </router-link>
               </li>
               <li>
-                <router-link to="/agendaEnEspera" data-toggle="push-menu">
+                <router-link to="/agendaEnEspera" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="fas fa-hourglass-half text-green"></i> En Espera
                 </router-link>
               </li>
@@ -78,13 +78,13 @@
             </a>
             <ul class="treeview-menu">
               <li>
-                <router-link to="/clientes" data-toggle="push-menu">
+                <router-link to="/clientes" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="fa fa-users text-green" aria-hidden="true"></i>
                   <span>Mis Clientes</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/agendaCumple" data-toggle="push-menu">
+                <router-link to="/agendaCumple" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="fas fa-birthday-cake text-green"></i>
                   <span>Cumpleaños</span>
                 </router-link>
@@ -101,31 +101,43 @@
             </a>
             <ul class="treeview-menu">
               <li>
-                <router-link to="/cajaRegistradora" data-toggle="push-menu">
+                <router-link
+                  to="/cajaRegistradora"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-cash-register text-green"></i>
                   <span>Caja Registradora</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/facturarAtencion" data-toggle="push-menu">
+                <router-link
+                  to="/facturarAtencion"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-file-invoice-dollar text-green"></i>
                   <span>Facturar Atención</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/historialFacturas" data-toggle="push-menu">
+                <router-link
+                  to="/historialFacturas"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-file-invoice text-green"></i>
                   <span>Historial Facturas</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/historialGastos" data-toggle="push-menu">
+                <router-link
+                  to="/historialGastos"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-history text-green"></i>
                   <span>Historial Gastos</span>
                 </router-link>
               </li>
               <li>
-                <router-link to="/nomina" data-toggle="push-menu">
+                <router-link to="/nomina" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="fas fa-university text-green"></i>
                   <span>Nómina</span>
                 </router-link>
@@ -142,37 +154,55 @@
             </a>
             <ul class="treeview-menu">
               <li>
-                <router-link to="/reportCitas" data-toggle="push-menu">
+                <router-link to="/reportCitas" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
                   <i class="fas fa-chart-line text-green"></i> Citas por Mes
                 </router-link>
               </li>
               <li>
-                <router-link to="/reportEmpleados" data-toggle="push-menu">
+                <router-link
+                  to="/reportEmpleados"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-chart-area text-green"></i> Citas por Empleados
                 </router-link>
               </li>
               <li>
-                <router-link to="/reportServicios" data-toggle="push-menu">
+                <router-link
+                  to="/reportServicios"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="far fa-chart-bar text-green"></i> Servicios Frecuentes
                 </router-link>
               </li>
               <li>
-                <router-link to="/reportAgendalibre" data-toggle="push-menu">
+                <router-link
+                  to="/reportAgendalibre"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-user-plus text-green"></i> Agendas Libres
                 </router-link>
               </li>
               <li>
-                <router-link to="/agendaAtendidos" data-toggle="push-menu">
+                <router-link
+                  to="/agendaAtendidos"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="fas fa-calendar-check text-green"></i> Atendidos
                 </router-link>
               </li>
               <li>
-                <router-link to="/agendaNoAsistio" data-toggle="push-menu">
+                <router-link
+                  to="/agendaNoAsistio"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="far fa-calendar-minus text-green"></i> No Asistieron
                 </router-link>
               </li>
               <li>
-                <router-link to="/agendaCancelaron" data-toggle="push-menu">
+                <router-link
+                  to="/agendaCancelaron"
+                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
+                >
                   <i class="far fa-calendar-times text-green"></i> Cancelaron
                 </router-link>
               </li>
@@ -182,19 +212,19 @@
             <i class="fas fa-tools"></i> Administración
           </li>
           <li>
-            <router-link to="/buzonSugerencias" data-toggle="push-menu">
+            <router-link to="/buzonSugerencias" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fas fa-mail-bulk"></i>
               <span>Buzón</span>
             </router-link>
           </li>
           <li>
-            <router-link to="/empleados" data-toggle="push-menu">
+            <router-link to="/empleados" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fas fa-user-tie text-white"></i>
               <span>Empleados</span>
             </router-link>
           </li>
           <li>
-            <router-link to="/roles" data-toggle="push-menu">
+            <router-link to="/roles" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fas fa-user-cog text-white"></i>
               <span>Roles</span>
             </router-link>
@@ -203,13 +233,13 @@
             <i class="fas fa-wrench"></i> Configuración
           </li>
           <li>
-            <router-link to="/miperfil" data-toggle="push-menu">
+            <router-link to="/miperfil" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fa fa-address-card text-white" aria-hidden="true"></i>
               <span>Mi Perfil</span>
             </router-link>
           </li>
           <li>
-            <router-link to="/mipagina" data-toggle="push-menu">
+            <router-link to="/mipagina" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fab fa-chrome text-white"></i>
               <span>Página Web</span>
             </router-link>
@@ -229,7 +259,8 @@ export default {
       imagen: "",
       nombres: "",
       estado_usuario: 1,
-      rol_user: ""
+      rol_user: "",
+      windowWidth: 0
     };
   },
   methods: {
@@ -267,9 +298,25 @@ export default {
         .finally(function() {
           // always executed
         });
+    },
+    //optenemos el tamaño pantalla que nos envia this.$nextTick
+    getWindowWidth(event) {
+      this.windowWidth = document.documentElement.clientWidth;
+      /*  console.log(this.windowWidth); */
+    },
+    //destruir el objeto getWindowWidth
+    beforeDestroy() {
+      window.removeEventListener("resize", this.getWindowWidth);
     }
   },
   mounted() {
+    //lanza el evento
+    this.$nextTick(function() {
+      window.addEventListener("resize", this.getWindowWidth);
+      //Init
+      this.getWindowWidth();
+    });
+
     this.verPerfil();
     this.cantidadSolicitudes();
   }

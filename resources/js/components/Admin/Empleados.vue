@@ -289,22 +289,24 @@
                                     estado_usuario: 2
                                 }).then(function (response) {
                                     Swal.fire({
+                                        toast:true,
                                         position: 'top-end',
                                         type: 'success',
                                         title: 'Empleado Desactivado!',
                                         showConfirmButton: false,
-                                        timer: 1500
+                                        timer: 2500
                                     });
                                         jQuery('#tablaEmpleados').DataTable().ajax.reload(null,false);
                                 })
                                 .catch(function (error) {
                                     if (error.response.status == 422) {//preguntamos si el error es 422
                                         Swal.fire({
+                                            toast:true,
                                             position: 'top-end',
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);
@@ -340,22 +342,24 @@
                                     estado_usuario: 1
                                 }).then(function (response) {
                                     Swal.fire({
+                                        toast:true,
                                         position: 'top-end',
                                         type: 'success',
                                         title: 'Empleado Activado!',
                                         showConfirmButton: false,
-                                        timer: 1500
+                                        timer: 2500
                                     });
                                         jQuery('#tablaEmpleados').DataTable().ajax.reload(null,false);
                                 })
                                 .catch(function (error) {
                                     if (error.response.status == 422) {//preguntamos si el error es 422
                                         Swal.fire({
+                                            toast:true,
                                             position: 'top-end',
                                             type: 'error',
                                             title: 'Se produjo un Error, Reintentar',
                                             showConfirmButton: false,
-                                            timer: 1500
+                                            timer: 2500
                                         });
                                     }
                                     console.log(error.response.data.errors);
@@ -390,11 +394,12 @@
                     jQuery('#tablaEmpleados').DataTable().ajax.reload();
                     me.cerrarModal();
                     Swal.fire({
+                        toast:true,
                         position: 'top-end',
                         type: 'success',
                         title: 'Empleado creado con éxito',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 2500
                     });
                     //console.log(response);
                 })
@@ -432,11 +437,12 @@
                     jQuery('#tablaEmpleados').DataTable().ajax.reload(null,false);
                     me.cerrarModal();
                     Swal.fire({
+                        toast:true,
                         position: 'top-end',
                         type: 'success',
                         title: 'Empleado actualizado',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 2500
                     });
                     console.log(response);
                 })

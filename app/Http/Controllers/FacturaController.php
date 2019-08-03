@@ -468,4 +468,16 @@ class FacturaController extends Controller
 
         return $factura;
     }
+
+    public function totalFacturadoDiario(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+
+        $fechahoy = Carbon::now()->format('Y-m-d');
+
+        $cont = Factura::where([['estado_factura', 1], ['created_at', 'like', '%' . $fechahoy . '%']])
+            ->sum('valor_total');
+
+        return $cont;
+    }
 }

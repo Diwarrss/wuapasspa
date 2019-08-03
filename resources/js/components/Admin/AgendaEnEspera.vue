@@ -146,11 +146,12 @@ export default {
                 })
                 .then(function(response) {
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "success",
                     title: "Atendido!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500
                   });
                   jQuery("#tablaEspera")
                     .DataTable()
@@ -160,11 +161,12 @@ export default {
                   if (error.response.status == 422) {
                     //preguntamos si el error es 422
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "error",
                       title: "Se produjo un Error, Reintentar",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                   }
                   console.log(error.response.data.errors);
@@ -205,11 +207,12 @@ export default {
                 })
                 .then(function(response) {
                   Swal.fire({
+                    toast: true,
                     position: "top-end",
                     type: "success",
                     title: "No Asistió!",
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500
                   });
                   jQuery("#tablaEspera")
                     .DataTable()
@@ -219,11 +222,12 @@ export default {
                   if (error.response.status == 422) {
                     //preguntamos si el error es 422
                     Swal.fire({
+                      toast: true,
                       position: "top-end",
                       type: "error",
                       title: "Se produjo un Error, Reintentar",
                       showConfirmButton: false,
-                      timer: 1500
+                      timer: 2500
                     });
                   }
                   console.log(error.response.data.errors);
