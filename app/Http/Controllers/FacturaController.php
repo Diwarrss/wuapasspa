@@ -50,7 +50,7 @@ class FacturaController extends Controller
 
     public function listarFacturacionDiaria(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
+        if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
         $fechahoy = Carbon::now()->format('Y-m-d');
 
@@ -79,7 +79,7 @@ class FacturaController extends Controller
                 ['facturas.created_at', 'like', '%' . $fechahoy . '%']
             ])
             ->groupBy('detalle_facturas.facturas_id')
-            //->orderByDesc('facturas.id')
+            ->orderByDesc('facturas.created_at')
             ->get();
 
         return datatables($listarFacturar)->toJson();

@@ -819,7 +819,7 @@ export default {
           //processing: true,
           lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
           responsive: true,
-          order: [[0, "asc"]],
+          order: [],
           ////serverSide: true, //Lado servidor activar o no mas de 20000 registros
           ajax: "/listarFacturacionDiaria",
           columns: [
