@@ -36,6 +36,7 @@
                                 <thead>
                                     <tr>
                                         <th>Cliente</th>
+                                        <th>WhatsApp:</th>
                                         <th>Notas: </th>
                                         <th>Fecha Solicitada: </th>
                                         <th>Servicios: </th>
@@ -332,6 +333,10 @@
                         "ajax": "/showSolicitudesPendientes",
                         "columns": [
                                 {data:'nombre_completo'},
+                                {render: function (data, type, row) {
+                                    return '<a href="https://wa.me/57'+ row.celular +'?text=Hola, '+ row.nombre_completo +'" target="_blank" title="Enviar Mensaje"><i class="fab fa-whatsapp text-green"></i> ' + row.celular + ' <span class="label label-success"> Enviar</span></a>';
+                                    }
+                                },
                                 {data:'comentario'},
                                 {data:'fechaprobable'},
                                 {data:'nombre_servicio'},
