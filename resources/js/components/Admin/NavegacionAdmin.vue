@@ -144,6 +144,13 @@
               </li>
             </ul>
           </li>
+          <li>
+            <router-link to="/servicios" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
+              <i class="fab fa-buffer text-white"></i>
+              <span>Servicios</span>
+              <span class="pull-right-container"></span>
+            </router-link>
+          </li>
           <li class="treeview">
             <a href="#">
               <i class="fas fa-chart-pie text-white"></i>
