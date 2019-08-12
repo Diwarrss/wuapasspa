@@ -6,7 +6,7 @@
         <div class="col-md-5 mx-auto">
             <div class="text-center py-3">
                 <img src="/img/perfiles/Logo-GridSoft.png" height="35">
-            </div>            
+            </div>
             <div class="card">
                 <div class="card-body">
                     {{-- <div class="text-center py-2">
@@ -48,7 +48,7 @@
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="btn btn-block btn-primary tx-tfm mb-2">
                                     <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                                </button>                                
+                                </button>
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
@@ -69,7 +69,7 @@
                             <div class="col-md-12 text-center">
                                 <span>¿No tienes una cuenta?
                                     <a class="mb-2" href="{{ route('register') }}">Registrate</a>
-                                </span> 
+                                </span>
                             </div>
                         </div>
                     </div>
