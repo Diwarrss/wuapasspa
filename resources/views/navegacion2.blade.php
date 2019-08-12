@@ -5,8 +5,8 @@
         <span style="font-size:1.2rem; color: black;">{{$item->nombre_corto}}</span>
         @endforeach
     </a>
-    <button class="btn btn-light" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="fas fa-bars fa-2x"></i>
+    <button class="navbar-toggler btn btn-light" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars fa-2x text-dark"></i>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarCollapse">
