@@ -16,10 +16,10 @@
     <!-- Para que sea Full PWA -->
     @laravelPWA
     @if (Auth::check())
-        <script src="{{ asset('js/enable-push.js') }}" defer></script>           
+        <script src="{{ asset('js/enable-push.js') }}" defer></script>
     @endif
 </head>
-<body style="background-image: linear-gradient(to bottom, #9937ae, #843eae, #6e43ad, #5846a9, #4148a4, #3e49a6, #3b49a8, #374aaa, #4b4ab4, #604abd, #7548c5, #8a44cb); background-repeat: no-repeat; background-attachment: fixed;">
+<body style="background-image: linear-gradient(to right top, #24c2ad, #1cc9a6, #25cf9b, #38d58e, #4eda7f); background-repeat: no-repeat; background-attachment: fixed;">
     <div id="app">
         @include('navegacion2')
 
@@ -35,12 +35,12 @@
                         <div class="align-center">
                             © Copyright 2019 <a href="https://www.gridsoft.co/" target="_blank">www.gridsoft.co</a> All Rights Reserved
                         </div>
-                    </div>            
+                    </div>
                 </div>
             </div>
         </footer>
     </div>
-    
+
     <!--Importando todos los Js del webpack vue y boostrap-->
     <script src="{{asset('js/misLibrerias.js')}}"></script>
     <script src="{{ asset('js/appCliente.js') }}"></script>

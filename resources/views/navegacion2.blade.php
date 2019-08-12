@@ -1,11 +1,11 @@
-<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background:black">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background:white">
     <a class="navbar-brand font-weight-bold" href="{{asset('/')}}">
         @foreach ($logoEmpresa as $item)
         <img src="/img/perfiles/{{$item->logo_empresa}}" height="50" class="d-inline-block align-top" alt="">
-        <span style="font-size:1.2rem;">{{$item->nombre_corto}}</span>
+        <span style="font-size:1.2rem; color: black;">{{$item->nombre_corto}}</span>
         @endforeach
     </a>
-    <button class="navbar-toggler text-white btn btn-outline-info" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="btn btn-light" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <i class="fas fa-bars fa-2x"></i>
     </button>
 

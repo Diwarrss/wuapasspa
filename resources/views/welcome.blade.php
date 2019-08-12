@@ -15,9 +15,9 @@
         <link type="text/css" rel="stylesheet" href="{{asset('css/miWelcome.css')}}"/>
         <!-- Para que sea Full PWA -->
         @laravelPWA
-        
+
         @if (Auth::check())
-            <script src="{{ asset('js/enable-push.js') }}" defer></script>           
+            <script src="{{ asset('js/enable-push.js') }}" defer></script>
         @endif
     </head>
     <body>
@@ -27,7 +27,7 @@
             @include('navegacion')
             <main>
                 {{-- seccion del carousel --}}
-                <section class="carousel slide cid-ru615axhXJ" data-interval="false" id="slider2-x" style="background-image: linear-gradient(to bottom, #9937ae, #843eae, #6e43ad, #5846a9, #4148a4, #3e49a6, #3b49a8, #374aaa, #4b4ab4, #604abd, #7548c5, #8a44cb); background-repeat: no-repeat; background-attachment: fixed;">
+                <section class="carousel slide cid-ru615axhXJ" data-interval="false" id="slider2-x" style="background-image: linear-gradient(to right top, #24c2ad, #1cc9a6, #25cf9b, #38d58e, #4eda7f);">
                     @if ($errors->has('sugerencia'))
                         <div class="container">
                             <div class="alert alert-info alert-dismissible fade show" role="alert">

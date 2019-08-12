@@ -1,11 +1,11 @@
 <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-8">
-    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm" style="background:black">
+    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm" style="background:white">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
+                <span  style="background: black;"></span>
+                <span  style="background: black;"></span>
+                <span  style="background: black;"></span>
+                <span  style="background: black;"></span>
             </div>
         </button>
         <div class="menu-logo">
@@ -16,7 +16,7 @@
                         <img src="/img/perfiles/{{$item->logo_empresa}}" title="" style="height: 3.8rem;">
                     </a>
                 </span>
-                <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4" href="">{{$item->nombre_corto}}</a></span>
+                <span class="navbar-caption-wrap"><a class="navbar-caption text-black display-4" href="">{{$item->nombre_corto}}</a></span>
                 @endforeach
             </div>
         </div>
