@@ -9,11 +9,11 @@
             </div>            
             <div class="card">
                 <div class="card-body">
-                    <div class="text-center py-2">
+                    {{-- <div class="text-center py-2">
                         @foreach ($logoEmpresa as $item)
                         <img src="/img/perfiles/{{$item->logo_empresa}}" height="60" style="border: medium">
                         @endforeach
-                    </div>
+                    </div> --}}
                     <form method="POST" action="{{ route('login') }}" novalidate>
                         @csrf
                         <div class="form-group row">
