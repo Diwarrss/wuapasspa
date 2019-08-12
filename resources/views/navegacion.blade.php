@@ -45,7 +45,7 @@
                             </form>
                         </a>
                     @elseif(Auth::user()->roles_roles_id == 2)<!-- si es empleado-->
-                        <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4">
+                        <span class="navbar-caption-wrap"><a class="navbar-caption text-dark display-4">
                             <i class="far fa-user"></i> {{ Auth::user()->nombre_usuario }}</a>
                         </span>
 
@@ -60,7 +60,7 @@
                             </form>
                         </a>
                     @elseif(Auth::user()->roles_roles_id == 4)<!-- si es agendador-->
-                        <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4">
+                        <span class="navbar-caption-wrap"><a class="navbar-caption text-dark display-4">
                             <i class="far fa-user"></i> {{ Auth::user()->nombre_usuario }}</a>
                         </span>
 
@@ -75,7 +75,7 @@
                             </form>
                         </a>
                     @else
-                        <span class="navbar-caption-wrap"><a class="navbar-caption text-white display-4">
+                        <span class="navbar-caption-wrap"><a class="navbar-caption text-dark display-4">
                             <i class="far fa-user"></i> {{ Auth::user()->nombre_usuario }}</a>
                         </span>
 
