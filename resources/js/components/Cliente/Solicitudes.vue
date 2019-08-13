@@ -332,6 +332,7 @@ export default {
       jQuery("#tablaSolicitudes")
         .DataTable()
         .ajax.reload();
+      jQuery("#tablatotalsolicitudes").DataTable().ajax.reload();
     }
   },
   mounted() {
