@@ -173,6 +173,9 @@ export default {
                     timer: 2500
                   });
                   tablatotalsolicitudes.ajax.reload(); //refrescar todos los datos
+                  jQuery("#tablaSolicitudes")
+                    .DataTable()
+                    .ajax.reload();
                 })
                 .catch(function(error) {
                   if (error.response.status == 422) {
@@ -230,6 +233,9 @@ export default {
                     timer: 2500
                   });
                   tablatotalsolicitudes.ajax.reload(); //refrescar todos los datos
+                  jQuery("#tablaSolicitudes")
+                    .DataTable()
+                    .ajax.reload();
                 })
                 .catch(function(error) {
                   if (error.response.status == 422) {
@@ -287,6 +293,9 @@ export default {
                     timer: 2500
                   });
                   tablatotalsolicitudes.ajax.reload(); //refrescar todos los datos
+                  jQuery("#tablaSolicitudes")
+                    .DataTable()
+                    .ajax.reload();
                 })
                 .catch(function(error) {
                   if (error.response.status == 422) {
@@ -329,6 +338,9 @@ export default {
     },
     actualizarCitas() {
       jQuery("#tablatotalsolicitudes")
+        .DataTable()
+        .ajax.reload();
+      jQuery("#tablaSolicitudes")
         .DataTable()
         .ajax.reload();
     }
