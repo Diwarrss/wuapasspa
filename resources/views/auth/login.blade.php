@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="container py-5">
-    <div class="row justify-content-center py-3">
+    <div class="row justify-content-center py-5">
         <div class="col-md-5 mx-auto">
-            <div class="text-center py-3">
-                <img src="/img/perfiles/Logo-GridSoft.png" height="35">
-            </div>
             <div class="card">
                 <div class="card-body">
+                    <div class="text-center p-4">
+                        <img src="/img/perfiles/Logo-GridSoft.png" height="35">
+                    </div>
                     {{-- <div class="text-center py-2">
                         @foreach ($logoEmpresa as $item)
                         <img src="/img/perfiles/{{$item->logo_empresa}}" height="60" style="border: medium">
