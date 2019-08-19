@@ -16,65 +16,72 @@
             </ol>
         </section>
         <section class="content">
-            <div class="box box-primary">
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a data-toggle="tab" href="#pendientes" class="text-danger"><i class="fas fa-hourglass-start"></i> Pendientes <span class="label label-danger" v-text="cantidad"></span></a>
-                    </li>
-                    <li>
-                        <a data-toggle="tab" href="#agendadas" class="text-success"> <i class="far fa-calendar-check"></i> Agendadas</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div id="pendientes" class="tab-pane fade in active">
-                        <div class="box-header">
-                            <button @click="actualizarPendientes()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
-                            <!-- <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a> -->
+            <div class="row">
+                <template v-if="cambiar == 0">
+                    <div class="col-md-8">
+                        <div class="box box-danger">
+                            <div class="box-header">
+                                <h3 class="box-title"><i class="fas fa-hourglass-start"></i> Pendientes <span class="label label-danger" v-text="cantidad"></span></h3>
+                                <button @click="actualizarPendientes()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
+                                <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a>
+                            </div>
+                            <div class="table-responsive container-fluid">
+                                <table id="tablaPendientes" class="table table-bordered table-hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th>WhatsApp:</th>
+                                            <th>Notas: </th>
+                                            <th>Fecha Solicitada: </th>
+                                            <th>Servicios: </th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="table-responsive container-fluid">
-                            <table id="tablaPendientes" class="table table-bordered table-hover" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>Cliente</th>
-                                        <th>WhatsApp:</th>
-                                        <th>Notas: </th>
-                                        <th>Fecha Solicitada: </th>
-                                        <th>Servicios: </th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="font-weight: normal;">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="agendadas" class="tab-pane fade">
-                        <div class="box-header">
-                            <button @click="actualizarAgendadas()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
-                            <!-- <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a> -->
-                        </div>
-                        <div class="table-responsive container-fluid">
-                            <table id="tablaAgendadas" class="table table-bordered table-hover" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>Agendada el</th>
-                                        <th>Cliente</th>
-                                        <th>Fecha Cita</th>
-                                        <th>WhatsApp</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="font-weight: normal;">
-                                </tbody>
-                            </table>
+                        <div class="box box-success">
+                            <div class="box-header">
+                                <h3 class="box-title"><i class="far fa-calendar-check"></i> Agendadas</h3>
+                                <button @click="actualizarAgendadas()" class="btn btn-info btn-sm"><i class="fas fa-sync-alt"></i> Actualizar</button>
+                                <a href="/admin#/agendaLibre" type="button" class="btn btn-primary btn-sm"><i class="fas fa-send"></i> Agendar Libre</a>
+                            </div>
+                            <div class="table-responsive container-fluid">
+                                <table id="tablaAgendadas" class="table table-bordered table-hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Agendada el</th>
+                                            <th>Cliente</th>
+                                            <th>Fecha Cita</th>
+                                            <th>WhatsApp</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <!-- el calendario salvaje -->
-                    <div id="sheluder" class="tab-pane fade">
+                    <div class="col-md-4">
+                        <div class="box box-warning">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Listado de Citas <i class="far fa-eye"></i></h3>
+                            </div>
+                            <div class="box-body box-profile">
+                                <agendadiaria></agendadiaria>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template v-if="cambiar == 1">
+                    <div class="col-md-12">
                         <div class="box-header">
-                            <button data-toggle="tab" href="#pendientes" class="btn btn-info btn-sm"><i class="fas fa-reply"></i> Volver</button>
+                            <button @click="volver()" class="btn btn-info btn-sm"><i class="fas fa-reply"></i> Volver</button>
                             <hr>
                             <form class="form-horizontal">
                                 <div class="form-group">
@@ -118,7 +125,7 @@
                             @event-clicked="cancelarReservacion"
                         />
                     </div>
-                </div>
+                </template>
             </div>
         </section>
     </div>
@@ -128,6 +135,7 @@
     export default {
         data() {
             return {
+                cambiar: 0,
                 roles_roles_id: 0,
                 id: '',
                 solicitudId: '',
@@ -361,6 +369,7 @@
                     });
                     //funcion de enviar los datos de la  lista de reservaciones pendientes.
                     tablaPendientes.on('click', '.agendar', function () {
+                        data.cambiar = 1;
                         jQuery.noConflict();// para evitar errores
                         var idRow = jQuery(this).closest('tr'); //fila que le dan click
 
@@ -714,7 +723,13 @@
                 $("[data-dismiss=modal]").trigger({ type: "click" });//para cerrar la modal con boostrap 3
                 jQuery('#tablaPendientes').DataTable().ajax.reload();
             },
-
+            volver()
+            {
+                this.cambiar=0;
+                this.listarAgendadas();
+                this.listarPendientes();
+                this.cantidadSolicitudes();
+            }
         },
         watch: {//apenas se sellecciona un peluqero que actualize los datos
             idEmpleadoElegido: function () {

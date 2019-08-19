@@ -115,6 +115,12 @@ Vue.component(
     require("./components/Admin/ImagenPerfil.vue").default
 );
 
+//componente sheluder diarios
+Vue.component(
+    "agendadiaria",
+    require("./components/Admin/AgendaDiaria.vue").default
+);
+
 //----*********** Aqui agregaremos todo configurado con Vue-Router*********
 // 0. If using a module system (e.g. via vue-cli), import Vue and VueRouter
 // and then call `Vue.use(VueRouter)`.
@@ -170,7 +176,8 @@ const Servicios = require("./components/Admin/Servicios.vue").default;
 // either be an actual component constructor created via
 // `Vue.extend()`, or just a component options object.
 // We'll talk about nested routes later.
-const routes = [{
+const routes = [
+    {
         path: "*",
         component: Error404
     },

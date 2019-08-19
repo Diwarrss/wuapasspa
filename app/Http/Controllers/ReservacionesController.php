@@ -555,6 +555,64 @@ class ReservacionesController extends Controller
         return $empleados;
     }
 
+    //agenda diaria consulta
+    public function agendaDiaria(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+
+        $reservaAtendidos =  DB::table('reservaciones')
+            ->join('users', 'reservaciones.users_users_id', '=', 'users.id')
+            ->join('solicitudes', 'reservaciones.solicitudes_solicitudes_id', '=', 'solicitudes.id')
+            ->join('users as cliente', 'solicitudes.users_users_id', '=', 'cliente.id')
+            ->select(
+                'reservaciones.id',
+                'reservaciones.estado_reservacion',
+                DB::raw("(CASE reservaciones.estado_reservacion
+                WHEN 1 THEN 'Por Confirmar'
+                WHEN 2 THEN 'Atendido'
+                WHEN 3 THEN 'No Asistió'
+                WHEN 4 THEN 'En Espera'
+                ELSE 'CANCELO' END) AS estado_reservaciones_nombre"),
+                DB::raw("DATE_FORMAT(solicitudes.created_at, '%d/%m/%Y %h:%i %p') as fechaSolicitada"),
+                DB::raw("DATE_FORMAT(reservaciones.created_at, '%d/%m/%Y %h:%i %p') as fechaAgendada"),
+                DB::raw("CONCAT(cliente.nombre_usuario, ' ',cliente.apellido_usuario) as nombre_cliente"),
+                DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_completo_empleado"),
+                DB::raw("IF(reservaciones.solicitudes_solicitudes_id != '', 'Sistema', 'Presencial') as tipo_agenda"),
+                DB::raw("CONCAT(DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%d/%m/%Y %h:%i %p'),' a ',DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%h:%i %p')) as fecha_reserva"),
+                DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%Y-%m-%d') as date"),
+                DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%H:%i') as startTime"),
+                DB::raw("DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%H:%i') as endTime")
+            )
+            ->orderBy('reservaciones.id', 'desc');
+
+        $anonimos =  DB::table('anonimos')
+            ->join('reservaciones', 'reservaciones.id', '=', 'anonimos.reservaciones_id')
+            ->join('users', 'reservaciones.users_users_id', '=', 'users.id')
+            ->select(
+                'reservaciones.id',
+                'reservaciones.estado_reservacion',
+                DB::raw("(CASE reservaciones.estado_reservacion
+                WHEN 1 THEN 'Por Confirmar'
+                WHEN 2 THEN 'Atendido'
+                WHEN 3 THEN 'No Asistió'
+                WHEN 4 THEN 'En Espera'
+                ELSE 'CANCELO' END) AS estado_reservaciones_nombre"),
+                DB::raw("DATE_FORMAT(anonimos.created_at, '%d/%m/%Y %h:%i %p') as fechaSolicitada"),
+                DB::raw("DATE_FORMAT(reservaciones.created_at, '%d/%m/%Y %h:%i %p') as fechaAgendada"),
+                'nombre_anonimo as nombre_cliente',
+                DB::raw("CONCAT(users.nombre_usuario, ' ',users.apellido_usuario) as nombre_completo_empleado"),
+                DB::raw("IF(reservaciones.solicitudes_solicitudes_id != '', 'Sistema', 'Presencial') as tipo_agenda"),
+                DB::raw("CONCAT(DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%d/%m/%Y %h:%i %p'),' a ',DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%h:%i %p')) as fecha_reserva"),
+                DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%Y-%m-%d') as date"),
+                DB::raw("DATE_FORMAT(reservaciones.fechaHoraInicio_reserva, '%H:%i') as startTime"),
+                DB::raw("DATE_FORMAT(reservaciones.fechaHoraFinal_reserva, '%H:%i') as endTime")
+            )
+            ->orderBy('reservaciones.id', 'desc')
+            ->unionAll($reservaAtendidos)
+            ->get();
+
+        return $anonimos;
+    }
 
     public function listarAnonimas(Request $request)
     {

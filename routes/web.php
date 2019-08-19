@@ -76,6 +76,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/showAtendidos', 'ReservacionesController@showAtendidos')->name('showAtendidos');
         Route::get('/showNoAsistio', 'ReservacionesController@showNoAsistio')->name('showNoAsistio');
         Route::get('/showCanceladas', 'ReservacionesController@showCanceladas')->name('showCanceladas');
+        Route::get('/agendaDiaria', 'ReservacionesController@agendaDiaria')->name('agendaDiaria');
         //Vista de Reportes
         Route::get('/listarTotalAnonimas', 'ReservacionesController@listarTotalAnonimas')->name('listarTotalAnonimas');
         Route::get('/showCitasMes', 'ReportesController@showCitasMes')->name('showCitasMes');
@@ -181,6 +182,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/showAtendidos', 'ReservacionesController@showAtendidos')->name('showAtendidos');
         Route::get('/showNoAsistio', 'ReservacionesController@showNoAsistio')->name('showNoAsistio');
         Route::get('/showCanceladas', 'ReservacionesController@showCanceladas')->name('showCanceladas');
+        Route::get('/agendaDiaria', 'ReservacionesController@agendaDiaria')->name('agendaDiaria');
         //vista buzon de sugerencias
         Route::get('/showBuzon', 'SugerenciaController@showBuzon')->name('showBuzon');
         //agenda anonima
