@@ -35,14 +35,14 @@
           <div class="box box-success">
             <div class="box-header text-center">
               <h3 class="box-title">
-                <i class="far fa-list-alt"></i> Seleccionar el Cliente
+                <i class="fas fa-users"></i> Seleccionar el Cliente
               </h3>
             </div>
             <div class="box-body">
               <div class="col-md-6 col-md-offset-3">
                 <v-select
                   :options="clientes"
-                  :reduce="cliente => cliente.code"
+                  :reduce="cliente => cliente.id"
                   placeholder="Buscar Cliente"
                   label="cliente"
                   v-model="clienteSelect"
@@ -56,23 +56,71 @@
           </div>
           <div class="box box-primary">
             <div class="box-header text-center">
-              <h3 class="box-title">
-                <i class="far fa-list-alt"></i> Seleccionar los Servicios o Productos
-              </h3>
+              <div class="col-md-12">
+                <h3 class="box-title">
+                  <i class="fas fa-coins"></i> Buscar Servicios o Productos
+                </h3>
+              </div>
             </div>
             <div class="box-body">
               <div class="col-md-6 col-md-offset-3">
                 <v-select
-                  :options="clientes"
-                  :reduce="cliente => cliente.code"
-                  placeholder="Buscar Cliente"
-                  label="cliente"
-                  v-model="clienteSelect"
+                  :options="servicios"
+                  :reduce="servicio => servicio.id"
+                  placeholder="Seleccionar servicio o producto"
+                  label="servicio"
+                  v-model="selectServProd"
                 >
                   <i slot="spinner" class="icon icon-spinner"></i>
                   <div slot="no-options">No hay Resultados!</div>
                 </v-select>
-                {{clienteSelect}}
+                <br />
+              </div>
+              <div class="col-md-12" v-if="selectServProd !=0">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Servicio</th>
+                        <th>Realizado Por</th>
+                        <th>Cantidad</th>
+                        <th>Descuento</th>
+                        <th>Valor</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+              <div class="col-md-12" v-if="selectServProd !=0">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Descuento</th>
+                        <th>Valor</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="box box-default">
+            <div class="box-header text-center">
+              <div class="col-md-12">
+                <h3 class="box-title">
+                  <i class="fas fa-file-invoice-dollar"></i> Información a Facturar
+                </h3>
+              </div>
+              <div class="box-body"></div>
+              <div class="box-footer">
+                <button class="btn btn-success">
+                  <i class="fas fa-check"></i> Facturar
+                </button>
               </div>
             </div>
           </div>
@@ -92,9 +140,15 @@ export default {
   data() {
     return {
       clienteSelect: 0,
+      selectServProd: 0,
       clientes: [
-        { code: "1", cliente: "Canada" },
-        { code: "2", cliente: "suiza" }
+        { id: "1", cliente: "Juan Diego Diaz" },
+        { id: "2", cliente: "Pedro Niño Diaz" }
+      ],
+      servicios: [
+        { id: "1", servicio: "Uñas" },
+        { id: "2", servicio: "Pedicure" },
+        { id: "3", servicio: "Arroz" }
       ]
     };
   }
