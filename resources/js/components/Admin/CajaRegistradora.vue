@@ -149,7 +149,7 @@
               <div class="box-body">
                 <div class="form-group">
                   <label for="nombre_usuario" class="col-sm-4 control-label hidden-xs">Nombre Caja</label>
-                  <div class="col-sm-8 col-xs-12">
+                  <div class="col-sm-6">
                     <input
                       type="text"
                       class="form-control"
@@ -167,7 +167,7 @@
                 <div class="form-group">
                   <label for="valor_inicial" class="col-sm-4 control-label hidden-xs">Valor Inicial</label>
 
-                  <div class="col-sm-8 col-xs-12">
+                  <div class="col-sm-6">
                     <input
                       type="number"
                       class="form-control"
@@ -188,7 +188,7 @@
                     class="col-sm-4 control-label hidden-xs"
                   >Valor Producido</label>
 
-                  <div class="col-sm-8 col-xs-12">
+                  <div class="col-sm-6">
                     <input
                       type="number"
                       class="form-control"
@@ -226,7 +226,7 @@
                 <div class="form-group">
                   <label for="estado_usuario" class="col-sm-4 control-label hidden-xs">Estado</label>
 
-                  <div class="col-sm-8 col-xs-12">
+                  <div class="col-sm-6">
                     <select class="form-control" v-model="estado_caja">
                       <option value disabled>Seleccionar...</option>
                       <option value="1">Activo</option>

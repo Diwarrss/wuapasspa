@@ -70,29 +70,6 @@
           </li>
           <li class="treeview">
             <a href="#">
-              <i class="fas fa-user-check text-white"></i>
-              <span>Clientes</span>
-              <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-            </a>
-            <ul class="treeview-menu">
-              <li>
-                <router-link to="/clientes" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
-                  <i class="fa fa-users text-green" aria-hidden="true"></i>
-                  <span>Mis Clientes</span>
-                </router-link>
-              </li>
-              <li>
-                <router-link to="/agendaCumple" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
-                  <i class="fas fa-birthday-cake text-green"></i>
-                  <span>Cumpleaños</span>
-                </router-link>
-              </li>
-            </ul>
-          </li>
-          <li class="treeview">
-            <a href="#">
               <i class="fas fa-money-check-alt text-white"></i>
               <span>Facturación</span>
               <span class="pull-right-container">
@@ -102,20 +79,11 @@
             <ul class="treeview-menu">
               <li>
                 <router-link
-                  to="/cajaRegistradora"
-                  :data-toggle="[windowWidth<576 ? 'push-menu':'']"
-                >
-                  <i class="fas fa-cash-register text-green"></i>
-                  <span>Caja Registradora</span>
-                </router-link>
-              </li>
-              <li>
-                <router-link
                   to="/facturarAtencion"
                   :data-toggle="[windowWidth<576 ? 'push-menu':'']"
                 >
                   <i class="fas fa-file-invoice-dollar text-green"></i>
-                  <span>Facturar Atención</span>
+                  <span>Facturación</span>
                 </router-link>
               </li>
               <li>
@@ -145,11 +113,41 @@
             </ul>
           </li>
           <li>
+            <router-link to="/cajaRegistradora" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
+              <i class="fas fa-cash-register text-white"></i>
+              <span>Caja Registradora</span>
+              <span class="pull-right-container"></span>
+            </router-link>
+          </li>
+          <li>
             <router-link to="/servicios" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
               <i class="fab fa-buffer text-white"></i>
               <span>Servicios</span>
               <span class="pull-right-container"></span>
             </router-link>
+          </li>
+          <li class="treeview">
+            <a href="#">
+              <i class="fas fa-user-check text-white"></i>
+              <span>Clientes</span>
+              <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+            </a>
+            <ul class="treeview-menu">
+              <li>
+                <router-link to="/clientes" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
+                  <i class="fa fa-users text-green" aria-hidden="true"></i>
+                  <span>Mis Clientes</span>
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/agendaCumple" :data-toggle="[windowWidth<576 ? 'push-menu':'']">
+                  <i class="fas fa-birthday-cake text-green"></i>
+                  <span>Cumpleaños</span>
+                </router-link>
+              </li>
+            </ul>
           </li>
           <li class="treeview">
             <a href="#">
