@@ -32,10 +32,16 @@ class Servicio extends Model
     const ACTIVO = 1;
     const DESACTIVADO = 2;
 
+    //creamos TIPOS
+    const SERVICIO = 1;
+    const PRODUCTO = 2;
+
     protected $fillable = [
         'nombre_servicio',
         'descripcion_servicio',
         'estado_servicio',
+        'tipo',
+        'stock',
         'url_video',
         'valor_servicio',
         'empresas_empresas_id',
@@ -44,11 +50,13 @@ class Servicio extends Model
     ];
 
     //para las relaciones Eloquent
-    public function empresa(){
-        return $this->belongsTo('App\Role');//un servicio pertenece a/tiene una Empresa
+    public function empresa()
+    {
+        return $this->belongsTo('App\Role'); //un servicio pertenece a/tiene una Empresa
     }
 
-    public function solicitud(){
-        return $this->belongsToMany('App\Solicitude');//un servicio va a tener varias solicitudes relacion Muchos a Muchos
+    public function solicitud()
+    {
+        return $this->belongsToMany('App\Solicitude'); //un servicio va a tener varias solicitudes relacion Muchos a Muchos
     }
 }

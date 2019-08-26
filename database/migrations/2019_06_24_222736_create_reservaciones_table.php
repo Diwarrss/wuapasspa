@@ -27,8 +27,8 @@ class CreateReservacionesTable extends Migration
                 \App\Reservacione::NOASISTIO, \App\Reservacione::ENESPERA, \App\Reservacione::CANCELO
             ])
                 ->default(\App\Reservacione::PENDIENTE);
-            $table->unsignedInteger('facturas_id')->nullable();
-            $table->foreign('facturas_id')->references('id')->on('facturas');
+            /* $table->unsignedInteger('facturas_id')->nullable();
+            $table->foreign('facturas_id')->references('id')->on('facturas'); */
             $table->timestamps();
         });
     }

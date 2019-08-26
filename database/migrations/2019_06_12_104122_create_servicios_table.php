@@ -18,7 +18,9 @@ class CreateServiciosTable extends Migration
             $table->string('nombre_servicio', 150);
             $table->string('descripcion_servicio', 255)->nullable();
             $table->enum('estado_servicio', [App\Servicio::ACTIVO, App\Servicio::DESACTIVADO])->default(\App\Servicio::ACTIVO);
-            $table->string('url_video',500)->nullable();
+            $table->enum('tipo', [App\Servicio::SERVICIO, App\Servicio::PRODUCTO]);
+            $table->integer('stock')->nullable();
+            $table->string('url_video', 500)->nullable();
             $table->decimal('valor_servicio', 12, 2);
             $table->unsignedInteger('empresas_empresas_id');
             $table->foreign('empresas_empresas_id')->references('id')->on('empresas');

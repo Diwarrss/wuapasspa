@@ -22,6 +22,8 @@ class CreateFacturasTable extends Migration
                 \App\Factura::GASTOS, \App\Factura::INGRESOS
             ])
                 ->default(\App\Factura::FACTURA);
+            $table->unsignedInteger('orden_id')->nullable()->comment('Orden antes de facturar');
+            $table->foreign('orden_id')->references('id')->on('ordens');
             $table->unsignedInteger('creado_por');
             $table->foreign('creado_por')->references('id')->on('users');
             $table->enum('estado_factura', [

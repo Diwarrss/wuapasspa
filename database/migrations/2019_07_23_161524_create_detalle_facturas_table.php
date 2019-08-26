@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 
 class CreateDetalleFacturasTable extends Migration
 {
@@ -20,7 +19,7 @@ class CreateDetalleFacturasTable extends Migration
             $table->foreign('facturas_id')->references('id')->on('facturas');
             $table->unsignedInteger('servicios_servicios_id');
             $table->foreign('servicios_servicios_id')->references('id')->on('servicios');
-            $table->unsignedInteger('empleado_id');
+            $table->unsignedInteger('empleado_id')->nullable()->comment('Persona q hace el servicio');
             $table->foreign('empleado_id')->references('id')->on('users');
             $table->integer('cantidad_facturada');
             $table->decimal('valor_servicio', 12, 2);

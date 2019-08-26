@@ -12,6 +12,7 @@ class DetalleFactura extends Model
         'empleado_id',
         'cantidad_facturada',
         'valor_servicio',
-        'valor_descuento'
+        'valor_descuento',
+        'nomina_id',
     ];
 }

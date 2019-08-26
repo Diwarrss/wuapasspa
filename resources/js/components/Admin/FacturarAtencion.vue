@@ -37,6 +37,9 @@
               <h3 class="box-title">
                 <i class="fas fa-users"></i> Seleccionar el Cliente
               </h3>
+              <button class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear
+              </button>
             </div>
             <div class="box-body">
               <div class="col-md-6 col-md-offset-3">
@@ -60,6 +63,9 @@
                 <h3 class="box-title">
                   <i class="fas fa-coins"></i> Buscar Servicios o Productos
                 </h3>
+                <button class="btn btn-primary">
+                  <i class="fas fa-plus"></i> Crear
+                </button>
               </div>
             </div>
             <div class="box-body">
@@ -146,9 +152,9 @@ export default {
         { id: "2", cliente: "Pedro Niño Diaz" }
       ],
       servicios: [
-        { id: "1", servicio: "Uñas" },
-        { id: "2", servicio: "Pedicure" },
-        { id: "3", servicio: "Arroz" }
+        { id: "1", servicio: "Uñas", tipo: "S" },
+        { id: "2", servicio: "Pedicure", tipo: "P" },
+        { id: "3", servicio: "Arroz", tipo: "S" }
       ]
     };
   }
