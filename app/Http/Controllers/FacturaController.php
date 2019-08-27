@@ -7,7 +7,6 @@ use App\Factura;
 use App\Reservacione;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Servicios_solicitudes;
 use Carbon\Carbon;
 use App\DetalleFactura;
 use App\Movimiento;
@@ -20,6 +19,8 @@ use App\FacturaGastos;
 
 class FacturaController extends Controller
 {
+
+
     public function listarFacturacion(Request $request)
     {
         if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax

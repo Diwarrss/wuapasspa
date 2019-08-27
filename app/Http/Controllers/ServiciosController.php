@@ -53,6 +53,8 @@ class ServiciosController extends Controller
                 'servicios.estado_servicio',
                 'servicios.url_video',
                 'servicios.valor_servicio',
+                'servicios.tipo',
+                'servicios.stock',
                 'imagenes.empresas_empresas_id',
                 'imagenes.url_imagen',
                 'categorias.nombre_categoria',
@@ -68,16 +70,32 @@ class ServiciosController extends Controller
     {
         if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
-        //para validar
-        $request->validate([
-            'categoriaServicio' => 'required',
-            'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
-            'descripcion' => 'required|max:255',
-            'estadoServicio' => 'required',
-            'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
-            'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'valorServicio' => 'required|max:12'
-        ]);
+        $tipo = $request->tipo;
+        if ($tipo == "2") {
+            $request->validate([
+                'categoriaServicio' => 'required',
+                'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
+                'descripcion' => 'required|max:255',
+                'estadoServicio' => 'required',
+                'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
+                'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'valorServicio' => 'required|min:2|max:12',
+                'tipo' => 'required',
+                'stock' => 'required|max:10',
+            ]);
+        } else {
+            //para validar
+            $request->validate([
+                'categoriaServicio' => 'required',
+                'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
+                'descripcion' => 'required|max:255',
+                'estadoServicio' => 'required',
+                'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
+                'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'valorServicio' => 'required|min:2|max:12',
+                'tipo' => 'required',
+            ]);
+        }
 
         //aqui guardamos la imagen en esta variable
         $imagenFile = $request->imagenServicio;
@@ -115,6 +133,8 @@ class ServiciosController extends Controller
             $servicio->nombre_servicio = $request->nombreServicio;
             $servicio->descripcion_servicio = $request->descripcion;
             $servicio->estado_servicio = $request->estadoServicio;
+            $servicio->tipo = $request->tipo;
+            $servicio->stock = $request->stock;
             $servicio->url_video = $url_Final;
             $servicio->valor_servicio = $request->valorServicio;
             $servicio->empresas_empresas_id = 1;
@@ -126,6 +146,8 @@ class ServiciosController extends Controller
             $servicio->nombre_servicio = $request->nombreServicio;
             $servicio->descripcion_servicio = $request->descripcion;
             $servicio->estado_servicio = $request->estadoServicio;
+            $servicio->tipo = $request->tipo;
+            $servicio->stock = $request->stock;
             $servicio->url_video = $url_Final;
             $servicio->valor_servicio = $request->valorServicio;
             $servicio->empresas_empresas_id = 1;
@@ -138,16 +160,32 @@ class ServiciosController extends Controller
     {
         if (!$request->ajax()) return redirect('/'); //seguridad http si es diferente a peticion ajax
 
-        //para validar
-        $request->validate([
-            'categoriaServicio' => 'required',
-            'nombreServicio' => 'required|max:150|string|', //unique:servicios,nombre_servicio,'.$request->idServicio
-            'descripcion' => 'required|max:255',
-            'estadoServicio' => 'required',
-            'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
-            'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'valorServicio' => 'required|max:12'
-        ]);
+        $tipo = $request->tipo;
+        if ($tipo == "2") {
+            $request->validate([
+                'categoriaServicio' => 'required',
+                'nombreServicio' => 'required|max:150|string|', //unique:servicios,nombre_servicio,'.$request->idServicio
+                'descripcion' => 'required|max:255',
+                'estadoServicio' => 'required',
+                'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
+                'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'valorServicio' => 'required|min:2|max:12',
+                'tipo' => 'required',
+                'stock' => 'required|max:10',
+            ]);
+        } else {
+            //para validar
+            $request->validate([
+                'categoriaServicio' => 'required',
+                'nombreServicio' => 'required|max:150|string|', //unique:servicios,nombre_servicio,'.$request->idServicio
+                'descripcion' => 'required|max:255',
+                'estadoServicio' => 'required',
+                'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
+                'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'valorServicio' => 'required|min:2|max:12',
+                'tipo' => 'required',
+            ]);
+        }
 
         $servicio = Servicio::findOrFail($request->idServicio); //actualizamos para el user logueado
         $imagenFile = $request->imagenServicio; //capturamos la imagen
@@ -187,6 +225,8 @@ class ServiciosController extends Controller
                 $servicio->nombre_servicio = $request->nombreServicio;
                 $servicio->descripcion_servicio = $request->descripcion;
                 $servicio->estado_servicio = $request->estadoServicio;
+                $servicio->tipo = $request->tipo;
+                $servicio->stock = $request->stock;
                 $servicio->url_video = $url_Final;
                 $servicio->valor_servicio = $request->valorServicio;
                 $servicio->empresas_empresas_id = 1;
@@ -206,6 +246,8 @@ class ServiciosController extends Controller
                 $servicio->nombre_servicio = $request->nombreServicio;
                 $servicio->descripcion_servicio = $request->descripcion;
                 $servicio->estado_servicio = $request->estadoServicio;
+                $servicio->tipo = $request->tipo;
+                $servicio->stock = $request->stock;
                 $servicio->url_video = $url_Final;
                 $servicio->valor_servicio = $request->valorServicio;
                 $servicio->empresas_empresas_id = 1;
@@ -219,6 +261,8 @@ class ServiciosController extends Controller
             $servicio->nombre_servicio = $request->nombreServicio;
             $servicio->descripcion_servicio = $request->descripcion;
             $servicio->estado_servicio = $request->estadoServicio;
+            $servicio->tipo = $request->tipo;
+            $servicio->stock = $request->stock;
             $servicio->url_video = $url_Final;
             $servicio->valor_servicio = $request->valorServicio;
             $servicio->empresas_empresas_id = 1;
