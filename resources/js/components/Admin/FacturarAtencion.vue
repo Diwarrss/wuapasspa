@@ -562,10 +562,11 @@ export default {
         });
     },
     listarServProd() {
+      let me = this;
       axios
         .get("/listarServProd")
         .then(function(response) {
-          this.serviciosArray = response.data;
+          me.serviciosArray = response.data;
           // handle success
           console.log(response);
         })
