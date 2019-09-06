@@ -457,4 +457,16 @@ class UserController extends Controller
             DB::rollBack(); //si hay error no ejecute la transaccion
         }
     }
+
+    //enlistar clientes para facturacion
+    public function listarClientesFact(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $clientes = \App\User::select('id', DB::raw('CONCAT(nombre_usuario," ", apellido_usuario) AS cliente'))
+            ->where([['roles_roles_id', 3], ['estado_usuario', 1]])
+            ->get();
+
+        return $clientes;
+    }
 }

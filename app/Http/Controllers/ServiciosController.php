@@ -75,7 +75,7 @@ class ServiciosController extends Controller
             $request->validate([
                 'categoriaServicio' => 'required',
                 'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
-                'descripcion' => 'required|max:255',
+                'descripcion' => 'max:255',
                 'estadoServicio' => 'required',
                 'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
                 'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -88,7 +88,7 @@ class ServiciosController extends Controller
             $request->validate([
                 'categoriaServicio' => 'required',
                 'nombreServicio' => 'required|max:150|string|unique:servicios,nombre_servicio',
-                'descripcion' => 'required|max:255',
+                'descripcion' => 'max:255',
                 'estadoServicio' => 'required',
                 'urlVideoServicio' => ['nullable', 'max:250', 'regex:/^(http[s]?:\/\/){0,1}(w{3,3}\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/'],
                 'imagenServicio' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -279,4 +279,8 @@ class ServiciosController extends Controller
             ->get();
         return view('/cliente/nuevaCita', ['logoEmpresa' => $logoEmpresa]);
     }
+
+    //enlistar servicios para facturacion
+    public function listarServProd(Request $request)
+    { }
 }

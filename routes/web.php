@@ -130,6 +130,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/crearFacturaGastos', 'FacturaController@crearFacturaGastos')->name('crearFacturaGastos');
         Route::get('/listarGastosDiarios', 'FacturaController@listarGastosDiarios')->name('listarGastosDiarios');
         Route::get('/verInfoFactura', 'FacturaController@verInfoFactura')->name('verInfoFactura');
+
+        //Controlador de Facturacion 2 Mejorada
+        Route::get('/listarClientesFact', 'UserController@listarClientesFact')->name('listarClientesFact');
+        Route::get('/listarServProd', 'ServiciosController@listarServProd')->name('listarServProd');
+
         //pdf de factura servicios
         Route::get('/pdfFacturaServicios/{id}', 'FacturaController@pdfFacturaServicios');
         Route::get('/pdfFacturaAnulServicios/{id}', 'FacturaController@pdfFacturaAnulServicios');
