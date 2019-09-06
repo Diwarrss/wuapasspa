@@ -282,5 +282,13 @@ class ServiciosController extends Controller
 
     //enlistar servicios para facturacion
     public function listarServProd(Request $request)
-    { }
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $servicios = \App\Servicio::select('id', 'nombre_servicio', 'tipo')
+            ->where('estado_servicio', 1)
+            ->get();
+
+        return $servicios;
+    }
 }

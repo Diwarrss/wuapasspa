@@ -463,7 +463,7 @@ class UserController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
 
-        $clientes = \App\User::select('id', DB::raw('CONCAT(nombre_usuario," ", apellido_usuario) AS cliente'))
+        $clientes = \App\User::select(DB::raw('CONCAT(nombre_usuario," ", apellido_usuario) AS cliente'), 'id')
             ->where([['roles_roles_id', 3], ['estado_usuario', 1]])
             ->get();
 

@@ -74,7 +74,7 @@
                   :options="serviciosArray"
                   :reduce="servicio => servicio.id"
                   placeholder="Seleccionar servicio o producto"
-                  label="servicio"
+                  label="nombre_servicio"
                   v-model="selectServProd"
                 >
                   <i slot="spinner" class="icon icon-spinner"></i>
@@ -546,12 +546,13 @@ export default {
   },
   methods: {
     listarClientesFact() {
+      let me = this;
       axios
         .get("/listarClientesFact")
         .then(function(response) {
-          this.clientesArray = response.data;
+          me.clientesArray = response.data;
           // handle success
-          console.log(this.clientesArray);
+          //console.log(me.clientesArray);
         })
         .catch(function(error) {
           // handle error
@@ -568,7 +569,7 @@ export default {
         .then(function(response) {
           me.serviciosArray = response.data;
           // handle success
-          console.log(response);
+          //console.log(me.serviciosArray);
         })
         .catch(function(error) {
           // handle error

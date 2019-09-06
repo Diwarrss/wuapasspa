@@ -5916,10 +5916,10 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     listarClientesFact: function listarClientesFact() {
+      var me = this;
       axios.get("/listarClientesFact").then(function (response) {
-        this.clientesArray = response.data; // handle success
-
-        console.log(this.clientesArray);
+        me.clientesArray = response.data; // handle success
+        //console.log(me.clientesArray);
       })["catch"](function (error) {
         // handle error
         console.log(error);
@@ -5930,8 +5930,7 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       axios.get("/listarServProd").then(function (response) {
         me.serviciosArray = response.data; // handle success
-
-        console.log(response);
+        //console.log(me.serviciosArray);
       })["catch"](function (error) {
         // handle error
         console.log(error);
@@ -46853,7 +46852,7 @@ var render = function() {
                           return servicio.id
                         },
                         placeholder: "Seleccionar servicio o producto",
-                        label: "servicio"
+                        label: "nombre_servicio"
                       },
                       model: {
                         value: _vm.selectServProd,
