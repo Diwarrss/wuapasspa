@@ -291,4 +291,16 @@ class ServiciosController extends Controller
 
         return $servicios;
     }
+
+    //enlistar servicios para facturacion
+    public function getServicioID(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+
+        $id = $request->id;
+
+        $infoService = \App\Servicio::where('id', $id)->get();
+
+        return $infoService;
+    }
 }

@@ -449,7 +449,7 @@ class FacturaController extends Controller
     //lista de servicios para mostrar como descripcion de la factura
     public function verInfoFactura(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax()) return redirect('/');
 
         $id_factura = $request->id_factura;
 

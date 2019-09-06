@@ -5869,6 +5869,100 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //importamos vue-select
 
 
@@ -5880,7 +5974,10 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       clienteSelect: 0,
-      selectServProd: 0,
+      selectServicio: "",
+      tipoServicioElegido: "",
+      idServicioElegido: "",
+      infoServicioElegido: [],
       clientesArray: [],
       serviciosArray: [],
       arrayErrors: [],
@@ -5911,7 +6008,11 @@ __webpack_require__.r(__webpack_exports__);
         suffix: "",
         precision: 0,
         masked: false
-      }
+      },
+      lista_empleados: [],
+      cantidadServicio: 1,
+      valor_descuento: 0,
+      idEmpleadoElegido: 0
     };
   },
   methods: {
@@ -5931,6 +6032,18 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("/listarServProd").then(function (response) {
         me.serviciosArray = response.data; // handle success
         //console.log(me.serviciosArray);
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      })["finally"](function () {// always executed
+      });
+    },
+    //mostrar todos los empleados con Rol Empleado Activos
+    listaEmpleados: function listaEmpleados() {
+      var me = this; // Make a request for a user with a given ID
+
+      axios.get("/showEmpleado").then(function (response) {
+        me.lista_empleados = response.data; //console.log("Empleados: " + me.lista_empleados);
       })["catch"](function (error) {
         // handle error
         console.log(error);
@@ -5984,6 +6097,63 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       })["finally"](function () {// always executed
       });
+    },
+    elegirServicio: function elegirServicio() {
+      var me = this;
+      var dataElegida = me.selectServicio;
+
+      if (dataElegida != null) {
+        me.valor_descuento = 0;
+        me.cantidadServicio = 1;
+        me.idServicioElegido = dataElegida.split(",", 1); //elegimos el primer valor encontrado antes de la ,
+
+        me.tipoServicioElegido = dataElegida.charAt(dataElegida.length - 1); //elegimos el ultimo valor como es 1 y 2 no hay problema
+        //si es un servicio se colocan los empleados
+
+        if (me.tipoServicioElegido == 1) {
+          me.listaEmpleados();
+        }
+        /* else {
+        //console.log("Producto");
+        } */
+
+
+        if (me.idServicioElegido != "") {
+          //aqui vamos a realizar la consulta de los datos completos del servicio o producto seleccionado
+          axios.get("/getServicioID", {
+            params: {
+              id: me.idServicioElegido
+            }
+          }).then(function (response) {
+            me.infoServicioElegido = response.data; //console.log(me.infoServicioElegido);
+          })["catch"](function (error) {
+            // handle error
+            console.log(error);
+          });
+        } else {
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            type: "error",
+            title: "No hay Servicio a buscar",
+            showConfirmButton: false,
+            timer: 2500
+          });
+        }
+      } else {
+        console.log("No hay Servicio Elegido");
+      } //console.log(me.idServicioElegido);
+      //console.log(me.tipoServicioElegido);
+
+      /* Swal.fire({
+        toast: true,
+        position: "top-end",
+        type: "success",
+        title: "Servicio Seleccionado",
+        showConfirmButton: false,
+        timer: 2500
+      }); */
+
     },
     imagenSeleccionada2: function imagenSeleccionada2(event) {
       //metodo para capturar la imagen
@@ -6062,6 +6232,10 @@ __webpack_require__.r(__webpack_exports__);
 
         console.log(error); //console.log(me.arrayErrors);
       });
+    },
+    formatearValor: function formatearValor(value) {
+      var val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
   },
   mounted: function mounted() {
@@ -39591,6 +39765,7 @@ function open(propsData) {
     }
 });
 
+
 /***/ }),
 
 /***/ "./node_modules/v-calendar-scheduler/components/mixins/IsView.js":
@@ -41628,6 +41803,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _EventDialogInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EventDialogInput */ "./node_modules/v-calendar-scheduler/components/dialog/EventDialogInput.vue");
+//
 //
 //
 //
@@ -46803,11 +46979,6 @@ var render = function() {
                         [_vm._v("No hay Resultados!")]
                       )
                     ]
-                  ),
-                  _vm._v(
-                    "\n              " +
-                      _vm._s(_vm.clienteSelect) +
-                      "\n            "
                   )
                 ],
                 1
@@ -46849,17 +47020,18 @@ var render = function() {
                       attrs: {
                         options: _vm.serviciosArray,
                         reduce: function(servicio) {
-                          return servicio.id
+                          return servicio.id + "," + servicio.tipo
                         },
                         placeholder: "Seleccionar servicio o producto",
                         label: "nombre_servicio"
                       },
+                      on: { input: _vm.elegirServicio },
                       model: {
-                        value: _vm.selectServProd,
+                        value: _vm.selectServicio,
                         callback: function($$v) {
-                          _vm.selectServProd = $$v
+                          _vm.selectServicio = $$v
                         },
-                        expression: "selectServProd"
+                        expression: "selectServicio"
                       }
                     },
                     [
@@ -46882,12 +47054,259 @@ var render = function() {
                 1
               ),
               _vm._v(" "),
-              _vm.selectServProd != 0
-                ? _c("div", { staticClass: "col-md-12" }, [_vm._m(4)])
+              _vm.tipoServicioElegido == 1 && _vm.selectServicio != null
+                ? _c("div", { staticClass: "col-md-12" }, [
+                    _c("div", { staticClass: "table-responsive" }, [
+                      _c("table", { staticClass: "table table-bordered" }, [
+                        _vm._m(4),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          { staticStyle: { "font-weight": "normal" } },
+                          _vm._l(_vm.infoServicioElegido, function(detalle) {
+                            return _c("tr", { key: detalle.id }, [
+                              _c("td", [
+                                _c("span", [
+                                  _vm._v(_vm._s(detalle.nombre_servicio))
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "td",
+                                [
+                                  _c(
+                                    "v-select",
+                                    {
+                                      attrs: {
+                                        options: _vm.lista_empleados,
+                                        reduce: function(empleado) {
+                                          return empleado.id
+                                        },
+                                        placeholder: "Seleccionar...",
+                                        label: "nombre"
+                                      },
+                                      model: {
+                                        value: _vm.idEmpleadoElegido,
+                                        callback: function($$v) {
+                                          _vm.idEmpleadoElegido = $$v
+                                        },
+                                        expression: "idEmpleadoElegido"
+                                      }
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "icon icon-spinner",
+                                        attrs: { slot: "spinner" },
+                                        slot: "spinner"
+                                      }),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        {
+                                          attrs: { slot: "no-options" },
+                                          slot: "no-options"
+                                        },
+                                        [_vm._v("No hay Resultados!")]
+                                      )
+                                    ]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.cantidadServicio,
+                                      expression: "cantidadServicio"
+                                    }
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: { type: "number", "max:3": "" },
+                                  domProps: { value: _vm.cantidadServicio },
+                                  on: {
+                                    input: function($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.cantidadServicio = $event.target.value
+                                    }
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "td",
+                                [
+                                  _c(
+                                    "money",
+                                    _vm._b(
+                                      {
+                                        staticClass: "form-control",
+                                        model: {
+                                          value: _vm.valor_descuento,
+                                          callback: function($$v) {
+                                            _vm.valor_descuento = $$v
+                                          },
+                                          expression: "valor_descuento"
+                                        }
+                                      },
+                                      "money",
+                                      _vm.money,
+                                      false
+                                    ),
+                                    [_vm._v(_vm._s(_vm.valor_descuento))]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c("span", [
+                                  _vm._v(
+                                    "$" +
+                                      _vm._s(
+                                        _vm.formatearValor(
+                                          _vm.cantidadServicio *
+                                            detalle.valor_servicio -
+                                            _vm.valor_descuento
+                                        )
+                                      )
+                                  )
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-success",
+                                    attrs: { type: "button", title: "Agregar" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.agregarServicio()
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "fas fa-check" })]
+                                )
+                              ])
+                            ])
+                          }),
+                          0
+                        )
+                      ])
+                    ])
+                  ])
                 : _vm._e(),
               _vm._v(" "),
-              _vm.selectServProd != 0
-                ? _c("div", { staticClass: "col-md-12" }, [_vm._m(5)])
+              _vm.tipoServicioElegido == 2 && _vm.selectServicio != null
+                ? _c("div", { staticClass: "col-md-12" }, [
+                    _c("div", { staticClass: "table-responsive" }, [
+                      _c("table", { staticClass: "table table-bordered" }, [
+                        _vm._m(5),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          { staticStyle: { "font-weight": "normal" } },
+                          _vm._l(_vm.infoServicioElegido, function(detalle) {
+                            return _c("tr", { key: detalle.id }, [
+                              _c("td", [
+                                _c("span", [
+                                  _vm._v(_vm._s(detalle.nombre_servicio))
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.cantidadServicio,
+                                      expression: "cantidadServicio"
+                                    }
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: { type: "number", "max:3": "" },
+                                  domProps: { value: _vm.cantidadServicio },
+                                  on: {
+                                    input: function($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.cantidadServicio = $event.target.value
+                                    }
+                                  }
+                                })
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "td",
+                                [
+                                  _c(
+                                    "money",
+                                    _vm._b(
+                                      {
+                                        staticClass: "form-control",
+                                        model: {
+                                          value: _vm.valor_descuento,
+                                          callback: function($$v) {
+                                            _vm.valor_descuento = $$v
+                                          },
+                                          expression: "valor_descuento"
+                                        }
+                                      },
+                                      "money",
+                                      _vm.money,
+                                      false
+                                    ),
+                                    [_vm._v(_vm._s(_vm.valor_descuento))]
+                                  )
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c("span", [
+                                  _vm._v(
+                                    "$" +
+                                      _vm._s(
+                                        _vm.formatearValor(
+                                          _vm.cantidadServicio *
+                                            detalle.valor_servicio -
+                                            _vm.valor_descuento
+                                        )
+                                      )
+                                  )
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-success",
+                                    attrs: { type: "button", title: "Agregar" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.agregarServicio()
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "fas fa-check" })]
+                                )
+                              ])
+                            ])
+                          }),
+                          0
+                        )
+                      ])
+                    ])
+                  ])
                 : _vm._e()
             ])
           ]),
@@ -48000,23 +48419,19 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "table-responsive" }, [
-      _c("table", { staticClass: "table table-bordered table-hover" }, [
-        _c("thead", [
-          _c("tr", [
-            _c("th", [_vm._v("Servicio")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Realizado Por")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Cantidad")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Descuento")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Valor")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Acción")])
-          ])
-        ])
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Servicio")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Realizado Por")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Cantidad")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Descuento")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Valor")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Acción")])
       ])
     ])
   },
@@ -48024,21 +48439,17 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "table-responsive" }, [
-      _c("table", { staticClass: "table table-bordered table-hover" }, [
-        _c("thead", [
-          _c("tr", [
-            _c("th", [_vm._v("Producto")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Cantidad")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Descuento")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Valor")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Acción")])
-          ])
-        ])
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Producto")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Cantidad")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Descuento")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Valor")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Acción")])
       ])
     ])
   },
@@ -74457,7 +74868,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! c:\laragon\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\wuapasspa\resources\js\appAdmin.js */"./resources/js/appAdmin.js");
 
 
 /***/ })

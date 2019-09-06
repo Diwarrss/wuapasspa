@@ -134,6 +134,7 @@ Route::group(['middleware' => 'auth'], function () {
         //Controlador de Facturacion 2 Mejorada
         Route::get('/listarClientesFact', 'UserController@listarClientesFact')->name('listarClientesFact');
         Route::get('/listarServProd', 'ServiciosController@listarServProd')->name('listarServProd');
+        Route::get('/getServicioID', 'ServiciosController@getServicioID')->name('getServicioID');
 
         //pdf de factura servicios
         Route::get('/pdfFacturaServicios/{id}', 'FacturaController@pdfFacturaServicios');

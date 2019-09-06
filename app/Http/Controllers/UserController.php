@@ -63,8 +63,10 @@ class UserController extends Controller
 
     //listar empleados para seleccionarlos en el componente de agenda.
     //los peluqueos tienen el rol 2 y estan activos 1
-    public function showEmpleado()
+    public function showEmpleado(Request $request)
     {
+        if (!$request->ajax()) return redirect('/');
+
         $empleados = User::select('id', DB::raw("CONCAT(nombre_usuario,'  ',apellido_usuario) AS nombre"))
             ->where([
                 ['estado_usuario', '1'],

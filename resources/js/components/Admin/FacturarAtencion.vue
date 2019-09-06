@@ -53,7 +53,7 @@
                   <i slot="spinner" class="icon icon-spinner"></i>
                   <div slot="no-options">No hay Resultados!</div>
                 </v-select>
-                {{clienteSelect}}
+                <!-- {{clienteSelect}} -->
               </div>
             </div>
           </div>
@@ -72,19 +72,21 @@
               <div class="col-md-6 col-md-offset-3">
                 <v-select
                   :options="serviciosArray"
-                  :reduce="servicio => servicio.id"
+                  :reduce="servicio => servicio.id + ',' + servicio.tipo"
+                  @input="elegirServicio"
                   placeholder="Seleccionar servicio o producto"
                   label="nombre_servicio"
-                  v-model="selectServProd"
+                  v-model="selectServicio"
                 >
                   <i slot="spinner" class="icon icon-spinner"></i>
                   <div slot="no-options">No hay Resultados!</div>
                 </v-select>
+                <!-- {{selectServicio}} -->
                 <br />
               </div>
-              <div class="col-md-12" v-if="selectServProd !=0">
+              <div class="col-md-12" v-if="tipoServicioElegido == 1 && selectServicio !=null">
                 <div class="table-responsive">
-                  <table class="table table-bordered table-hover">
+                  <table class="table table-bordered">
                     <thead>
                       <tr>
                         <th>Servicio</th>
@@ -95,12 +97,64 @@
                         <th>Acción</th>
                       </tr>
                     </thead>
+                    <tbody style="font-weight: normal;">
+                      <!-- <tr v-if="infoServicioElegido.length == 0">
+                        <td colspan="6">
+                          <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
+                        </td>
+                      </tr>-->
+                      <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
+                        <td>
+                          <span>{{detalle.nombre_servicio}}</span>
+                        </td>
+                        <td>
+                          <v-select
+                            :options="lista_empleados"
+                            :reduce="empleado => empleado.id"
+                            placeholder="Seleccionar..."
+                            label="nombre"
+                            v-model="idEmpleadoElegido"
+                          >
+                            <i slot="spinner" class="icon icon-spinner"></i>
+                            <div slot="no-options">No hay Resultados!</div>
+                          </v-select>
+                        </td>
+                        <td>
+                          <input
+                            v-model="cantidadServicio"
+                            type="number"
+                            max:3
+                            class="form-control"
+                          />
+                        </td>
+                        <td>
+                          <money
+                            class="form-control"
+                            v-bind="money"
+                            v-model="valor_descuento"
+                          >{{valor_descuento}}</money>
+                        </td>
+                        <td>
+                          <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
+                        </td>
+                        <td>
+                          <button
+                            @click="agregarServicio()"
+                            type="button"
+                            class="btn btn-success"
+                            title="Agregar"
+                          >
+                            <i class="fas fa-check"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
               </div>
-              <div class="col-md-12" v-if="selectServProd !=0">
+              <div class="col-md-12" v-if="tipoServicioElegido == 2 && selectServicio !=null">
                 <div class="table-responsive">
-                  <table class="table table-bordered table-hover">
+                  <table class="table table-bordered">
                     <thead>
                       <tr>
                         <th>Producto</th>
@@ -110,6 +164,46 @@
                         <th>Acción</th>
                       </tr>
                     </thead>
+                    <tbody style="font-weight: normal;">
+                      <!-- <tr v-if="infoServicioElegido.length == 0">
+                        <td colspan="6">
+                          <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
+                        </td>
+                      </tr>-->
+                      <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
+                        <td>
+                          <span>{{detalle.nombre_servicio}}</span>
+                        </td>
+                        <td>
+                          <input
+                            v-model="cantidadServicio"
+                            type="number"
+                            max:3
+                            class="form-control"
+                          />
+                        </td>
+                        <td>
+                          <money
+                            class="form-control"
+                            v-bind="money"
+                            v-model="valor_descuento"
+                          >{{valor_descuento}}</money>
+                        </td>
+                        <td>
+                          <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
+                        </td>
+                        <td>
+                          <button
+                            @click="agregarServicio()"
+                            type="button"
+                            class="btn btn-success"
+                            title="Agregar"
+                          >
+                            <i class="fas fa-check"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
               </div>
@@ -510,7 +604,10 @@ export default {
   data() {
     return {
       clienteSelect: 0,
-      selectServProd: 0,
+      selectServicio: "",
+      tipoServicioElegido: "",
+      idServicioElegido: "",
+      infoServicioElegido: [],
       clientesArray: [],
       serviciosArray: [],
       arrayErrors: [],
@@ -541,7 +638,11 @@ export default {
         suffix: "",
         precision: 0,
         masked: false
-      }
+      },
+      lista_empleados: [],
+      cantidadServicio: 1,
+      valor_descuento: 0,
+      idEmpleadoElegido: 0
     };
   },
   methods: {
@@ -570,6 +671,24 @@ export default {
           me.serviciosArray = response.data;
           // handle success
           //console.log(me.serviciosArray);
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
+    //mostrar todos los empleados con Rol Empleado Activos
+    listaEmpleados() {
+      let me = this;
+      // Make a request for a user with a given ID
+      axios
+        .get("/showEmpleado")
+        .then(function(response) {
+          me.lista_empleados = response.data;
+          //console.log("Empleados: " + me.lista_empleados);
         })
         .catch(function(error) {
           // handle error
@@ -627,6 +746,62 @@ export default {
         .finally(function() {
           // always executed
         });
+    },
+    elegirServicio() {
+      let me = this;
+      let dataElegida = me.selectServicio;
+
+      if (dataElegida != null) {
+        me.valor_descuento = 0;
+        me.cantidadServicio = 1;
+        me.idServicioElegido = dataElegida.split(",", 1); //elegimos el primer valor encontrado antes de la ,
+        me.tipoServicioElegido = dataElegida.charAt(dataElegida.length - 1); //elegimos el ultimo valor como es 1 y 2 no hay problema
+
+        //si es un servicio se colocan los empleados
+        if (me.tipoServicioElegido == 1) {
+          me.listaEmpleados();
+        } /* else {
+          //console.log("Producto");
+        } */
+
+        if (me.idServicioElegido != "") {
+          //aqui vamos a realizar la consulta de los datos completos del servicio o producto seleccionado
+          axios
+            .get("/getServicioID", {
+              params: { id: me.idServicioElegido }
+            })
+            .then(function(response) {
+              me.infoServicioElegido = response.data;
+              //console.log(me.infoServicioElegido);
+            })
+            .catch(function(error) {
+              // handle error
+              console.log(error);
+            });
+        } else {
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            type: "error",
+            title: "No hay Servicio a buscar",
+            showConfirmButton: false,
+            timer: 2500
+          });
+        }
+      } else {
+        console.log("No hay Servicio Elegido");
+      }
+
+      //console.log(me.idServicioElegido);
+      //console.log(me.tipoServicioElegido);
+      /* Swal.fire({
+        toast: true,
+        position: "top-end",
+        type: "success",
+        title: "Servicio Seleccionado",
+        showConfirmButton: false,
+        timer: 2500
+      }); */
     },
     imagenSeleccionada2(event) {
       //metodo para capturar la imagen
@@ -717,6 +892,10 @@ export default {
           console.log(error);
           //console.log(me.arrayErrors);
         });
+    },
+    formatearValor(value) {
+      let val = (value / 1).toFixed(2).replace(".", ",");
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
   },
   mounted() {
