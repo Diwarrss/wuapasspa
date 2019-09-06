@@ -27,7 +27,28 @@
               </h3>
             </div>
             <div class="box-body">
-              <button class="btn btn-success">Diego Alejandro Vargas</button>
+              <div class="row" v-for="detalle in ordenesArray" :key="detalle.id">
+                <div class="col-md-10 col-xs-9 col-sm-9">
+                  <div
+                    class="callout callout-success table-hover"
+                    @click="elegirOrden(detalle.id)"
+                    style="cursor: pointer"
+                  >
+                    <h4>Orden 4</h4>
+
+                    <p>Cliente 11111</p>
+                  </div>
+                </div>
+                <div class="col-md-2 col-xs-3 col-sm-3">
+                  <button
+                    @click="eliminarOrden(detalle.id)"
+                    class="btn btn-danger"
+                    title="Eliminar orden"
+                  >
+                    <i class="fas fa-close"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -46,6 +67,7 @@
                 <v-select
                   :options="clientesArray"
                   :reduce="cliente => cliente.id"
+                  @input="elegirCliente"
                   placeholder="Buscar Cliente"
                   label="cliente"
                   v-model="clienteSelect"
@@ -57,173 +79,179 @@
               </div>
             </div>
           </div>
-          <div class="box box-primary">
-            <div class="box-header text-center">
-              <div class="col-md-12">
-                <h3 class="box-title">
-                  <i class="fas fa-coins"></i> Buscar Servicios o Productos
-                </h3>
-                <button class="btn btn-primary" @click="abrirModalServicios()">
-                  <i class="fas fa-plus"></i> Crear
-                </button>
+          <section v-show="mostrarDivs == 1">
+            <div class="box box-primary">
+              <div class="box-header text-center">
+                <div class="col-md-12">
+                  <h3 class="box-title">
+                    <i class="fas fa-coins"></i> Buscar Productos o Servicios
+                  </h3>
+                  <button class="btn btn-primary" @click="abrirModalServicios()">
+                    <i class="fas fa-plus"></i> Crear
+                  </button>
+                </div>
               </div>
-            </div>
-            <div class="box-body">
-              <div class="col-md-6 col-md-offset-3">
-                <v-select
-                  :options="serviciosArray"
-                  :reduce="servicio => servicio.id + ',' + servicio.tipo"
-                  @input="elegirServicio"
-                  placeholder="Seleccionar servicio o producto"
-                  label="nombre_servicio"
-                  v-model="selectServicio"
-                >
-                  <i slot="spinner" class="icon icon-spinner"></i>
-                  <div slot="no-options">No hay Resultados!</div>
-                </v-select>
-                <!-- {{selectServicio}} -->
-                <br />
-              </div>
-              <div class="col-md-12" v-if="tipoServicioElegido == 1 && selectServicio !=null">
-                <div class="table-responsive">
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th>Servicio</th>
-                        <th>Realizado Por</th>
-                        <th>Cantidad</th>
-                        <th>Descuento</th>
-                        <th>Valor</th>
-                        <th>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody style="font-weight: normal;">
-                      <!-- <tr v-if="infoServicioElegido.length == 0">
+              <div class="box-body">
+                <div class="col-md-6 col-md-offset-3">
+                  <v-select
+                    :options="serviciosArray"
+                    :reduce="servicio => servicio.id + ',' + servicio.tipo"
+                    @input="elegirServicio"
+                    placeholder="Seleccionar servicio o producto"
+                    label="nombre_servicio"
+                    v-model="selectServicio"
+                  >
+                    <i slot="spinner" class="icon icon-spinner"></i>
+                    <div slot="no-options">No hay Resultados!</div>
+                  </v-select>
+                  <!-- {{selectServicio}} -->
+                  <br />
+                </div>
+                <div class="col-md-12" v-if="tipoServicioElegido == 1 && selectServicio !=null">
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Servicio</th>
+                          <th>Realizado Por</th>
+                          <th>Cantidad</th>
+                          <th>Descuento</th>
+                          <th>Valor</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody style="font-weight: normal;">
+                        <!-- <tr v-if="infoServicioElegido.length == 0">
                         <td colspan="6">
                           <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
                         </td>
-                      </tr>-->
-                      <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
-                        <td>
-                          <span>{{detalle.nombre_servicio}}</span>
-                        </td>
-                        <td>
-                          <v-select
-                            :options="lista_empleados"
-                            :reduce="empleado => empleado.id"
-                            placeholder="Seleccionar..."
-                            label="nombre"
-                            v-model="idEmpleadoElegido"
-                          >
-                            <i slot="spinner" class="icon icon-spinner"></i>
-                            <div slot="no-options">No hay Resultados!</div>
-                          </v-select>
-                        </td>
-                        <td>
-                          <input
-                            v-model="cantidadServicio"
-                            type="number"
-                            max:3
-                            class="form-control"
-                          />
-                        </td>
-                        <td>
-                          <money
-                            class="form-control"
-                            v-bind="money"
-                            v-model="valor_descuento"
-                          >{{valor_descuento}}</money>
-                        </td>
-                        <td>
-                          <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
-                        </td>
-                        <td>
-                          <button
-                            @click="agregarServicio()"
-                            type="button"
-                            class="btn btn-success"
-                            title="Agregar"
-                          >
-                            <i class="fas fa-check"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        </tr>-->
+                        <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
+                          <td>
+                            <span>{{detalle.nombre_servicio}}</span>
+                          </td>
+                          <td>
+                            <v-select
+                              :options="lista_empleados"
+                              :reduce="empleado => empleado.id"
+                              placeholder="Seleccionar..."
+                              label="nombre"
+                              v-model="idEmpleadoElegido"
+                            >
+                              <i slot="spinner" class="icon icon-spinner"></i>
+                              <div slot="no-options">No hay Resultados!</div>
+                            </v-select>
+                          </td>
+                          <td>
+                            <number-input
+                              v-model="cantidadServicio"
+                              :min="1"
+                              :max="99"
+                              inline
+                              controls
+                              size="large"
+                            ></number-input>
+                          </td>
+                          <td>
+                            <money
+                              class="form-control"
+                              v-bind="money"
+                              v-model="valor_descuento"
+                            >{{valor_descuento}}</money>
+                          </td>
+                          <td>
+                            <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
+                          </td>
+                          <td>
+                            <button
+                              @click="agregarServicio(detalle.id)"
+                              type="button"
+                              class="btn btn-success"
+                              title="Agregar"
+                            >
+                              <i class="fas fa-check"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-12" v-if="tipoServicioElegido == 2 && selectServicio !=null">
-                <div class="table-responsive">
-                  <table class="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Descuento</th>
-                        <th>Valor</th>
-                        <th>Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody style="font-weight: normal;">
-                      <!-- <tr v-if="infoServicioElegido.length == 0">
+                <div class="col-md-12" v-if="tipoServicioElegido == 2 && selectServicio !=null">
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Producto</th>
+                          <th>Cantidad</th>
+                          <th>Descuento</th>
+                          <th>Valor</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody style="font-weight: normal;">
+                        <!-- <tr v-if="infoServicioElegido.length == 0">
                         <td colspan="6">
                           <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
                         </td>
-                      </tr>-->
-                      <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
-                        <td>
-                          <span>{{detalle.nombre_servicio}}</span>
-                        </td>
-                        <td>
-                          <input
-                            v-model="cantidadServicio"
-                            type="number"
-                            max:3
-                            class="form-control"
-                          />
-                        </td>
-                        <td>
-                          <money
-                            class="form-control"
-                            v-bind="money"
-                            v-model="valor_descuento"
-                          >{{valor_descuento}}</money>
-                        </td>
-                        <td>
-                          <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
-                        </td>
-                        <td>
-                          <button
-                            @click="agregarServicio()"
-                            type="button"
-                            class="btn btn-success"
-                            title="Agregar"
-                          >
-                            <i class="fas fa-check"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        </tr>-->
+                        <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
+                          <td>
+                            <span>{{detalle.nombre_servicio}}</span>
+                          </td>
+                          <td>
+                            <number-input
+                              v-model="cantidadServicio"
+                              :min="1"
+                              :max="99"
+                              inline
+                              controls
+                              size="large"
+                            ></number-input>
+                          </td>
+                          <td>
+                            <money
+                              class="form-control"
+                              v-bind="money"
+                              v-model="valor_descuento"
+                            >{{valor_descuento}}</money>
+                          </td>
+                          <td>
+                            <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
+                          </td>
+                          <td>
+                            <button
+                              @click="agregarServicio(detalle.id)"
+                              type="button"
+                              class="btn btn-success"
+                              title="Agregar"
+                            >
+                              <i class="fas fa-check"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="box box-default">
-            <div class="box-header text-center">
-              <div class="col-md-12">
-                <h3 class="box-title">
-                  <i class="fas fa-file-invoice-dollar"></i> Información a Facturar
-                </h3>
-              </div>
-              <div class="box-body"></div>
-              <div class="box-footer">
-                <button class="btn btn-success">
-                  <i class="fas fa-check"></i> Facturar
-                </button>
+            <div class="box box-default">
+              <div class="box-header text-center">
+                <div class="col-md-12">
+                  <h3 class="box-title">
+                    <i class="fas fa-file-invoice-dollar"></i> Información a Facturar
+                  </h3>
+                </div>
+                <div class="box-body"></div>
+                <div class="box-footer">
+                  <button class="btn btn-success">
+                    <i class="fas fa-check"></i> Facturar
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </section>
@@ -595,6 +623,7 @@
 <script>
 //importamos vue-select
 import vSelect from "vue-select";
+import VueNumberInput from "@chenfengyuan/vue-number-input";
 import "vue-select/dist/vue-select.css";
 import moment from "moment";
 export default {
@@ -642,10 +671,29 @@ export default {
       lista_empleados: [],
       cantidadServicio: 1,
       valor_descuento: 0,
-      idEmpleadoElegido: 0
+      idEmpleadoElegido: 0,
+      mostrarDivs: 0,
+      ordenesArray: []
     };
   },
   methods: {
+    listarOrdenes() {
+      let me = this;
+      axios
+        .get("/listarOrdenes")
+        .then(function(response) {
+          me.ordenesArray = response.data;
+          // handle success
+          console.log(me.ordenesArray);
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        })
+        .finally(function() {
+          // always executed
+        });
+    },
     listarClientesFact() {
       let me = this;
       axios
@@ -826,12 +874,13 @@ export default {
       fileCargada.append("stock", me.stock);
 
       //reseteamos los errores
-      this.arrayErrors = [];
+      me.arrayErrors = [];
 
       axios
         .post("/crearServicio", fileCargada)
         .then(function(response) {
           me.cerrarModal();
+          me.listarServProd();
           Swal.fire({
             toast: true,
             position: "top-end",
@@ -874,6 +923,7 @@ export default {
         })
         .then(function(response) {
           me.cerrarModal();
+          me.listarClientesFact();
           Swal.fire({
             toast: true,
             position: "top-end",
@@ -896,11 +946,50 @@ export default {
     formatearValor(value) {
       let val = (value / 1).toFixed(2).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    elegirCliente() {
+      let me = this;
+      me.mostrarDivs = 1;
+      me.mostrarDivs = 1;
+    },
+    agregarServicio(id) {
+      let me = this;
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        type: "success",
+        title: "Agregado con éxito",
+        showConfirmButton: false,
+        timer: 2500
+      });
+    },
+    eliminarOrden(id) {
+      let me = this;
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        type: "success",
+        title: "Eliminado con exito Orden",
+        showConfirmButton: false,
+        timer: 2500
+      });
+    },
+    elegirOrden(id) {
+      let me = this;
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        type: "success",
+        title: "Orden Elejida con exito",
+        showConfirmButton: false,
+        timer: 2500
+      });
     }
   },
   mounted() {
     this.listarClientesFact();
     this.listarServProd();
+    this.listarOrdenes();
   }
 };
 </script>

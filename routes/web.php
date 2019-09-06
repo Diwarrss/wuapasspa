@@ -135,6 +135,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/listarClientesFact', 'UserController@listarClientesFact')->name('listarClientesFact');
         Route::get('/listarServProd', 'ServiciosController@listarServProd')->name('listarServProd');
         Route::get('/getServicioID', 'ServiciosController@getServicioID')->name('getServicioID');
+        Route::get('/listarOrdenes', 'OrdenController@listarOrdenes')->name('listarOrdenes');
 
         //pdf de factura servicios
         Route::get('/pdfFacturaServicios/{id}', 'FacturaController@pdfFacturaServicios');
