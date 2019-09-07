@@ -11,7 +11,16 @@ class OrdenController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
 
-        $ordenes = \App\Orden::where('estado_orden', 2)->get();
+        $ordenes = \App\Orden::join('users as cliente', 'ordens.cliente', '=', 'cliente.id')
+            ->select(
+                'ordens.id as idOrden',
+                'ordens.created_at',
+                'ordens.prefijo',
+                'ordens.numero_orden',
+                'cliente.nombre_usuario',
+                'cliente.apellido_usuario'
+            )
+            ->where('estado_orden', 2)->get();
 
         return $ordenes;
     }

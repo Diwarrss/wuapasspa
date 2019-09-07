@@ -6511,6 +6511,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 //importamos vue-select
 
 
@@ -47531,25 +47533,50 @@ var render = function() {
               { staticClass: "box-body" },
               _vm._l(_vm.ordenesArray, function(detalle) {
                 return _c("div", { key: detalle.id, staticClass: "row" }, [
-                  _c("div", { staticClass: "col-md-10 col-xs-9 col-sm-9" }, [
-                    _c(
-                      "div",
-                      {
-                        staticClass: "callout callout-success table-hover",
-                        staticStyle: { cursor: "pointer" },
-                        on: {
-                          click: function($event) {
-                            return _vm.elegirOrden(detalle.id)
+                  _c(
+                    "div",
+                    {
+                      staticClass: "col-md-10 col-xs-9 col-sm-9",
+                      staticStyle: { "font-weight": "normal" }
+                    },
+                    [
+                      _c(
+                        "div",
+                        {
+                          staticClass: "callout callout-success",
+                          staticStyle: { cursor: "pointer" },
+                          on: {
+                            click: function($event) {
+                              return _vm.elegirOrden(detalle.id)
+                            }
                           }
-                        }
-                      },
-                      [
-                        _c("h4", [_vm._v("Orden 4")]),
-                        _vm._v(" "),
-                        _c("p", [_vm._v("Cliente 11111")])
-                      ]
-                    )
-                  ]),
+                        },
+                        [
+                          _c("h4", [
+                            _c("i", { staticClass: "fas fa-user" }),
+                            _vm._v(
+                              "\n                    Cliente: " +
+                                _vm._s(
+                                  detalle.nombre_usuario +
+                                    " " +
+                                    detalle.apellido_usuario
+                                ) +
+                                "\n                  "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("p", [
+                            _vm._v(
+                              "Numero: " +
+                                _vm._s(
+                                  detalle.prefijo + " " + detalle.numero_orden
+                                )
+                            )
+                          ])
+                        ]
+                      )
+                    ]
+                  ),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-2 col-xs-3 col-sm-3" }, [
                     _c(

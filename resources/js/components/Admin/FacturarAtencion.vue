@@ -28,15 +28,17 @@
             </div>
             <div class="box-body">
               <div class="row" v-for="detalle in ordenesArray" :key="detalle.id">
-                <div class="col-md-10 col-xs-9 col-sm-9">
+                <div class="col-md-10 col-xs-9 col-sm-9" style="font-weight: normal;">
                   <div
-                    class="callout callout-success table-hover"
+                    class="callout callout-success"
                     @click="elegirOrden(detalle.id)"
                     style="cursor: pointer"
                   >
-                    <h4>Orden 4</h4>
-
-                    <p>Cliente 11111</p>
+                    <h4>
+                      <i class="fas fa-user"></i>
+                      Cliente: {{detalle.nombre_usuario+ ' ' +detalle.apellido_usuario}}
+                    </h4>
+                    <p>Numero: {{detalle.prefijo+ ' ' +detalle.numero_orden}}</p>
                   </div>
                 </div>
                 <div class="col-md-2 col-xs-3 col-sm-3">
