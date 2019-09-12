@@ -290,6 +290,7 @@
                 file: '',
                 idImagen: '',
                 url_imagen: '',
+                tipoAccionModal: ''
             }
         },
         methods: {
