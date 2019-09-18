@@ -67,9 +67,9 @@
             <div class="box-body">
               <div class="col-md-6 col-md-offset-3">
                 <v-select
+                  @input="elegirCliente"
                   :options="clientesArray"
                   :reduce="cliente => cliente.id"
-                  @input="elegirCliente"
                   placeholder="Buscar Cliente"
                   label="cliente"
                   v-model="clienteSelect"
@@ -77,11 +77,11 @@
                   <i slot="spinner" class="icon icon-spinner"></i>
                   <div slot="no-options">No hay Resultados!</div>
                 </v-select>
-                <!-- {{clienteSelect}} -->
+                <!-- {{clienteSelect}}  @input="elegirCliente"-->
               </div>
             </div>
           </div>
-          <section v-show="mostrarDivs == 1">
+          <section v-if="mostrarDivs == 1">
             <div class="box box-primary">
               <div class="box-header text-center">
                 <div class="col-md-12">
@@ -185,6 +185,7 @@
                       <thead>
                         <tr>
                           <th>Producto</th>
+                          <th>Valor Unitario</th>
                           <th>Cantidad</th>
                           <th>Descuento</th>
                           <th>Valor</th>
@@ -197,13 +198,20 @@
                           <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
                         </td>
                         </tr>-->
-                        <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
+                        <tr v-for="(detalle, index) in infoServicioElegido" v-bind:key="index">
                           <td>
                             <span>{{detalle.nombre_servicio}}</span>
                           </td>
                           <td>
+                            <money
+                              class="form-control"
+                              v-bind="money"
+                              v-model="detalle.valor_servicio"
+                            >{{detalle.valor_servicio}}</money>
+                          </td>
+                          <td>
                             <number-input
-                              v-model="cantidadServicio"
+                              v-model="detalle.cantidad"
                               :min="1"
                               :max="99"
                               inline
@@ -219,7 +227,7 @@
                             >{{valor_descuento}}</money>
                           </td>
                           <td>
-                            <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
+                            <span>${{formatearValor((detalle.cantidad*detalle.valor_servicio)-valor_descuento)}}</span>
                           </td>
                           <td>
                             <button
@@ -663,11 +671,11 @@ export default {
       valorServicio: "",
       //para usar el vue componente de moneyConcurrente
       money: {
-        decimal: ",",
-        thousands: ".",
-        prefix: "$",
+        decimal: ".",
+        thousands: ",",
+        prefix: "",
         suffix: "",
-        precision: 0,
+        precision: 2,
         masked: false
       },
       lista_empleados: [],
@@ -679,6 +687,7 @@ export default {
     };
   },
   methods: {
+    //before this is my own methods
     listarOrdenes() {
       let me = this;
       axios
@@ -821,7 +830,13 @@ export default {
               params: { id: me.idServicioElegido }
             })
             .then(function(response) {
-              me.infoServicioElegido = response.data;
+              if (me.infoServicioElegido.length > 0) {
+                response.data[0].cantidad = 1;
+                me.infoServicioElegido.push(response.data[0]);
+              } else {
+                response.data[0].cantidad = 1;
+                me.infoServicioElegido = response.data;
+              }
               //console.log(me.infoServicioElegido);
             })
             .catch(function(error) {
@@ -951,8 +966,11 @@ export default {
     },
     elegirCliente() {
       let me = this;
-      me.mostrarDivs = 1;
-      me.mostrarDivs = 1;
+      if (me.clienteSelect == null) {
+        me.mostrarDivs = 0;
+      } else {
+        me.mostrarDivs = 1;
+      }
     },
     agregarServicio(id) {
       let me = this;
