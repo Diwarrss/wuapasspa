@@ -136,6 +136,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/listarServProd', 'ServiciosController@listarServProd')->name('listarServProd');
         Route::get('/getServicioID', 'ServiciosController@getServicioID')->name('getServicioID');
         Route::get('/listarOrdenes', 'OrdenController@listarOrdenes')->name('listarOrdenes');
+        Route::post('/guardarOrdenes', 'OrdenController@guardarOrdenes')->name('guardarOrdenes');
+        Route::post('/eliminarArticulo', 'OrdenController@eliminarArticulo')->name('eliminarArticulo');
 
         //pdf de factura servicios
         Route::get('/pdfFacturaServicios/{id}', 'FacturaController@pdfFacturaServicios');

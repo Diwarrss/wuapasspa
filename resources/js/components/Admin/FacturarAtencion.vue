@@ -109,82 +109,14 @@
                   <!-- {{selectServicio}} -->
                   <br />
                 </div>
-                <div class="col-md-12" v-if="tipoServicioElegido == 1 && selectServicio !=null">
+
+                <div class="col-md-12" v-if="selectServicio !=null">
                   <div class="table-responsive">
                     <table class="table table-bordered">
                       <thead>
                         <tr>
-                          <th>Servicio</th>
+                          <th>Articulo</th>
                           <th>Realizado Por</th>
-                          <th>Cantidad</th>
-                          <th>Descuento</th>
-                          <th>Valor</th>
-                          <th>Acción</th>
-                        </tr>
-                      </thead>
-                      <tbody style="font-weight: normal;">
-                        <!-- <tr v-if="infoServicioElegido.length == 0">
-                        <td colspan="6">
-                          <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
-                        </td>
-                        </tr>-->
-                        <tr v-for="detalle in infoServicioElegido" :key="detalle.id">
-                          <td>
-                            <span>{{detalle.nombre_servicio}}</span>
-                          </td>
-                          <td>
-                            <v-select
-                              :options="lista_empleados"
-                              :reduce="empleado => empleado.id"
-                              placeholder="Seleccionar..."
-                              label="nombre"
-                              v-model="idEmpleadoElegido"
-                            >
-                              <i slot="spinner" class="icon icon-spinner"></i>
-                              <div slot="no-options">No hay Resultados!</div>
-                            </v-select>
-                          </td>
-                          <td>
-                            <number-input
-                              v-model="cantidadServicio"
-                              :min="1"
-                              :max="99"
-                              inline
-                              controls
-                              size="large"
-                            ></number-input>
-                          </td>
-                          <td>
-                            <money
-                              class="form-control"
-                              v-bind="money"
-                              v-model="valor_descuento"
-                            >{{valor_descuento}}</money>
-                          </td>
-                          <td>
-                            <span>${{formatearValor((cantidadServicio*detalle.valor_servicio)-valor_descuento)}}</span>
-                          </td>
-                          <td>
-                            <button
-                              @click="agregarServicio(detalle.id)"
-                              type="button"
-                              class="btn btn-success"
-                              title="Agregar"
-                            >
-                              <i class="fas fa-check"></i>
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="col-md-12" v-if="tipoServicioElegido == 2 && selectServicio !=null">
-                  <div class="table-responsive">
-                    <table class="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th>Producto</th>
                           <th>Valor Unitario</th>
                           <th>Cantidad</th>
                           <th>Descuento</th>
@@ -198,12 +130,27 @@
                           <div class="alert alert-danger text-center" role="alert">No hay Datos</div>
                         </td>
                         </tr>-->
-                        <tr v-for="(detalle, index) in infoServicioElegido" v-bind:key="index">
+                        <tr v-for="(detalle,index) in infoServicioElegido" v-bind:key="index">
                           <td>
                             <span>{{detalle.nombre_servicio}}</span>
                           </td>
                           <td>
+                            <v-select
+                              :disabled="detalle.desabilitado"
+                              v-if="detalle.tipo == 1"
+                              :options="lista_empleados"
+                              :reduce="empleado => empleado.id"
+                              placeholder="Seleccionar..."
+                              label="nombre"
+                              v-model="detalle.realizadoPor"
+                            >
+                              <i slot="spinner" class="icon icon-spinner"></i>
+                              <div slot="no-options">No hay Resultados!</div>
+                            </v-select>
+                          </td>
+                          <td>
                             <money
+                              :disabled="detalle.desabilitado"
                               class="form-control"
                               v-bind="money"
                               v-model="detalle.valor_servicio"
@@ -211,6 +158,7 @@
                           </td>
                           <td>
                             <number-input
+                              :disabled="detalle.desabilitado"
                               v-model="detalle.cantidad"
                               :min="1"
                               :max="99"
@@ -221,22 +169,33 @@
                           </td>
                           <td>
                             <money
+                              :disabled="detalle.desabilitado"
                               class="form-control"
                               v-bind="money"
-                              v-model="valor_descuento"
-                            >{{valor_descuento}}</money>
+                              v-model="detalle.descuento"
+                            >{{detalle.descuento}}</money>
                           </td>
                           <td>
-                            <span>${{formatearValor((detalle.cantidad*detalle.valor_servicio)-valor_descuento)}}</span>
+                            <span>${{formatearValor((detalle.cantidad*detalle.valor_servicio)-detalle.descuento)}}</span>
                           </td>
                           <td>
                             <button
-                              @click="agregarServicio(detalle.id)"
+                              v-if="detalle.guardado == 0"
+                              @click="agregarArticulo(detalle,index)"
                               type="button"
                               class="btn btn-success"
                               title="Agregar"
                             >
                               <i class="fas fa-check"></i>
+                            </button>
+                            <button
+                              @click="eliminarArticulo(detalle,index)"
+                              v-else
+                              type="button"
+                              class="btn btn-danger"
+                              title="Elmininar"
+                            >
+                              <i class="fas fa-window-close"></i>
                             </button>
                           </td>
                         </tr>
@@ -684,6 +643,7 @@ export default {
       idEmpleadoElegido: 0,
       mostrarDivs: 0,
       ordenesArray: []
+      //provicional para reactivity
     };
   },
   methods: {
@@ -831,10 +791,18 @@ export default {
             })
             .then(function(response) {
               if (me.infoServicioElegido.length > 0) {
-                response.data[0].cantidad = 1;
+                response.data[0].cantidad = 1; //cantidad defaul del porducto o servicios
+                response.data[0].realizadoPor = 0; //id del empleado que hizo el servicio
+                response.data[0].descuento = 0;
+                response.data[0].guardado = 0; //apenas se crea por eso el estado de guardado es 0
+                response.data[0].desabilitado = false; //Una vez guardado no se puede modificar
                 me.infoServicioElegido.push(response.data[0]);
               } else {
                 response.data[0].cantidad = 1;
+                response.data[0].realizadoPor = 0;
+                response.data[0].descuento = 0;
+                response.data[0].guardado = 0; //apenas se crea por eso el estado de guardado es 0
+                response.data[0].desabilitado = false; //Una vez guardado no se puede modificar
                 me.infoServicioElegido = response.data;
               }
               //console.log(me.infoServicioElegido);
@@ -972,8 +940,28 @@ export default {
         me.mostrarDivs = 1;
       }
     },
-    agregarServicio(id) {
+    agregarArticulo(detalle, index) {
       let me = this;
+      axios
+        .post("/guardarOrdenes", {
+          detalle: detalle
+        })
+        .then(function(response) {
+          //response.data
+          me.infoServicioElegido[index].realizadoPor =
+            response.data.realizadoPor;
+          me.infoServicioElegido[index].valor_servicio =
+            response.data.valor_servicio;
+          me.infoServicioElegido[index].cantidad = response.data.cantidad;
+          me.infoServicioElegido[index].descuento = response.data.descuento;
+          me.infoServicioElegido[index].guardado = response.data.guardado;
+          me.infoServicioElegido[index].desabilitado =
+            response.data.desabilitado;
+          console.log("done");
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
       Swal.fire({
         toast: true,
         position: "top-end",
@@ -982,6 +970,22 @@ export default {
         showConfirmButton: false,
         timer: 2500
       });
+    },
+    eliminarArticulo(detalle, index) {
+      let me = this;
+      axios
+        .post("/eliminarArticulo", {
+          detalle: detalle
+        })
+        .then(function(response) {
+          if (response.data) {
+            me.infoServicioElegido.splice(index, 1);
+            console.log("elminiado");
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     },
     eliminarOrden(id) {
       let me = this;

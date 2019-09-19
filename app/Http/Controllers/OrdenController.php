@@ -24,4 +24,19 @@ class OrdenController extends Controller
 
         return $ordenes;
     }
+    //esta madre falta hacerla en la base de datos x ahora solo visual
+    public function guardarOrdenes(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $detalle = $request->detalle;
+        $detalle["guardado"] = 1;
+        $detalle["desabilitado"] = true;
+        return $detalle;
+    }
+    public function eliminarArticulo(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $eliminado = "true";
+        return $eliminado;
+    }
 }
