@@ -630,11 +630,11 @@ export default {
       valorServicio: "",
       //para usar el vue componente de moneyConcurrente
       money: {
-        decimal: ".",
-        thousands: ",",
-        prefix: "",
+        decimal: ",",
+        thousands: ".",
+        prefix: "$",
         suffix: "",
-        precision: 2,
+        precision: 0,
         masked: false
       },
       lista_empleados: [],
@@ -929,7 +929,7 @@ export default {
         });
     },
     formatearValor(value) {
-      let val = (value / 1).toFixed(2).replace(".", ",");
+      let val = (value / 1).toFixed(0).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     elegirCliente() {
