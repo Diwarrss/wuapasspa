@@ -6480,39 +6480,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //importamos vue-select
 
 
@@ -6557,7 +6524,7 @@ __webpack_require__.r(__webpack_exports__);
         thousands: ".",
         prefix: "$",
         suffix: "",
-        precision: 0,
+        precision: 2,
         masked: false
       },
       lista_empleados: [],
@@ -6565,10 +6532,12 @@ __webpack_require__.r(__webpack_exports__);
       valor_descuento: 0,
       idEmpleadoElegido: 0,
       mostrarDivs: 0,
-      ordenesArray: []
+      ordenesArray: [] //provicional para reactivity
+
     };
   },
   methods: {
+    //before this is my own methods
     listarOrdenes: function listarOrdenes() {
       var me = this;
       axios.get("/listarOrdenes").then(function (response) {
@@ -6690,7 +6659,28 @@ __webpack_require__.r(__webpack_exports__);
               id: me.idServicioElegido
             }
           }).then(function (response) {
-            me.infoServicioElegido = response.data; //console.log(me.infoServicioElegido);
+            if (me.infoServicioElegido.length > 0) {
+              response.data[0].cantidad = 1; //cantidad defaul del porducto o servicios
+
+              response.data[0].realizadoPor = 0; //id del empleado que hizo el servicio
+
+              response.data[0].descuento = 0;
+              response.data[0].guardado = 0; //apenas se crea por eso el estado de guardado es 0
+
+              response.data[0].desabilitado = false; //Una vez guardado no se puede modificar
+
+              me.infoServicioElegido.push(response.data[0]);
+            } else {
+              response.data[0].cantidad = 1;
+              response.data[0].realizadoPor = 0;
+              response.data[0].descuento = 0;
+              response.data[0].guardado = 0; //apenas se crea por eso el estado de guardado es 0
+
+              response.data[0].desabilitado = false; //Una vez guardado no se puede modificar
+
+              me.infoServicioElegido = response.data;
+            } //console.log(me.infoServicioElegido);
+
           })["catch"](function (error) {
             // handle error
             console.log(error);
@@ -6801,16 +6791,34 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     formatearValor: function formatearValor(value) {
-      var val = (value / 1).toFixed(2).replace(".", ",");
+      var val = (value / 1).toFixed(0).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     elegirCliente: function elegirCliente() {
       var me = this;
-      me.mostrarDivs = 1;
-      me.mostrarDivs = 1;
+
+      if (me.clienteSelect == null) {
+        me.mostrarDivs = 0;
+      } else {
+        me.mostrarDivs = 1;
+      }
     },
-    agregarServicio: function agregarServicio(id) {
+    agregarArticulo: function agregarArticulo(detalle, index) {
       var me = this;
+      axios.post("/guardarOrdenes", {
+        detalle: detalle
+      }).then(function (response) {
+        //response.data
+        me.infoServicioElegido[index].realizadoPor = response.data.realizadoPor;
+        me.infoServicioElegido[index].valor_servicio = response.data.valor_servicio;
+        me.infoServicioElegido[index].cantidad = response.data.cantidad;
+        me.infoServicioElegido[index].descuento = response.data.descuento;
+        me.infoServicioElegido[index].guardado = response.data.guardado;
+        me.infoServicioElegido[index].desabilitado = response.data.desabilitado;
+        console.log("done");
+      })["catch"](function (error) {
+        console.log(error);
+      });
       Swal.fire({
         toast: true,
         position: "top-end",
@@ -6818,6 +6826,19 @@ __webpack_require__.r(__webpack_exports__);
         title: "Agregado con éxito",
         showConfirmButton: false,
         timer: 2500
+      });
+    },
+    eliminarArticulo: function eliminarArticulo(detalle, index) {
+      var me = this;
+      axios.post("/eliminarArticulo", {
+        detalle: detalle
+      }).then(function (response) {
+        if (response.data) {
+          me.infoServicioElegido.splice(index, 1);
+          console.log("elminiado");
+        }
+      })["catch"](function (error) {
+        console.log(error);
       });
     },
     eliminarOrden: function eliminarOrden(id) {
@@ -7967,7 +7988,8 @@ __webpack_require__.r(__webpack_exports__);
       //el id del servicio
       file: '',
       idImagen: '',
-      url_imagen: ''
+      url_imagen: '',
+      tipoAccionModal: ''
     };
   },
   methods: {
@@ -13213,7 +13235,7 @@ exports = module.exports = __webpack_require__(/*! ../../css-loader/lib/css-base
 
 
 // module
-exports.push([module.i, ".v-cal-dialog {\n    position: fixed;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n    z-index: 999;\n    -webkit-box-sizing: border-box;\n    box-sizing: border-box;\n}\n.v-cal-dialog * {\n    -webkit-box-sizing: inherit;\n    box-sizing: inherit;\n}\n.v-cal-dialog .v-cal-dialog__bg {\n    background-color: rgba(0, 0, 0, 0.3);\n    position: absolute;\n    width: 100%;\n    height: 100%}\n.v-cal-dialog .v-cal-dialog-card {\n    position: absolute;\n    background: #fff;\n    width: 90%;\n    top: 50%;\n    left: 50%;\n    -webkit-transform: translate(-50%,  -50%);\n    transform: translate(-50%,  -50%);\n    max-width: 500px;\n    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);\n    box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);\n}\n.v-cal-dialog .v-cal-dialog-card__header {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -ms-flex-align: center;\n    align-items: center;\n    padding: 20px;\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__title {\n    font-size: 13px;\n    margin: 0;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close {\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n    -moz-appearance: none;\n    -webkit-appearance: none;\n    background-color: transparent;\n    border: none;\n    cursor: pointer;\n    display: inline-block;\n    -webkit-box-flex: 0;\n    -ms-flex-positive: 0;\n    flex-grow: 0;\n    -ms-flex-negative: 0;\n    flex-shrink: 0;\n    font-size: 0;\n    height: 18px;\n    max-height: 18px;\n    max-width: 18px;\n    min-height: 18px;\n    min-width: 18px;\n    outline: none;\n    position: relative;\n    vertical-align: top;\n    width: 18px;\n    padding: 0;\n    margin-left: auto;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before, .v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after {\n    background-color: #BCBCCB;\n    content: \"\";\n    display: block;\n    left: 50%;\n    position: absolute;\n    top: 50%;\n    -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);\n    transform: translateX(-50%) translateY(-50%) rotate(45deg);\n    -webkit-transform-origin: center center;\n    transform-origin: center center;\n}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before {\n    height: 2px;\n    width: 100%}\n.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after {\n    height: 100%;\n    width: 2px;\n}\n.v-cal-dialog .v-cal-dialog-card__body {\n    max-height: 550px;\n    overflow: auto;\n    padding: 20px;\n}\n.v-cal-dialog .v-cal-fields {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -ms-flex-wrap: wrap;\n    flex-wrap: wrap;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -ms-flex-wrap: wrap;\n    flex-wrap: wrap;\n    padding: 10px;\n    width: 100%}\n.v-cal-dialog .v-cal-fields .v-cal-input-group>label {\n    width: 100%;\n    margin-bottom: 5px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"checkbox\"], .v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"radio\"] {\n    margin-right: 5px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input {\n    width: auto;\n    -webkit-box-flex: 1;\n    -ms-flex: 1;\n    flex: 1;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:first-of-type {\n    padding-left: 0;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:last-of-type {\n    padding-right: 0;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input {\n    padding: 10px;\n    width: 100%}\n.v-cal-dialog .v-cal-fields .v-cal-input.is-inline label {\n    margin-bottom: 0;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input.is-radio input, .v-cal-dialog .v-cal-fields .v-cal-input.is-checkbox input {\n    margin-right: 5px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input label {\n    display: inline-block;\n    margin-bottom: 10px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"], .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"], .v-cal-dialog .v-cal-fields .v-cal-input textarea, .v-cal-dialog .v-cal-fields .v-cal-input select {\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n    display: block;\n    font-family: inherit;\n    width: 100%;\n    border: 1px solid #E8E9EC;\n    border-radius: 4px;\n    padding: 10px 12px;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:hover, .v-cal-dialog .v-cal-fields .v-cal-input textarea:hover, .v-cal-dialog .v-cal-fields .v-cal-input select:hover {\n    border-color: #808495;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:focus, .v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:active, .v-cal-dialog .v-cal-fields .v-cal-input textarea:focus, .v-cal-dialog .v-cal-fields .v-cal-input textarea:active, .v-cal-dialog .v-cal-fields .v-cal-input select:focus, .v-cal-dialog .v-cal-fields .v-cal-input select:active {\n    border-color: #3B86FF;\n}\n.v-cal-dialog .v-cal-fields .v-cal-input textarea {\n    min-width: 100%;\n    max-width: 100%;\n    min-height: 100px;\n    max-height: 150px;\n}\n.v-cal-dialog .v-cal-dialog-card__footer {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -ms-flex-align: center;\n    align-items: center;\n    padding: 20px;\n    border-top: 1px solid #EAF0F4;\n    -webkit-box-pack: end;\n    -ms-flex-pack: end;\n    justify-content: flex-end;\n}\n.v-cal {\n    font-family: inherit;\n    font-size: inherit;\n    padding: 20px;\n    background-color: #fff;\n    color: #4D4F5C;\n    -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);\n    -webkit-box-sizing: border-box;\n    box-sizing: border-box;\n}\n.v-cal * {\n    -webkit-box-sizing: inherit;\n    box-sizing: inherit;\n}\n.v-cal-button {\n    cursor: pointer;\n    background: #fff;\n    padding: 8px 18px;\n    border: 1px solid #D7DAE2;\n    -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);\n    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);\n    font-size: 13px;\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n}\n.v-cal-button.is-rounded {\n    border-radius: 4px;\n}\n.v-cal-button.v-cal-button--is-active {\n    background-color: #fff;\n    color: #3B86FF;\n}\n.v-cal-button:hover {\n    color: #3B86FF;\n    background-color: #fcfcfc;\n}\n.v-cal-button.is-primary {\n    border-color: #3B86FF;\n    background-color: #3B86FF;\n    color: #fff;\n}\n.v-cal-button:disabled, .v-cal-button:disabled:hover {\n    background-color: #f0f0f0;\n    color: #d0d0d0;\n    cursor: not-allowed;\n    border-color: #D7DAE2;\n}\n.v-cal-header {\n    padding: 0 0 40px;\n}/*\n.v-cal-header__actions {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-pack: justify;\n    -ms-flex-pack: justify;\n    justify-content: space-between;\n}\n.v-cal-header__actions .actions-left, .v-cal-header__actions .actions-right {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n}\n.v-cal-header__actions .v-cal-button:first-child {\n    border-bottom-left-radius: 4px;\n    border-top-left-radius: 4px;\n}\n.v-cal-header__actions .v-cal-button:last-child {\n    border-bottom-right-radius: 4px;\n    border-top-right-radius: 4px;\n}\n.v-cal-header__actions .v-cal-button:not(:last-child) {\n    border-right: none;\n}*/\n.v-cal-header__title-bar .v-cal-header__title {\n    margin: 0;\n    font-size: 18px;\n    font-weight: normal;\n    text-align: center;\n}\n.v-cal-content {\n    border: 1px solid #EAF0F4;\n}\n.v-cal-content .v-cal-weekdays, .v-cal-content .v-cal-days {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n}\n.v-cal-content .v-cal-event-item {\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    user-select: none;\n    position: relative;\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n    background-color: #3B86FF;\n    color: #3B86FF;\n    border-radius: 4px;\n    padding: 7px 14px;\n    text-align: left;\n    white-space: nowrap;\n    overflow: hidden;\n    cursor: pointer;\n}\n.v-cal-content .v-cal-event-item::after {\n    content: '';\n    display: block;\n    position: absolute;\n    width: 14px;\n    height: 100%;\n    top: 0;\n    right: 0;\n    background: -webkit-gradient(linear,  left top,  right top,  from(transparent),  color-stop(75%,  currentColor));\n    background: linear-gradient(to right,  transparent 0%,  currentColor 75%);\n}\n.v-cal-content .v-cal-event-item:not(:last-child) {\n    margin-bottom: 1px;\n}\n.v-cal-content .v-cal-event-item .v-cal-event-time, .v-cal-content .v-cal-event-item .v-cal-event-name {\n    color: #fff;\n}\n.v-cal-content .v-cal-event-item .v-cal-event-time {\n    font-weight: bold;\n    font-size: 12px;\n}\n.v-cal-content .v-cal-event-item .v-cal-event-name {\n    margin-left: 5px;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day, .v-cal-content.v-cal-content--week .v-cal-days .v-cal-day, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-day {\n    background: #fff;\n}\n.v-cal-content.v-cal-content--month .v-cal-weekdays, .v-cal-content.v-cal-content--week .v-cal-weekdays, .v-cal-content.v-cal-content--day .v-cal-weekdays {\n    background-color: #F5F6FA;\n    color: #A3A6B4;\n    text-transform: uppercase;\n    font-size: 13px;\n    font-weight: bold;\n    text-align: center;\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item, .v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday-item, .v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item {\n    padding: 15px 0;\n}\n.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item, .v-cal-content.v-cal-content--month .v-cal-days .v-cal-day {\n    width: 14.28571%}\n.v-cal-content.v-cal-content--month .v-cal-days:not(:last-child) {\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day {\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n    position: relative;\n    text-align: right;\n    min-height: 140px;\n    padding-bottom: 2px;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month {\n    overflow: hidden;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month.is-extended {\n    height: auto;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-today {\n    background-color: #F5F6FA;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-different-month {\n    color: rgba(67, 66, 93, 0.3);\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(:last-child) {\n    border-right: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(.is-disabled):hover {\n    background-color: #fcfcfc;\n}\n.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day .v-cal-day__number {\n    display: block;\n    font-size: 12px;\n    padding: 10px;\n}\n.v-cal-content.v-cal-content--month .v-cal-day.is-disabled, .v-cal-content.v-cal-content--week .v-cal-day.is-disabled {\n    background-color: #f0f0f0;\n    color: #b0b0b0;\n}\n.v-cal-content.v-cal-content--week .v-cal-hour.all-day, .v-cal-content.v-cal-content--week .v-cal-day__hour-block.all-day, .v-cal-content.v-cal-content--day .v-cal-hour.all-day, .v-cal-content.v-cal-content--day .v-cal-day__hour-block.all-day {\n    border-width: 3px !important;\n}\n.v-cal-content.v-cal-content--week .v-cal-times, .v-cal-content.v-cal-content--day .v-cal-times {\n    background: #fff;\n    font-size: 12px;\n    font-weight: normal;\n    border-right: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour, .v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour {\n    padding: 15px;\n}\n.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour.is-now, .v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour.is-now {\n    font-weight: bold;\n}\n.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour:not(:last-child) {\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day {\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today {\n    background-color: #F5F6FA;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month {\n    color: rgba(67, 66, 93, 0.3);\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child) {\n    border-right: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block {\n    -webkit-transition: all 0.3s ease-in-out;\n    transition: all 0.3s ease-in-out;\n    padding: 18px;\n    position: relative;\n    background-color: rgba(0, 0, 0, 0);\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover {\n    background-color: #fcfcfc;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child) {\n    border-bottom: 1px solid #EAF0F4;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill {\n    display: block;\n    font-size: .8125rem;\n    visibility: hidden;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content {\n    position: absolute;\n    left: 0;\n    top: 0;\n    right: 0;\n    bottom: 0;\n    width: 100%;\n    height: 100%}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -ms-flex-wrap: wrap;\n    flex-wrap: wrap;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item {\n    -webkit-box-flex: 0;\n    -ms-flex: none;\n    flex: none;\n    width: 15px;\n    height: 15px;\n    padding: 0;\n    font-size: 0;\n    border-radius: 50%}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child), .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child) {\n    margin-right: 2px;\n    margin-bottom: 2px;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item {\n    z-index: 1;\n    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);\n    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);\n    width: 100%;\n    padding: 3px 14px;\n    font-size: 12px;\n}\n.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping, .v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping {\n    -webkit-box-flex: 0;\n    -ms-flex: none;\n    flex: none;\n}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before {\n    content: '';\n    display: block;\n    position: absolute;\n    top: 0;\n    left: 0;\n    background-color: #3B86FF;\n}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now::after {\n    width: calc(100% + 1px);\n    height: 1px;\n}\n.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now::before {\n    width: 9px;\n    height: 9px;\n    border-radius: 50%;\n    -webkit-transform: translate(-50%,  -50%);\n    transform: translate(-50%,  -50%);\n}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before {\n    top: 16.66667%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before {\n    top: 33.33333%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before {\n    top: 50%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before {\n    top: 66.66667%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before {\n    top: 83.33333%}\n.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::before, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::before, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after, .v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before {\n    top: 100%}\n.v-cal-content.v-cal-content--week .v-cal-weekdays {\n    max-height: 3rem;\n    text-transform: none;\n}\n.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekdays__padding {\n    visibility: hidden;\n    padding:4px;\n}\n.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper .v-cal-weekday-item {\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n.v-cal-content.v-cal-content--day .v-cal-weekdays {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    text-transform: none;\n}\n.v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item {\n    -webkit-box-flex: 1;\n    -ms-flex-positive: 1;\n    flex-grow: 1;\n}\n", ""]);
+exports.push([module.i, ".v-cal-dialog{position:fixed;left:0;right:0;top:0;bottom:0;z-index:999;-webkit-box-sizing:border-box;box-sizing:border-box}.v-cal-dialog *{-webkit-box-sizing:inherit;box-sizing:inherit}.v-cal-dialog .v-cal-dialog__bg{background-color:rgba(0,0,0,0.3);position:absolute;width:100%;height:100%}.v-cal-dialog .v-cal-dialog-card{position:absolute;background:#fff;width:90%;top:50%;left:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%);max-width:500px;-webkit-box-shadow:0 0 6px rgba(0,0,0,0.4);box-shadow:0 0 6px rgba(0,0,0,0.4)}.v-cal-dialog .v-cal-dialog-card__header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:20px;border-bottom:1px solid #EAF0F4}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__title{font-size:13px;margin:0}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-moz-appearance:none;-webkit-appearance:none;background-color:transparent;border:none;cursor:pointer;display:inline-block;-webkit-box-flex:0;-ms-flex-positive:0;flex-grow:0;-ms-flex-negative:0;flex-shrink:0;font-size:0;height:18px;max-height:18px;max-width:18px;min-height:18px;min-width:18px;outline:none;position:relative;vertical-align:top;width:18px;padding:0;margin-left:auto}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before,.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after{background-color:#BCBCCB;content:\"\";display:block;left:50%;position:absolute;top:50%;-webkit-transform:translateX(-50%) translateY(-50%) rotate(45deg);transform:translateX(-50%) translateY(-50%) rotate(45deg);-webkit-transform-origin:center center;transform-origin:center center}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::before{height:2px;width:100%}.v-cal-dialog .v-cal-dialog-card__header .v-cal-dialog__close::after{height:100%;width:2px}.v-cal-dialog .v-cal-dialog-card__body{max-height:550px;overflow:auto;padding:20px}.v-cal-dialog .v-cal-fields{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap}.v-cal-dialog .v-cal-fields .v-cal-input-group{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;padding:10px;width:100%}.v-cal-dialog .v-cal-fields .v-cal-input-group>label{width:100%;margin-bottom:5px}.v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"checkbox\"],.v-cal-dialog .v-cal-fields .v-cal-input-group>label input[type=\"radio\"]{margin-right:5px}.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input{width:auto;-webkit-box-flex:1;-ms-flex:1;flex:1}.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:first-of-type{padding-left:0}.v-cal-dialog .v-cal-fields .v-cal-input-group .v-cal-input:last-of-type{padding-right:0}.v-cal-dialog .v-cal-fields .v-cal-input{padding:10px;width:100%}.v-cal-dialog .v-cal-fields .v-cal-input.is-inline label{margin-bottom:0}.v-cal-dialog .v-cal-fields .v-cal-input.is-radio input,.v-cal-dialog .v-cal-fields .v-cal-input.is-checkbox input{margin-right:5px}.v-cal-dialog .v-cal-fields .v-cal-input label{display:inline-block;margin-bottom:10px}.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"],.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"],.v-cal-dialog .v-cal-fields .v-cal-input textarea,.v-cal-dialog .v-cal-fields .v-cal-input select{-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out;display:block;font-family:inherit;width:100%;border:1px solid #E8E9EC;border-radius:4px;padding:10px 12px}.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:hover,.v-cal-dialog .v-cal-fields .v-cal-input textarea:hover,.v-cal-dialog .v-cal-fields .v-cal-input select:hover{border-color:#808495}.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"text\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"email\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"password\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"date\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:focus,.v-cal-dialog .v-cal-fields .v-cal-input input[type=\"time\"]:active,.v-cal-dialog .v-cal-fields .v-cal-input textarea:focus,.v-cal-dialog .v-cal-fields .v-cal-input textarea:active,.v-cal-dialog .v-cal-fields .v-cal-input select:focus,.v-cal-dialog .v-cal-fields .v-cal-input select:active{border-color:#3B86FF}.v-cal-dialog .v-cal-fields .v-cal-input textarea{min-width:100%;max-width:100%;min-height:100px;max-height:150px}.v-cal-dialog .v-cal-dialog-card__footer{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:20px;border-top:1px solid #EAF0F4;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end}.v-cal{font-family:inherit;font-size:inherit;padding:20px;background-color:#fff;color:#4D4F5C;-webkit-box-shadow:0 2px 6px rgba(0,0,0,0.04);box-shadow:0 2px 6px rgba(0,0,0,0.04);-webkit-box-sizing:border-box;box-sizing:border-box}.v-cal *{-webkit-box-sizing:inherit;box-sizing:inherit}.v-cal-button{cursor:pointer;background:#fff;padding:8px 18px;border:1px solid #D7DAE2;-webkit-box-shadow:0 2px 3px rgba(0,0,0,0.05);box-shadow:0 2px 3px rgba(0,0,0,0.05);font-size:13px;-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out}.v-cal-button.is-rounded{border-radius:4px}.v-cal-button.v-cal-button--is-active{background-color:#fff;color:#3B86FF}.v-cal-button:hover{color:#3B86FF;background-color:#fcfcfc}.v-cal-button.is-primary{border-color:#3B86FF;background-color:#3B86FF;color:#fff}.v-cal-button:disabled,.v-cal-button:disabled:hover{background-color:#f0f0f0;color:#d0d0d0;cursor:not-allowed;border-color:#D7DAE2}.v-cal-header{padding:0 0 40px}.v-cal-header__actions{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.v-cal-header__actions .actions-left,.v-cal-header__actions .actions-right{display:-webkit-box;display:-ms-flexbox;display:flex}.v-cal-header__actions .v-cal-button:first-child{border-bottom-left-radius:4px;border-top-left-radius:4px}.v-cal-header__actions .v-cal-button:last-child{border-bottom-right-radius:4px;border-top-right-radius:4px}.v-cal-header__actions .v-cal-button:not(:last-child){border-right:none}.v-cal-header__title-bar .v-cal-header__title{margin:0;font-size:18px;font-weight:normal;text-align:center}.v-cal-content{border:1px solid #EAF0F4}.v-cal-content .v-cal-weekdays,.v-cal-content .v-cal-days{display:-webkit-box;display:-ms-flexbox;display:flex}.v-cal-content .v-cal-event-item{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;position:relative;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;background-color:#3B86FF;color:#3B86FF;border-radius:4px;padding:7px 14px;text-align:left;white-space:nowrap;overflow:hidden;cursor:pointer}.v-cal-content .v-cal-event-item::after{content:'';display:block;position:absolute;width:14px;height:100%;top:0;right:0;background:-webkit-gradient(linear, left top, right top, from(transparent), color-stop(75%, currentColor));background:linear-gradient(to right, transparent 0%, currentColor 75%)}.v-cal-content .v-cal-event-item:not(:last-child){margin-bottom:1px}.v-cal-content .v-cal-event-item .v-cal-event-time,.v-cal-content .v-cal-event-item .v-cal-event-name{color:#fff}.v-cal-content .v-cal-event-item .v-cal-event-time{font-weight:bold;font-size:.85rem}.v-cal-content .v-cal-event-item .v-cal-event-name{margin-left:5px}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day,.v-cal-content.v-cal-content--week .v-cal-days .v-cal-day,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-day{background:#fff}.v-cal-content.v-cal-content--month .v-cal-weekdays,.v-cal-content.v-cal-content--week .v-cal-weekdays,.v-cal-content.v-cal-content--day .v-cal-weekdays{background-color:#F5F6FA;color:#A3A6B4;text-transform:uppercase;font-size:.75rem;font-weight:bold;text-align:center;border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item,.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday-item,.v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item{padding:15px 0}.v-cal-content.v-cal-content--month .v-cal-weekdays .v-cal-weekday-item,.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day{width:14.28571%}.v-cal-content.v-cal-content--month .v-cal-days:not(:last-child){border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day{-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out;position:relative;text-align:right;min-height:140px;padding-bottom:2px}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month{overflow:hidden}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.v-cal-day--month.is-extended{height:auto}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-today{background-color:#F5F6FA}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day.is-different-month{color:rgba(67,66,93,0.3)}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(:last-child){border-right:1px solid #EAF0F4}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day:not(.is-disabled):hover{background-color:#fcfcfc}.v-cal-content.v-cal-content--month .v-cal-days .v-cal-day .v-cal-day__number{display:block;font-size:.75rem;padding:10px}.v-cal-content.v-cal-content--month .v-cal-day.is-disabled,.v-cal-content.v-cal-content--week .v-cal-day.is-disabled{background-color:#f0f0f0;color:#b0b0b0}.v-cal-content.v-cal-content--week .v-cal-hour.all-day,.v-cal-content.v-cal-content--week .v-cal-day__hour-block.all-day,.v-cal-content.v-cal-content--day .v-cal-hour.all-day,.v-cal-content.v-cal-content--day .v-cal-day__hour-block.all-day{border-width:3px !important}.v-cal-content.v-cal-content--week .v-cal-times,.v-cal-content.v-cal-content--day .v-cal-times{background:#fff;font-size:.8125rem;font-weight:normal;border-right:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour,.v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour{padding:15px}.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour.is-now,.v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour.is-now{font-weight:bold}.v-cal-content.v-cal-content--week .v-cal-times .v-cal-hour:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-times .v-cal-hour:not(:last-child){border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-today{background-color:#F5F6FA}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day.is-different-month{color:rgba(67,66,93,0.3)}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day:not(:last-child){border-right:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block{-webkit-transition:all 0.3s ease-in-out;transition:all 0.3s ease-in-out;padding:15px;position:relative;background-color:rgba(0,0,0,0)}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:hover{background-color:#fcfcfc}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block:not(:last-child){border-bottom:1px solid #EAF0F4}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-block-fill{display:block;font-size:.8125rem;visibility:hidden}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-day__hour-block .v-cal-day__hour-content{position:absolute;left:0;top:0;right:0;bottom:0;width:100%;height:100%}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list{display:-webkit-box;display:-ms-flexbox;display:flex}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item{-webkit-box-flex:0;-ms-flex:none;flex:none;width:15px;height:15px;padding:0;font-size:0;border-radius:50%}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child),.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-list.tiny-events .v-cal-event-item:not(:last-child){margin-right:2px;margin-bottom:2px}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item{z-index:1;-webkit-box-shadow:0 0 5px rgba(0,0,0,0.25);box-shadow:0 0 5px rgba(0,0,0,0.25);width:100%;padding:3px 14px;font-size:.9rem}.v-cal-content.v-cal-content--week .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping,.v-cal-content.v-cal-content--day .v-cal-days .v-cal-days__wrapper .v-cal-event-item.is-overlapping{-webkit-box-flex:0;-ms-flex:none;flex:none}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.has-marker::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.has-marker::before{content:'';display:block;position:absolute;top:0;left:0;background-color:#3B86FF}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now::after{width:calc(100% + 1px);height:1px}.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now::before{width:9px;height:9px;border-radius:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%)}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-10::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-10::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-10::before{top:16.66667%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-20::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-20::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-20::before{top:33.33333%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-30::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-30::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-30::before{top:50%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-40::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-40::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-40::before{top:66.66667%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-50::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-50::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-50::before{top:83.33333%}.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--week .v-cal-day .v-cal-day__hour-block.is-now.is-60::before,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--week .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--day .v-cal-day .v-cal-day__hour-block.is-now.is-60::before,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::after,.v-cal-content.v-cal-content--day .v-cal-day:first-child .v-cal-day__hour-block.is-now.is-60::before{top:100%}.v-cal-content.v-cal-content--week .v-cal-weekdays{max-height:3rem;text-transform:none}.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekdays__padding{visibility:hidden}.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--week .v-cal-weekdays .v-cal-weekday__wrapper .v-cal-weekday-item{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}.v-cal-content.v-cal-content--day .v-cal-weekdays{display:-webkit-box;display:-ms-flexbox;display:flex;text-transform:none}.v-cal-content.v-cal-content--day .v-cal-weekdays .v-cal-weekday-item{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}", ""]);
 
 // exports
 
@@ -40338,7 +40360,7 @@ function open(propsData) {
             {
                 name: 'date',   //  Required
                 type: 'date',   //  def: 'text'
-                label: 'Fecha',  //  def: this.name
+                label: 'Date',  //  def: this.name
                 // showLabel: false,    //  def: true
                 required: true, //  def: false,
                 value: propsData.date,   //  def: null
@@ -40347,19 +40369,19 @@ function open(propsData) {
 
         if ( propsData.enableTimeInputs )
             defaultFields.splice(1, 0, {
-                label: 'Hora',
+                label: 'Times',
                 fields: [
                     {
                         name: 'startTime',
                         type: 'time',
-                        label: 'Hora Inicio',
+                        label: 'Start Time',
                         required: true,
                         value: propsData.startTime
                     },
                     {
                         name: 'endTime',
                         type: 'time',
-                        label: 'Hora Fin',
+                        label: 'End Time',
                         required: true,
                         value: propsData.endTime
                     }
@@ -40370,7 +40392,6 @@ function open(propsData) {
         return open(propsData);
     }
 });
-
 
 /***/ }),
 
@@ -40904,7 +40925,7 @@ const defaultLabels = {
 const defaultViews = ['month', 'week', 'day'];
 
 let config = {
-    locale: 'es',
+    locale: 'en',
     showTodayButton: true,
     minDate: null,
     maxDate: null,
@@ -42071,10 +42092,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 
 
@@ -42209,14 +42226,14 @@ __webpack_require__.r(__webpack_exports__);
                 const { fields, ...config } = this.eventDialogConfig;
 
                 if ( data instanceof Date ) {
-                    _utils_config__WEBPACK_IMPORTED_MODULE_1__["default"].date = data
+                    config.date = data
                 } else {
-                    _utils_config__WEBPACK_IMPORTED_MODULE_1__["default"].date = data.date;
-                    _utils_config__WEBPACK_IMPORTED_MODULE_1__["default"].startTime = data.time !== null ? moment__WEBPACK_IMPORTED_MODULE_3___default()(data.time, 'HH') : null;
-                    _utils_config__WEBPACK_IMPORTED_MODULE_1__["default"].endTime = data.time !== null ? moment__WEBPACK_IMPORTED_MODULE_3___default()(data.time, 'HH').add(1, 'h') : null;
+                    config.date = data.date;
+                    config.startTime = data.time !== null ? moment__WEBPACK_IMPORTED_MODULE_3___default()(data.time, 'HH') : null;
+                    config.endTime = data.time !== null ? moment__WEBPACK_IMPORTED_MODULE_3___default()(data.time, 'HH').add(1, 'h') : null;
                 }
 
-                _dialog__WEBPACK_IMPORTED_MODULE_7__["default"].show(_utils_config__WEBPACK_IMPORTED_MODULE_1__["default"], fields)
+                _dialog__WEBPACK_IMPORTED_MODULE_7__["default"].show(config, fields)
                     .$on('event-created', (event) => {
                         this.events.push(event._e);
                         this.$emit('event-created', event._e);
@@ -42409,7 +42426,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _EventDialogInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EventDialogInput */ "./node_modules/v-calendar-scheduler/components/dialog/EventDialogInput.vue");
-//
 //
 //
 //
@@ -43112,69 +43128,63 @@ var render = function() {
     { staticClass: "v-cal" },
     [
       _c("header", { staticClass: "v-cal-header" }, [
-        _c("div", [
-          _c("div", { staticClass: "col-12 col-xs-6 col-sm-6" }, [
-            _c("div", { staticClass: "btn-group" }, [
-              _vm.showTodayButton
-                ? _c(
-                    "button",
-                    {
-                      staticClass: "v-cal-button",
-                      class: {
-                        "v-cal-button--is-active":
-                          _vm.activeDate &&
-                          _vm.activeDate.isSame(_vm.today, "day")
-                      },
-                      on: { click: _vm.goToToday }
-                    },
-                    [_vm._v(_vm._s(_vm.labels.today))]
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _c("button", {
-                staticClass: "v-cal-button",
-                attrs: { disabled: !_vm.isPrevAllowed },
-                domProps: { innerHTML: _vm._s(_vm.labels.back) },
-                on: { click: _vm.prev }
-              }),
-              _vm._v(" "),
-              _c("button", {
-                staticClass: "v-cal-button",
-                attrs: { disabled: !_vm.isNextAllowed },
-                domProps: { innerHTML: _vm._s(_vm.labels.next) },
-                on: { click: _vm.next }
-              })
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-xs-6 col-sm-6" }, [
-            _c(
-              "div",
-              { staticClass: "btn-group" },
-              _vm._l(_vm.availableViews, function(view) {
-                return _c(
+        _c("div", { staticClass: "v-cal-header__actions" }, [
+          _c("div", { staticClass: "actions-left" }, [
+            _vm.showTodayButton
+              ? _c(
                   "button",
                   {
                     staticClass: "v-cal-button",
                     class: {
-                      "v-cal-button--is-active": _vm.activeView === view
+                      "v-cal-button--is-active":
+                        _vm.activeDate &&
+                        _vm.activeDate.isSame(_vm.today, "day")
                     },
-                    on: {
-                      click: function($event) {
-                        return _vm.switchView(view)
-                      }
-                    }
+                    on: { click: _vm.goToToday }
                   },
-                  [
-                    _vm._v(
-                      _vm._s(_vm._f("capitalizeFirstLetter")(_vm.labels[view]))
-                    )
-                  ]
+                  [_vm._v(_vm._s(_vm.labels.today))]
                 )
-              }),
-              0
-            )
-          ])
+              : _vm._e(),
+            _vm._v(" "),
+            _c("button", {
+              staticClass: "v-cal-button",
+              attrs: { disabled: !_vm.isPrevAllowed },
+              domProps: { innerHTML: _vm._s(_vm.labels.back) },
+              on: { click: _vm.prev }
+            }),
+            _vm._v(" "),
+            _c("button", {
+              staticClass: "v-cal-button",
+              attrs: { disabled: !_vm.isNextAllowed },
+              domProps: { innerHTML: _vm._s(_vm.labels.next) },
+              on: { click: _vm.next }
+            })
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "actions-right" },
+            _vm._l(_vm.availableViews, function(view) {
+              return _c(
+                "button",
+                {
+                  staticClass: "v-cal-button",
+                  class: { "v-cal-button--is-active": _vm.activeView === view },
+                  on: {
+                    click: function($event) {
+                      return _vm.switchView(view)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    _vm._s(_vm._f("capitalizeFirstLetter")(_vm.labels[view]))
+                  )
+                ]
+              )
+            }),
+            0
+          )
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "v-cal-header__title-bar" }, [
@@ -43243,7 +43253,7 @@ var render = function() {
               [
                 _c("header", { staticClass: "v-cal-dialog-card__header" }, [
                   _c("h5", { staticClass: "v-cal-dialog__title" }, [
-                    _vm._v("Agendar Solicitud")
+                    _vm._v(_vm._s(_vm.title))
                   ]),
                   _vm._v(" "),
                   _c("button", {
@@ -43275,20 +43285,33 @@ var render = function() {
                             : _c(
                                 "div",
                                 { staticClass: "v-cal-input-group" },
-                                _vm._l(field.fields, function(subfield, index) {
-                                  return _c("event-dialog-input", {
-                                    key: subfield.name + "-" + index,
-                                    attrs: { field: subfield },
-                                    model: {
-                                      value: _vm.event[subfield.name],
-                                      callback: function($$v) {
-                                        _vm.$set(_vm.event, subfield.name, $$v)
-                                      },
-                                      expression: "event[subfield.name]"
-                                    }
+                                [
+                                  field.label
+                                    ? _c("label", [_vm._v(_vm._s(field.label))])
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _vm._l(field.fields, function(
+                                    subfield,
+                                    index
+                                  ) {
+                                    return _c("event-dialog-input", {
+                                      key: subfield.name + "-" + index,
+                                      attrs: { field: subfield },
+                                      model: {
+                                        value: _vm.event[subfield.name],
+                                        callback: function($$v) {
+                                          _vm.$set(
+                                            _vm.event,
+                                            subfield.name,
+                                            $$v
+                                          )
+                                        },
+                                        expression: "event[subfield.name]"
+                                      }
+                                    })
                                   })
-                                }),
-                                1
+                                ],
+                                2
                               )
                         ]
                       })
@@ -43301,26 +43324,10 @@ var render = function() {
                   _c(
                     "button",
                     {
-                      staticClass: "v-cal-button is-rounded is-default",
-                      attrs: { type: "button" },
-                      on: { click: _vm.cancel }
-                    },
-                    [
-                      _c("i", { staticClass: "fas fa-times" }),
-                      _vm._v(" Cerrar")
-                    ]
-                  ),
-                  _vm._v("  \n                    "),
-                  _c(
-                    "button",
-                    {
                       staticClass: "v-cal-button is-rounded is-primary",
                       attrs: { type: "submit" }
                     },
-                    [
-                      _c("i", { staticClass: "fas fa-check" }),
-                      _vm._v(" Agendar")
-                    ]
+                    [_vm._v(_vm._s(_vm.createButtonLabel))]
                   )
                 ])
               ]
@@ -47667,362 +47674,345 @@ var render = function() {
             ])
           ]),
           _vm._v(" "),
-          _c(
-            "section",
-            {
-              directives: [
-                {
-                  name: "show",
-                  rawName: "v-show",
-                  value: _vm.mostrarDivs == 1,
-                  expression: "mostrarDivs == 1"
-                }
-              ]
-            },
-            [
-              _c("div", { staticClass: "box box-primary" }, [
-                _c("div", { staticClass: "box-header text-center" }, [
-                  _c("div", { staticClass: "col-md-12" }, [
-                    _vm._m(3),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            return _vm.abrirModalServicios()
-                          }
-                        }
-                      },
-                      [
-                        _c("i", { staticClass: "fas fa-plus" }),
-                        _vm._v(" Crear\n                ")
-                      ]
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "box-body" }, [
-                  _c(
-                    "div",
-                    { staticClass: "col-md-6 col-md-offset-3" },
-                    [
+          _vm.mostrarDivs == 1
+            ? _c("section", [
+                _c("div", { staticClass: "box box-primary" }, [
+                  _c("div", { staticClass: "box-header text-center" }, [
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _vm._m(3),
+                      _vm._v(" "),
                       _c(
-                        "v-select",
+                        "button",
                         {
-                          attrs: {
-                            options: _vm.serviciosArray,
-                            reduce: function(servicio) {
-                              return servicio.id + "," + servicio.tipo
-                            },
-                            placeholder: "Seleccionar servicio o producto",
-                            label: "nombre_servicio"
-                          },
-                          on: { input: _vm.elegirServicio },
-                          model: {
-                            value: _vm.selectServicio,
-                            callback: function($$v) {
-                              _vm.selectServicio = $$v
-                            },
-                            expression: "selectServicio"
+                          staticClass: "btn btn-primary",
+                          on: {
+                            click: function($event) {
+                              return _vm.abrirModalServicios()
+                            }
                           }
                         },
                         [
-                          _c("i", {
-                            staticClass: "icon icon-spinner",
-                            attrs: { slot: "spinner" },
-                            slot: "spinner"
-                          }),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            {
-                              attrs: { slot: "no-options" },
-                              slot: "no-options"
-                            },
-                            [_vm._v("No hay Resultados!")]
-                          )
+                          _c("i", { staticClass: "fas fa-plus" }),
+                          _vm._v(" Crear\n                ")
                         ]
-                      ),
-                      _vm._v(" "),
-                      _c("br")
-                    ],
-                    1
-                  ),
+                      )
+                    ])
+                  ]),
                   _vm._v(" "),
-                  _vm.tipoServicioElegido == 1 && _vm.selectServicio != null
-                    ? _c("div", { staticClass: "col-md-12" }, [
-                        _c("div", { staticClass: "table-responsive" }, [
-                          _c("table", { staticClass: "table table-bordered" }, [
-                            _vm._m(4),
+                  _c("div", { staticClass: "box-body" }, [
+                    _c(
+                      "div",
+                      { staticClass: "col-md-6 col-md-offset-3" },
+                      [
+                        _c(
+                          "v-select",
+                          {
+                            attrs: {
+                              options: _vm.serviciosArray,
+                              reduce: function(servicio) {
+                                return servicio.id + "," + servicio.tipo
+                              },
+                              placeholder: "Seleccionar servicio o producto",
+                              label: "nombre_servicio"
+                            },
+                            on: { input: _vm.elegirServicio },
+                            model: {
+                              value: _vm.selectServicio,
+                              callback: function($$v) {
+                                _vm.selectServicio = $$v
+                              },
+                              expression: "selectServicio"
+                            }
+                          },
+                          [
+                            _c("i", {
+                              staticClass: "icon icon-spinner",
+                              attrs: { slot: "spinner" },
+                              slot: "spinner"
+                            }),
                             _vm._v(" "),
                             _c(
-                              "tbody",
-                              { staticStyle: { "font-weight": "normal" } },
-                              _vm._l(_vm.infoServicioElegido, function(
-                                detalle
-                              ) {
-                                return _c("tr", { key: detalle.id }, [
-                                  _c("td", [
-                                    _c("span", [
-                                      _vm._v(_vm._s(detalle.nombre_servicio))
-                                    ])
-                                  ]),
-                                  _vm._v(" "),
-                                  _c(
-                                    "td",
-                                    [
+                              "div",
+                              {
+                                attrs: { slot: "no-options" },
+                                slot: "no-options"
+                              },
+                              [_vm._v("No hay Resultados!")]
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c("br")
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _vm.selectServicio != null
+                      ? _c("div", { staticClass: "col-md-12" }, [
+                          _c("div", { staticClass: "table-responsive" }, [
+                            _c(
+                              "table",
+                              { staticClass: "table table-bordered" },
+                              [
+                                _vm._m(4),
+                                _vm._v(" "),
+                                _c(
+                                  "tbody",
+                                  { staticStyle: { "font-weight": "normal" } },
+                                  _vm._l(_vm.infoServicioElegido, function(
+                                    detalle,
+                                    index
+                                  ) {
+                                    return _c("tr", { key: index }, [
+                                      _c("td", [
+                                        _c("span", [
+                                          _vm._v(
+                                            _vm._s(detalle.nombre_servicio)
+                                          )
+                                        ])
+                                      ]),
+                                      _vm._v(" "),
                                       _c(
-                                        "v-select",
-                                        {
-                                          attrs: {
-                                            options: _vm.lista_empleados,
-                                            reduce: function(empleado) {
-                                              return empleado.id
-                                            },
-                                            placeholder: "Seleccionar...",
-                                            label: "nombre"
-                                          },
-                                          model: {
-                                            value: _vm.idEmpleadoElegido,
-                                            callback: function($$v) {
-                                              _vm.idEmpleadoElegido = $$v
-                                            },
-                                            expression: "idEmpleadoElegido"
-                                          }
-                                        },
+                                        "td",
                                         [
-                                          _c("i", {
-                                            staticClass: "icon icon-spinner",
-                                            attrs: { slot: "spinner" },
-                                            slot: "spinner"
-                                          }),
-                                          _vm._v(" "),
+                                          detalle.tipo == 1
+                                            ? _c(
+                                                "v-select",
+                                                {
+                                                  attrs: {
+                                                    disabled:
+                                                      detalle.desabilitado,
+                                                    options:
+                                                      _vm.lista_empleados,
+                                                    reduce: function(empleado) {
+                                                      return empleado.id
+                                                    },
+                                                    placeholder:
+                                                      "Seleccionar...",
+                                                    label: "nombre"
+                                                  },
+                                                  model: {
+                                                    value: detalle.realizadoPor,
+                                                    callback: function($$v) {
+                                                      _vm.$set(
+                                                        detalle,
+                                                        "realizadoPor",
+                                                        $$v
+                                                      )
+                                                    },
+                                                    expression:
+                                                      "detalle.realizadoPor"
+                                                  }
+                                                },
+                                                [
+                                                  _c("i", {
+                                                    staticClass:
+                                                      "icon icon-spinner",
+                                                    attrs: { slot: "spinner" },
+                                                    slot: "spinner"
+                                                  }),
+                                                  _vm._v(" "),
+                                                  _c(
+                                                    "div",
+                                                    {
+                                                      attrs: {
+                                                        slot: "no-options"
+                                                      },
+                                                      slot: "no-options"
+                                                    },
+                                                    [
+                                                      _vm._v(
+                                                        "No hay Resultados!"
+                                                      )
+                                                    ]
+                                                  )
+                                                ]
+                                              )
+                                            : _vm._e()
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "td",
+                                        [
                                           _c(
-                                            "div",
-                                            {
-                                              attrs: { slot: "no-options" },
-                                              slot: "no-options"
+                                            "money",
+                                            _vm._b(
+                                              {
+                                                staticClass: "form-control",
+                                                attrs: {
+                                                  disabled: detalle.desabilitado
+                                                },
+                                                model: {
+                                                  value: detalle.valor_servicio,
+                                                  callback: function($$v) {
+                                                    _vm.$set(
+                                                      detalle,
+                                                      "valor_servicio",
+                                                      $$v
+                                                    )
+                                                  },
+                                                  expression:
+                                                    "detalle.valor_servicio"
+                                                }
+                                              },
+                                              "money",
+                                              _vm.money,
+                                              false
+                                            ),
+                                            [
+                                              _vm._v(
+                                                _vm._s(detalle.valor_servicio)
+                                              )
+                                            ]
+                                          )
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "td",
+                                        [
+                                          _c("number-input", {
+                                            attrs: {
+                                              disabled: detalle.desabilitado,
+                                              min: 1,
+                                              max: 99,
+                                              inline: "",
+                                              controls: "",
+                                              size: "large"
                                             },
-                                            [_vm._v("No hay Resultados!")]
-                                          )
-                                        ]
-                                      )
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "td",
-                                    [
-                                      _c("number-input", {
-                                        attrs: {
-                                          min: 1,
-                                          max: 99,
-                                          inline: "",
-                                          controls: "",
-                                          size: "large"
-                                        },
-                                        model: {
-                                          value: _vm.cantidadServicio,
-                                          callback: function($$v) {
-                                            _vm.cantidadServicio = $$v
-                                          },
-                                          expression: "cantidadServicio"
-                                        }
-                                      })
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "td",
-                                    [
-                                      _c(
-                                        "money",
-                                        _vm._b(
-                                          {
-                                            staticClass: "form-control",
                                             model: {
-                                              value: _vm.valor_descuento,
+                                              value: detalle.cantidad,
                                               callback: function($$v) {
-                                                _vm.valor_descuento = $$v
+                                                _vm.$set(
+                                                  detalle,
+                                                  "cantidad",
+                                                  $$v
+                                                )
                                               },
-                                              expression: "valor_descuento"
+                                              expression: "detalle.cantidad"
                                             }
-                                          },
-                                          "money",
-                                          _vm.money,
-                                          false
-                                        ),
-                                        [_vm._v(_vm._s(_vm.valor_descuento))]
-                                      )
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c("td", [
-                                    _c("span", [
-                                      _vm._v(
-                                        "$" +
-                                          _vm._s(
-                                            _vm.formatearValor(
-                                              _vm.cantidadServicio *
-                                                detalle.valor_servicio -
-                                                _vm.valor_descuento
-                                            )
+                                          })
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "td",
+                                        [
+                                          _c(
+                                            "money",
+                                            _vm._b(
+                                              {
+                                                staticClass: "form-control",
+                                                attrs: {
+                                                  disabled: detalle.desabilitado
+                                                },
+                                                model: {
+                                                  value: detalle.descuento,
+                                                  callback: function($$v) {
+                                                    _vm.$set(
+                                                      detalle,
+                                                      "descuento",
+                                                      $$v
+                                                    )
+                                                  },
+                                                  expression:
+                                                    "detalle.descuento"
+                                                }
+                                              },
+                                              "money",
+                                              _vm.money,
+                                              false
+                                            ),
+                                            [_vm._v(_vm._s(detalle.descuento))]
                                           )
-                                      )
-                                    ])
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("td", [
-                                    _c(
-                                      "button",
-                                      {
-                                        staticClass: "btn btn-success",
-                                        attrs: {
-                                          type: "button",
-                                          title: "Agregar"
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.agregarServicio(
-                                              detalle.id
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c("td", [
+                                        _c("span", [
+                                          _vm._v(
+                                            "$" +
+                                              _vm._s(
+                                                _vm.formatearValor(
+                                                  detalle.cantidad *
+                                                    detalle.valor_servicio -
+                                                    detalle.descuento
+                                                )
+                                              )
+                                          )
+                                        ])
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("td", [
+                                        detalle.guardado == 0
+                                          ? _c(
+                                              "button",
+                                              {
+                                                staticClass: "btn btn-success",
+                                                attrs: {
+                                                  type: "button",
+                                                  title: "Agregar"
+                                                },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.agregarArticulo(
+                                                      detalle,
+                                                      index
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass: "fas fa-check"
+                                                })
+                                              ]
                                             )
-                                          }
-                                        }
-                                      },
-                                      [_c("i", { staticClass: "fas fa-check" })]
-                                    )
-                                  ])
-                                ])
-                              }),
-                              0
+                                          : _c(
+                                              "button",
+                                              {
+                                                staticClass: "btn btn-danger",
+                                                attrs: {
+                                                  type: "button",
+                                                  title: "Elmininar"
+                                                },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.eliminarArticulo(
+                                                      detalle,
+                                                      index
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "fas fa-window-close"
+                                                })
+                                              ]
+                                            )
+                                      ])
+                                    ])
+                                  }),
+                                  0
+                                )
+                              ]
                             )
                           ])
                         ])
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.tipoServicioElegido == 2 && _vm.selectServicio != null
-                    ? _c("div", { staticClass: "col-md-12" }, [
-                        _c("div", { staticClass: "table-responsive" }, [
-                          _c("table", { staticClass: "table table-bordered" }, [
-                            _vm._m(5),
-                            _vm._v(" "),
-                            _c(
-                              "tbody",
-                              { staticStyle: { "font-weight": "normal" } },
-                              _vm._l(_vm.infoServicioElegido, function(
-                                detalle
-                              ) {
-                                return _c("tr", { key: detalle.id }, [
-                                  _c("td", [
-                                    _c("span", [
-                                      _vm._v(_vm._s(detalle.nombre_servicio))
-                                    ])
-                                  ]),
-                                  _vm._v(" "),
-                                  _c(
-                                    "td",
-                                    [
-                                      _c("number-input", {
-                                        attrs: {
-                                          min: 1,
-                                          max: 99,
-                                          inline: "",
-                                          controls: "",
-                                          size: "large"
-                                        },
-                                        model: {
-                                          value: _vm.cantidadServicio,
-                                          callback: function($$v) {
-                                            _vm.cantidadServicio = $$v
-                                          },
-                                          expression: "cantidadServicio"
-                                        }
-                                      })
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "td",
-                                    [
-                                      _c(
-                                        "money",
-                                        _vm._b(
-                                          {
-                                            staticClass: "form-control",
-                                            model: {
-                                              value: _vm.valor_descuento,
-                                              callback: function($$v) {
-                                                _vm.valor_descuento = $$v
-                                              },
-                                              expression: "valor_descuento"
-                                            }
-                                          },
-                                          "money",
-                                          _vm.money,
-                                          false
-                                        ),
-                                        [_vm._v(_vm._s(_vm.valor_descuento))]
-                                      )
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c("td", [
-                                    _c("span", [
-                                      _vm._v(
-                                        "$" +
-                                          _vm._s(
-                                            _vm.formatearValor(
-                                              _vm.cantidadServicio *
-                                                detalle.valor_servicio -
-                                                _vm.valor_descuento
-                                            )
-                                          )
-                                      )
-                                    ])
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("td", [
-                                    _c(
-                                      "button",
-                                      {
-                                        staticClass: "btn btn-success",
-                                        attrs: {
-                                          type: "button",
-                                          title: "Agregar"
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.agregarServicio(
-                                              detalle.id
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [_c("i", { staticClass: "fas fa-check" })]
-                                    )
-                                  ])
-                                ])
-                              }),
-                              0
-                            )
-                          ])
-                        ])
-                      ])
-                    : _vm._e()
-                ])
-              ]),
-              _vm._v(" "),
-              _vm._m(6)
-            ]
-          )
+                      : _vm._e()
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(5)
+              ])
+            : _vm._e()
         ])
       ])
     ]),
@@ -48031,7 +48021,7 @@ var render = function() {
       _c("div", { staticClass: "modal-dialog" }, [
         _c("div", { staticClass: "modal-content" }, [
           _c("form", { staticClass: "form-horizontal" }, [
-            _vm._m(7),
+            _vm._m(6),
             _vm._v(" "),
             _c("div", { staticClass: "modal-body" }, [
               _c("div", { staticClass: "box-body" }, [
@@ -48503,7 +48493,7 @@ var render = function() {
                   attrs: { "content-type": "multipart/form-data" }
                 },
                 [
-                  _vm._m(8),
+                  _vm._m(7),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-body" }, [
                     _c("div", { staticClass: "box-body" }, [
@@ -49122,27 +49112,11 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Servicio")]),
+        _c("th", [_vm._v("Articulo")]),
         _vm._v(" "),
         _c("th", [_vm._v("Realizado Por")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Cantidad")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Descuento")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Valor")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Acción")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("Producto")]),
+        _c("th", [_vm._v("Valor Unitario")]),
         _vm._v(" "),
         _c("th", [_vm._v("Cantidad")]),
         _vm._v(" "),
@@ -60491,7 +60465,7 @@ if(false) {}
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-!function(t,e){ true?module.exports=e():undefined}("undefined"!=typeof self?self:this,function(){return function(t){var e={};function n(o){if(e[o])return e[o].exports;var i=e[o]={i:o,l:!1,exports:{}};return t[o].call(i.exports,i,i.exports,n),i.l=!0,i.exports}return n.m=t,n.c=e,n.d=function(t,e,o){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:o})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var o=Object.create(null);if(n.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var i in t)n.d(o,i,function(e){return t[e]}.bind(null,i));return o},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="/",n(n.s=9)}([function(t,e){function n(t){return(n="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function o(e){return"function"==typeof Symbol&&"symbol"===n(Symbol.iterator)?t.exports=o=function(t){return n(t)}:t.exports=o=function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":n(t)},o(e)}t.exports=o},function(t,e,n){},function(t,e){t.exports=function(t,e,n){return e in t?Object.defineProperty(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}},function(t,e,n){var o=n(5),i=n(6),s=n(7);t.exports=function(t){return o(t)||i(t)||s()}},function(t,e,n){var o=n(2);t.exports=function(t){for(var e=1;e<arguments.length;e++){var n=null!=arguments[e]?arguments[e]:{},i=Object.keys(n);"function"==typeof Object.getOwnPropertySymbols&&(i=i.concat(Object.getOwnPropertySymbols(n).filter(function(t){return Object.getOwnPropertyDescriptor(n,t).enumerable}))),i.forEach(function(e){o(t,e,n[e])})}return t}},function(t,e){t.exports=function(t){if(Array.isArray(t)){for(var e=0,n=new Array(t.length);e<t.length;e++)n[e]=t[e];return n}}},function(t,e){t.exports=function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}},function(t,e){t.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}},function(t,e,n){"use strict";var o=n(1);n.n(o).a},function(t,e,n){"use strict";n.r(e);var o=n(3),i=n.n(o),s=n(2),r=n.n(s),a=n(0),l=n.n(a),c=n(4),u=n.n(c),h={watch:{typeAheadPointer:function(){this.maybeAdjustScroll()}},methods:{maybeAdjustScroll:function(){var t=this.pixelsToPointerTop(),e=this.pixelsToPointerBottom();return t<=this.viewport().top?this.scrollTo(t):e>=this.viewport().bottom?this.scrollTo(this.viewport().top+this.pointerHeight()):void 0},pixelsToPointerTop:function(){var t=0;if(this.$refs.dropdownMenu)for(var e=0;e<this.typeAheadPointer;e++)t+=this.$refs.dropdownMenu.children[e].offsetHeight;return t},pixelsToPointerBottom:function(){return this.pixelsToPointerTop()+this.pointerHeight()},pointerHeight:function(){var t=!!this.$refs.dropdownMenu&&this.$refs.dropdownMenu.children[this.typeAheadPointer];return t?t.offsetHeight:0},viewport:function(){return{top:this.$refs.dropdownMenu?this.$refs.dropdownMenu.scrollTop:0,bottom:this.$refs.dropdownMenu?this.$refs.dropdownMenu.offsetHeight+this.$refs.dropdownMenu.scrollTop:0}},scrollTo:function(t){return this.$refs.dropdownMenu?this.$refs.dropdownMenu.scrollTop=t:null}}},p={data:function(){return{typeAheadPointer:-1}},watch:{filteredOptions:function(){this.typeAheadPointer=0}},methods:{typeAheadUp:function(){this.typeAheadPointer>0&&(this.typeAheadPointer--,this.maybeAdjustScroll&&this.maybeAdjustScroll())},typeAheadDown:function(){this.typeAheadPointer<this.filteredOptions.length-1&&(this.typeAheadPointer++,this.maybeAdjustScroll&&this.maybeAdjustScroll())},typeAheadSelect:function(){this.filteredOptions[this.typeAheadPointer]?this.select(this.filteredOptions[this.typeAheadPointer]):this.taggable&&this.search.length&&this.select(this.search),this.clearSearchOnSelect&&(this.search="")}}},d={props:{loading:{type:Boolean,default:!1}},data:function(){return{mutableLoading:!1}},watch:{search:function(){this.$emit("search",this.search,this.toggleLoading)},loading:function(t){this.mutableLoading=t}},methods:{toggleLoading:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;return this.mutableLoading=null==t?!this.mutableLoading:t}}};function f(t,e,n,o,i,s,r,a){var l,c="function"==typeof t?t.options:t;if(e&&(c.render=e,c.staticRenderFns=n,c._compiled=!0),o&&(c.functional=!0),s&&(c._scopeId="data-v-"+s),r?(l=function(t){(t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext)||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),i&&i.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(r)},c._ssrRegister=l):i&&(l=a?function(){i.call(this,this.$root.$options.shadowRoot)}:i),l)if(c.functional){c._injectStyles=l;var u=c.render;c.render=function(t,e){return l.call(e),u(t,e)}}else{var h=c.beforeCreate;c.beforeCreate=h?[].concat(h,l):[l]}return{exports:t,options:c}}var y={Deselect:f({},function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"10",height:"10"}},[e("path",{attrs:{d:"M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"}})])},[],!1,null,null,null).exports,OpenIndicator:f({},function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"14",height:"10"}},[e("path",{attrs:{d:"M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"}})])},[],!1,null,null,null).exports},b={components:u()({},y),mixins:[h,p,d],props:{value:{},components:{type:Object,default:function(){return{}}},options:{type:Array,default:function(){return[]}},disabled:{type:Boolean,default:!1},clearable:{type:Boolean,default:!0},searchable:{type:Boolean,default:!0},multiple:{type:Boolean,default:!1},placeholder:{type:String,default:""},transition:{type:String,default:"vs__fade"},clearSearchOnSelect:{type:Boolean,default:!0},closeOnSelect:{type:Boolean,default:!0},label:{type:String,default:"label"},autocomplete:{type:String,default:"off"},reduce:{type:Function,default:function(t){return t}},getOptionLabel:{type:Function,default:function(t){if("object"===l()(t)){if(!t.hasOwnProperty(this.label))return;return t[this.label]}return t}},onTab:{type:Function,default:function(){this.selectOnTab&&this.typeAheadSelect()}},taggable:{type:Boolean,default:!1},tabindex:{type:Number,default:null},pushTags:{type:Boolean,default:!1},filterable:{type:Boolean,default:!0},filterBy:{type:Function,default:function(t,e,n){return(e||"").toLowerCase().indexOf(n.toLowerCase())>-1}},filter:{type:Function,default:function(t,e){var n=this;return t.filter(function(t){var o=n.getOptionLabel(t);return"number"==typeof o&&(o=o.toString()),n.filterBy(t,o,e)})}},createOption:{type:Function,default:function(t){return"object"===l()(this.optionList[0])&&(t=r()({},this.label,t)),this.$emit("option:created",t),t}},resetOnOptionsChange:{type:Boolean,default:!1},noDrop:{type:Boolean,default:!1},inputId:{type:String},dir:{type:String,default:"auto"},selectOnTab:{type:Boolean,default:!1},searchInputQuerySelector:{type:String,default:"[type=search]"}},data:function(){return{search:"",open:!1,pushedTags:[],_value:[]}},watch:{options:function(t){!this.taggable&&this.resetOnOptionsChange&&this.clearSelection()},multiple:function(){this.clearSelection()}},created:function(){var t=this;this.mutableLoading=this.loading,this.$options.propsData.hasOwnProperty("reduce")&&this.value&&(Array.isArray(this.value)?this.$data._value=this.value.map(function(e){return t.findOptionFromReducedValue(e)}):this.$data._value=this.findOptionFromReducedValue(this.value)),this.$on("option:created",this.maybePushTag)},methods:{select:function(t){this.isOptionSelected(t)||(this.taggable&&!this.optionExists(t)&&(t=this.createOption(t)),this.multiple&&(t=this.selectedValue.concat(t)),this.updateValue(t)),this.onAfterSelect(t)},deselect:function(t){var e=this;this.updateValue(this.selectedValue.filter(function(n){return!e.optionComparator(n,t)}))},clearSelection:function(){this.updateValue(this.multiple?[]:null)},onAfterSelect:function(t){this.closeOnSelect&&(this.open=!this.open,this.searchEl.blur()),this.clearSearchOnSelect&&(this.search="")},updateValue:function(t){var e=this;this.isTrackingValues&&(this.$data._value=t),null!==t&&(t=Array.isArray(t)?t.map(function(t){return e.reduce(t)}):this.reduce(t)),this.$emit("input",t)},toggleDropdown:function(t){var e=t.target,n=[this.$el,this.searchEl,this.$refs.toggle.$el];void 0!==this.$refs.openIndicator&&n.push.apply(n,[this.$refs.openIndicator.$el].concat(i()(Array.prototype.slice.call(this.$refs.openIndicator.$el.childNodes)))),(n.indexOf(e)>-1||e.classList.contains("vs__selected"))&&(this.open?this.searchEl.blur():this.disabled||(this.open=!0,this.searchEl.focus()))},isOptionSelected:function(t){var e=this;return this.selectedValue.some(function(n){return e.optionComparator(n,t)})},optionComparator:function(t,e){if("object"!==l()(t)&&"object"!==l()(e)){if(t===e)return!0}else{if(t===this.reduce(e))return!0;if(this.getOptionLabel(t)===this.getOptionLabel(e)||this.getOptionLabel(t)===e)return!0;if(this.reduce(t)===this.reduce(e))return!0}return!1},findOptionFromReducedValue:function(t){var e=this;return this.options.find(function(n){return JSON.stringify(e.reduce(n))===JSON.stringify(t)})||t},closeSearchOptions:function(){this.open=!1,this.$emit("search:blur")},maybeDeleteValue:function(){if(!this.searchEl.value.length&&this.selectedValue&&this.clearable){var t=null;this.multiple&&(t=i()(this.selectedValue.slice(0,this.selectedValue.length-1))),this.updateValue(t)}},optionExists:function(t){var e=this;return this.optionList.some(function(n){return"object"===l()(n)&&e.getOptionLabel(n)===t||n===t})},normalizeOptionForSlot:function(t){return"object"===l()(t)?t:r()({},this.label,t)},maybePushTag:function(t){this.pushTags&&this.pushedTags.push(t)},onEscape:function(){this.search.length?this.search="":this.searchEl.blur()},onSearchBlur:function(){if(!this.mousedown||this.searching)return this.clearSearchOnBlur&&(this.search=""),void this.closeSearchOptions();this.mousedown=!1,0!==this.search.length||0!==this.options.length||this.closeSearchOptions()},onSearchFocus:function(){this.open=!0,this.$emit("search:focus")},onMousedown:function(){this.mousedown=!0},onMouseUp:function(){this.mousedown=!1},onSearchKeyDown:function(t){switch(t.keyCode){case 8:return this.maybeDeleteValue();case 9:return this.onTab()}},onSearchKeyUp:function(t){switch(t.keyCode){case 27:return this.onEscape();case 38:return t.preventDefault(),this.typeAheadUp();case 40:return t.preventDefault(),this.typeAheadDown();case 13:return t.preventDefault(),this.typeAheadSelect()}}},computed:{isTrackingValues:function(){return void 0===this.value||this.$options.propsData.hasOwnProperty("reduce")},selectedValue:function(){var t=this.value;return this.isTrackingValues&&(t=this.$data._value),t?[].concat(t):[]},optionList:function(){return this.options.concat(this.pushedTags)},searchEl:function(){return this.$scopedSlots.search?this.$refs.selectedOptions.querySelector(this.searchInputQuerySelector):this.$refs.search},scope:function(){var t=this;return{search:{attributes:{disabled:this.disabled,placeholder:this.searchPlaceholder,tabindex:this.tabindex,readonly:!this.searchable,id:this.inputId,"aria-expanded":this.dropdownOpen,"aria-label":"Search for option",ref:"search",role:"combobox",type:"search",autocomplete:"off",value:this.search},events:{keydown:this.onSearchKeyDown,keyup:this.onSearchKeyUp,blur:this.onSearchBlur,focus:this.onSearchFocus,input:function(e){return t.search=e.target.value}}},spinner:{loading:this.mutableLoading},openIndicator:{attributes:{ref:"openIndicator",role:"presentation",class:"vs__open-indicator"}}}},childComponents:function(){return u()({},y,this.components)},stateClasses:function(){return{"vs--open":this.dropdownOpen,"vs--single":!this.multiple,"vs--searching":this.searching&&!this.noDrop,"vs--searchable":this.searchable&&!this.noDrop,"vs--unsearchable":!this.searchable,"vs--loading":this.mutableLoading,"vs--disabled":this.disabled}},clearSearchOnBlur:function(){return this.clearSearchOnSelect&&!this.multiple},searching:function(){return!!this.search},dropdownOpen:function(){return!this.noDrop&&(this.open&&!this.mutableLoading)},searchPlaceholder:function(){if(this.isValueEmpty&&this.placeholder)return this.placeholder},filteredOptions:function(){var t=[].concat(this.optionList);if(!this.filterable&&!this.taggable)return t;var e=this.search.length?this.filter(t,this.search,this):t;return this.taggable&&this.search.length&&!this.optionExists(this.search)&&e.unshift(this.search),e},isValueEmpty:function(){return 0===this.selectedValue.length},showClearButton:function(){return!this.multiple&&this.clearable&&!this.open&&!this.isValueEmpty}}},m=(n(8),f(b,function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"v-select",class:t.stateClasses,attrs:{dir:t.dir}},[n("div",{ref:"toggle",staticClass:"vs__dropdown-toggle",on:{mousedown:function(e){return e.preventDefault(),t.toggleDropdown(e)}}},[n("div",{ref:"selectedOptions",staticClass:"vs__selected-options"},[t._l(t.selectedValue,function(e){return t._t("selected-option-container",[n("span",{key:e.index,staticClass:"vs__selected"},[t._t("selected-option",[t._v("\n            "+t._s(t.getOptionLabel(e))+"\n          ")],null,t.normalizeOptionForSlot(e)),t._v(" "),t.multiple?n("button",{staticClass:"vs__deselect",attrs:{disabled:t.disabled,type:"button","aria-label":"Deselect option"},on:{click:function(n){return t.deselect(e)}}},[n(t.childComponents.Deselect,{tag:"component"})],1):t._e()],2)],{option:t.normalizeOptionForSlot(e),deselect:t.deselect,multiple:t.multiple,disabled:t.disabled})}),t._v(" "),t._t("search",[n("input",t._g(t._b({staticClass:"vs__search"},"input",t.scope.search.attributes,!1),t.scope.search.events))],null,t.scope.search)],2),t._v(" "),n("div",{staticClass:"vs__actions"},[n("button",{directives:[{name:"show",rawName:"v-show",value:t.showClearButton,expression:"showClearButton"}],staticClass:"vs__clear",attrs:{disabled:t.disabled,type:"button",title:"Clear selection"},on:{click:t.clearSelection}},[n(t.childComponents.Deselect,{tag:"component"})],1),t._v(" "),t._t("open-indicator",[t.noDrop?t._e():n(t.childComponents.OpenIndicator,t._b({tag:"component"},"component",t.scope.openIndicator.attributes,!1))],null,t.scope.openIndicator),t._v(" "),t._t("spinner",[n("div",{directives:[{name:"show",rawName:"v-show",value:t.mutableLoading,expression:"mutableLoading"}],staticClass:"vs__spinner"},[t._v("Loading...")])],null,t.scope.spinner)],2)]),t._v(" "),n("transition",{attrs:{name:t.transition}},[t.dropdownOpen?n("ul",{ref:"dropdownMenu",staticClass:"vs__dropdown-menu",attrs:{role:"listbox"},on:{mousedown:t.onMousedown,mouseup:t.onMouseUp}},[t._l(t.filteredOptions,function(e,o){return n("li",{key:o,staticClass:"vs__dropdown-option",class:{"vs__dropdown-option--selected":t.isOptionSelected(e),"vs__dropdown-option--highlight":o===t.typeAheadPointer},attrs:{role:"option"},on:{mouseover:function(e){t.typeAheadPointer=o},mousedown:function(n){return n.preventDefault(),n.stopPropagation(),t.select(e)}}},[t._t("option",[t._v("\n          "+t._s(t.getOptionLabel(e))+"\n        ")],null,t.normalizeOptionForSlot(e))],2)}),t._v(" "),t.filteredOptions.length?t._e():n("li",{staticClass:"vs__no-options",on:{mousedown:function(t){t.stopPropagation()}}},[t._t("no-options",[t._v("Sorry, no matching options.")])],2)],2):t._e()])],1)},[],!1,null,null,null).exports),g={ajax:d,pointer:p,pointerScroll:h};n.d(e,"VueSelect",function(){return m}),n.d(e,"mixins",function(){return g});e.default=m}])});
+!function(t,e){ true?module.exports=e():undefined}("undefined"!=typeof self?self:this,function(){return function(t){var e={};function n(o){if(e[o])return e[o].exports;var i=e[o]={i:o,l:!1,exports:{}};return t[o].call(i.exports,i,i.exports,n),i.l=!0,i.exports}return n.m=t,n.c=e,n.d=function(t,e,o){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:o})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var o=Object.create(null);if(n.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var i in t)n.d(o,i,function(e){return t[e]}.bind(null,i));return o},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="/",n(n.s=9)}([function(t,e){function n(t){return(n="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function o(e){return"function"==typeof Symbol&&"symbol"===n(Symbol.iterator)?t.exports=o=function(t){return n(t)}:t.exports=o=function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":n(t)},o(e)}t.exports=o},function(t,e,n){},function(t,e){t.exports=function(t,e,n){return e in t?Object.defineProperty(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}},function(t,e,n){var o=n(5),i=n(6),s=n(7);t.exports=function(t){return o(t)||i(t)||s()}},function(t,e,n){var o=n(2);t.exports=function(t){for(var e=1;e<arguments.length;e++){var n=null!=arguments[e]?arguments[e]:{},i=Object.keys(n);"function"==typeof Object.getOwnPropertySymbols&&(i=i.concat(Object.getOwnPropertySymbols(n).filter(function(t){return Object.getOwnPropertyDescriptor(n,t).enumerable}))),i.forEach(function(e){o(t,e,n[e])})}return t}},function(t,e){t.exports=function(t){if(Array.isArray(t)){for(var e=0,n=new Array(t.length);e<t.length;e++)n[e]=t[e];return n}}},function(t,e){t.exports=function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}},function(t,e){t.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}},function(t,e,n){"use strict";var o=n(1);n.n(o).a},function(t,e,n){"use strict";n.r(e);var o=n(3),i=n.n(o),s=n(2),r=n.n(s),a=n(0),l=n.n(a),u=n(4),c=n.n(u),h={watch:{typeAheadPointer:function(){this.maybeAdjustScroll()}},methods:{maybeAdjustScroll:function(){var t=this.pixelsToPointerTop(),e=this.pixelsToPointerBottom();return t<=this.viewport().top?this.scrollTo(t):e>=this.viewport().bottom?this.scrollTo(this.viewport().top+this.pointerHeight()):void 0},pixelsToPointerTop:function(){var t=0;if(this.$refs.dropdownMenu)for(var e=0;e<this.typeAheadPointer;e++)t+=this.$refs.dropdownMenu.children[e].offsetHeight;return t},pixelsToPointerBottom:function(){return this.pixelsToPointerTop()+this.pointerHeight()},pointerHeight:function(){var t=!!this.$refs.dropdownMenu&&this.$refs.dropdownMenu.children[this.typeAheadPointer];return t?t.offsetHeight:0},viewport:function(){return{top:this.$refs.dropdownMenu?this.$refs.dropdownMenu.scrollTop:0,bottom:this.$refs.dropdownMenu?this.$refs.dropdownMenu.offsetHeight+this.$refs.dropdownMenu.scrollTop:0}},scrollTo:function(t){return this.$refs.dropdownMenu?this.$refs.dropdownMenu.scrollTop=t:null}}},p={data:function(){return{typeAheadPointer:-1}},watch:{filteredOptions:function(){this.typeAheadPointer=0}},methods:{typeAheadUp:function(){this.typeAheadPointer>0&&(this.typeAheadPointer--,this.maybeAdjustScroll&&this.maybeAdjustScroll())},typeAheadDown:function(){this.typeAheadPointer<this.filteredOptions.length-1&&(this.typeAheadPointer++,this.maybeAdjustScroll&&this.maybeAdjustScroll())},typeAheadSelect:function(){this.filteredOptions[this.typeAheadPointer]?this.select(this.filteredOptions[this.typeAheadPointer]):this.taggable&&this.search.length&&this.select(this.search),this.clearSearchOnSelect&&(this.search="")}}},d={props:{loading:{type:Boolean,default:!1}},data:function(){return{mutableLoading:!1}},watch:{search:function(){this.$emit("search",this.search,this.toggleLoading)},loading:function(t){this.mutableLoading=t}},methods:{toggleLoading:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;return this.mutableLoading=null==t?!this.mutableLoading:t}}};function f(t,e,n,o,i,s,r,a){var l,u="function"==typeof t?t.options:t;if(e&&(u.render=e,u.staticRenderFns=n,u._compiled=!0),o&&(u.functional=!0),s&&(u._scopeId="data-v-"+s),r?(l=function(t){(t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext)||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),i&&i.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(r)},u._ssrRegister=l):i&&(l=a?function(){i.call(this,this.$root.$options.shadowRoot)}:i),l)if(u.functional){u._injectStyles=l;var c=u.render;u.render=function(t,e){return l.call(e),c(t,e)}}else{var h=u.beforeCreate;u.beforeCreate=h?[].concat(h,l):[l]}return{exports:t,options:u}}var y={Deselect:f({},function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"10",height:"10"}},[e("path",{attrs:{d:"M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"}})])},[],!1,null,null,null).exports,OpenIndicator:f({},function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"14",height:"10"}},[e("path",{attrs:{d:"M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"}})])},[],!1,null,null,null).exports},b={components:c()({},y),mixins:[h,p,d],props:{value:{},components:{type:Object,default:function(){return{}}},options:{type:Array,default:function(){return[]}},disabled:{type:Boolean,default:!1},clearable:{type:Boolean,default:!0},searchable:{type:Boolean,default:!0},multiple:{type:Boolean,default:!1},placeholder:{type:String,default:""},transition:{type:String,default:"vs__fade"},clearSearchOnSelect:{type:Boolean,default:!0},closeOnSelect:{type:Boolean,default:!0},label:{type:String,default:"label"},autocomplete:{type:String,default:"off"},reduce:{type:Function,default:function(t){return t}},getOptionLabel:{type:Function,default:function(t){if("object"===l()(t)){if(!t.hasOwnProperty(this.label))return;return t[this.label]}return t}},getOptionKey:{type:Function,default:function(t){if("object"===l()(t)&&t.id)return t.id;try{return JSON.stringify(t)}catch(t){return}}},onTab:{type:Function,default:function(){this.selectOnTab&&this.typeAheadSelect()}},taggable:{type:Boolean,default:!1},tabindex:{type:Number,default:null},pushTags:{type:Boolean,default:!1},filterable:{type:Boolean,default:!0},filterBy:{type:Function,default:function(t,e,n){return(e||"").toLowerCase().indexOf(n.toLowerCase())>-1}},filter:{type:Function,default:function(t,e){var n=this;return t.filter(function(t){var o=n.getOptionLabel(t);return"number"==typeof o&&(o=o.toString()),n.filterBy(t,o,e)})}},createOption:{type:Function,default:function(t){return"object"===l()(this.optionList[0])&&(t=r()({},this.label,t)),this.$emit("option:created",t),t}},resetOnOptionsChange:{type:Boolean,default:!1},noDrop:{type:Boolean,default:!1},inputId:{type:String},dir:{type:String,default:"auto"},selectOnTab:{type:Boolean,default:!1},searchInputQuerySelector:{type:String,default:"[type=search]"}},data:function(){return{search:"",open:!1,pushedTags:[],_value:[]}},watch:{options:function(t){!this.taggable&&this.resetOnOptionsChange&&this.clearSelection(),this.value&&this.isTrackingValues&&this.setInternalValueFromOptions(this.value)},value:function(t){this.isTrackingValues&&this.setInternalValueFromOptions(t)},multiple:function(){this.clearSelection()}},created:function(){this.mutableLoading=this.loading,void 0!==this.value&&this.isTrackingValues&&this.setInternalValueFromOptions(this.value),this.$on("option:created",this.maybePushTag)},methods:{setInternalValueFromOptions:function(t){var e=this;Array.isArray(t)?this.$data._value=t.map(function(t){return e.findOptionFromReducedValue(t)}):this.$data._value=this.findOptionFromReducedValue(t)},select:function(t){this.isOptionSelected(t)||(this.taggable&&!this.optionExists(t)&&(t=this.createOption(t)),this.multiple&&(t=this.selectedValue.concat(t)),this.updateValue(t)),this.onAfterSelect(t)},deselect:function(t){var e=this;this.updateValue(this.selectedValue.filter(function(n){return!e.optionComparator(n,t)}))},clearSelection:function(){this.updateValue(this.multiple?[]:null)},onAfterSelect:function(t){this.closeOnSelect&&(this.open=!this.open,this.searchEl.blur()),this.clearSearchOnSelect&&(this.search="")},updateValue:function(t){var e=this;this.isTrackingValues&&(this.$data._value=t),null!==t&&(t=Array.isArray(t)?t.map(function(t){return e.reduce(t)}):this.reduce(t)),this.$emit("input",t)},toggleDropdown:function(t){var e=t.target,n=[this.$el,this.searchEl,this.$refs.toggle];void 0!==this.$refs.openIndicator&&n.push.apply(n,[this.$refs.openIndicator.$el].concat(i()(Array.prototype.slice.call(this.$refs.openIndicator.$el.childNodes)))),(n.indexOf(e)>-1||e.classList.contains("vs__selected"))&&(this.open?this.searchEl.blur():this.disabled||(this.open=!0,this.searchEl.focus()))},isOptionSelected:function(t){var e=this;return this.selectedValue.some(function(n){return e.optionComparator(n,t)})},optionComparator:function(t,e){if("object"!==l()(t)&&"object"!==l()(e)){if(t===e)return!0}else{if(t===this.reduce(e))return!0;if(this.getOptionLabel(t)===this.getOptionLabel(e)||this.getOptionLabel(t)===e)return!0;if(this.reduce(t)===this.reduce(e))return!0}return!1},findOptionFromReducedValue:function(t){var e=this;return this.options.find(function(n){return JSON.stringify(e.reduce(n))===JSON.stringify(t)})||t},closeSearchOptions:function(){this.open=!1,this.$emit("search:blur")},maybeDeleteValue:function(){if(!this.searchEl.value.length&&this.selectedValue&&this.clearable){var t=null;this.multiple&&(t=i()(this.selectedValue.slice(0,this.selectedValue.length-1))),this.updateValue(t)}},optionExists:function(t){var e=this;return this.optionList.some(function(n){return"object"===l()(n)&&e.getOptionLabel(n)===t||n===t})},normalizeOptionForSlot:function(t){return"object"===l()(t)?t:r()({},this.label,t)},maybePushTag:function(t){this.pushTags&&this.pushedTags.push(t)},onEscape:function(){this.search.length?this.search="":this.searchEl.blur()},onSearchBlur:function(){if(!this.mousedown||this.searching)return this.clearSearchOnBlur&&(this.search=""),void this.closeSearchOptions();this.mousedown=!1,0!==this.search.length||0!==this.options.length||this.closeSearchOptions()},onSearchFocus:function(){this.open=!0,this.$emit("search:focus")},onMousedown:function(){this.mousedown=!0},onMouseUp:function(){this.mousedown=!1},onSearchKeyDown:function(t){switch(t.keyCode){case 8:return this.maybeDeleteValue();case 9:return this.onTab()}},onSearchKeyUp:function(t){switch(t.keyCode){case 27:return this.onEscape();case 38:return t.preventDefault(),this.typeAheadUp();case 40:return t.preventDefault(),this.typeAheadDown();case 13:return t.preventDefault(),this.typeAheadSelect()}}},computed:{isTrackingValues:function(){return void 0===this.value||this.$options.propsData.hasOwnProperty("reduce")},selectedValue:function(){var t=this.value;return this.isTrackingValues&&(t=this.$data._value),t?[].concat(t):[]},optionList:function(){return this.options.concat(this.pushedTags)},searchEl:function(){return this.$scopedSlots.search?this.$refs.selectedOptions.querySelector(this.searchInputQuerySelector):this.$refs.search},scope:function(){var t=this;return{search:{attributes:{disabled:this.disabled,placeholder:this.searchPlaceholder,tabindex:this.tabindex,readonly:!this.searchable,id:this.inputId,"aria-expanded":this.dropdownOpen,"aria-label":"Search for option",ref:"search",role:"combobox",type:"search",autocomplete:"off",value:this.search},events:{keydown:this.onSearchKeyDown,keyup:this.onSearchKeyUp,blur:this.onSearchBlur,focus:this.onSearchFocus,input:function(e){return t.search=e.target.value}}},spinner:{loading:this.mutableLoading},openIndicator:{attributes:{ref:"openIndicator",role:"presentation",class:"vs__open-indicator"}}}},childComponents:function(){return c()({},y,this.components)},stateClasses:function(){return{"vs--open":this.dropdownOpen,"vs--single":!this.multiple,"vs--searching":this.searching&&!this.noDrop,"vs--searchable":this.searchable&&!this.noDrop,"vs--unsearchable":!this.searchable,"vs--loading":this.mutableLoading,"vs--disabled":this.disabled}},clearSearchOnBlur:function(){return this.clearSearchOnSelect&&!this.multiple},searching:function(){return!!this.search},dropdownOpen:function(){return!this.noDrop&&(this.open&&!this.mutableLoading)},searchPlaceholder:function(){if(this.isValueEmpty&&this.placeholder)return this.placeholder},filteredOptions:function(){var t=[].concat(this.optionList);if(!this.filterable&&!this.taggable)return t;var e=this.search.length?this.filter(t,this.search,this):t;return this.taggable&&this.search.length&&!this.optionExists(this.search)&&e.unshift(this.search),e},isValueEmpty:function(){return 0===this.selectedValue.length},showClearButton:function(){return!this.multiple&&this.clearable&&!this.open&&!this.isValueEmpty}}},g=(n(8),f(b,function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"v-select",class:t.stateClasses,attrs:{dir:t.dir}},[n("div",{ref:"toggle",staticClass:"vs__dropdown-toggle",on:{mousedown:function(e){return e.preventDefault(),t.toggleDropdown(e)}}},[n("div",{ref:"selectedOptions",staticClass:"vs__selected-options"},[t._l(t.selectedValue,function(e){return t._t("selected-option-container",[n("span",{key:t.getOptionKey(e),staticClass:"vs__selected"},[t._t("selected-option",[t._v("\n            "+t._s(t.getOptionLabel(e))+"\n          ")],null,t.normalizeOptionForSlot(e)),t._v(" "),t.multiple?n("button",{staticClass:"vs__deselect",attrs:{disabled:t.disabled,type:"button","aria-label":"Deselect option"},on:{click:function(n){return t.deselect(e)}}},[n(t.childComponents.Deselect,{tag:"component"})],1):t._e()],2)],{option:t.normalizeOptionForSlot(e),deselect:t.deselect,multiple:t.multiple,disabled:t.disabled})}),t._v(" "),t._t("search",[n("input",t._g(t._b({staticClass:"vs__search"},"input",t.scope.search.attributes,!1),t.scope.search.events))],null,t.scope.search)],2),t._v(" "),n("div",{staticClass:"vs__actions"},[n("button",{directives:[{name:"show",rawName:"v-show",value:t.showClearButton,expression:"showClearButton"}],staticClass:"vs__clear",attrs:{disabled:t.disabled,type:"button",title:"Clear selection"},on:{click:t.clearSelection}},[n(t.childComponents.Deselect,{tag:"component"})],1),t._v(" "),t._t("open-indicator",[t.noDrop?t._e():n(t.childComponents.OpenIndicator,t._b({tag:"component"},"component",t.scope.openIndicator.attributes,!1))],null,t.scope.openIndicator),t._v(" "),t._t("spinner",[n("div",{directives:[{name:"show",rawName:"v-show",value:t.mutableLoading,expression:"mutableLoading"}],staticClass:"vs__spinner"},[t._v("Loading...")])],null,t.scope.spinner)],2)]),t._v(" "),n("transition",{attrs:{name:t.transition}},[t.dropdownOpen?n("ul",{ref:"dropdownMenu",staticClass:"vs__dropdown-menu",attrs:{role:"listbox"},on:{mousedown:t.onMousedown,mouseup:t.onMouseUp}},[t._l(t.filteredOptions,function(e,o){return n("li",{key:t.getOptionKey(e),staticClass:"vs__dropdown-option",class:{"vs__dropdown-option--selected":t.isOptionSelected(e),"vs__dropdown-option--highlight":o===t.typeAheadPointer},attrs:{role:"option"},on:{mouseover:function(e){t.typeAheadPointer=o},mousedown:function(n){return n.preventDefault(),n.stopPropagation(),t.select(e)}}},[t._t("option",[t._v("\n          "+t._s(t.getOptionLabel(e))+"\n        ")],null,t.normalizeOptionForSlot(e))],2)}),t._v(" "),t.filteredOptions.length?t._e():n("li",{staticClass:"vs__no-options",on:{mousedown:function(t){t.stopPropagation()}}},[t._t("no-options",[t._v("Sorry, no matching options.")])],2)],2):t._e()])],1)},[],!1,null,null,null).exports),m={ajax:d,pointer:p,pointerScroll:h};n.d(e,"VueSelect",function(){return g}),n.d(e,"mixins",function(){return m});e.default=g}])});
 //# sourceMappingURL=vue-select.js.map
 
 /***/ }),
